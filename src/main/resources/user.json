@@ -1,51 +1,107 @@
-[{
-  "userId": 1,
-  "userName": "johndoe",
-  "followersCount": 2,
-  "follower": [
-    {
-      "userId": 2,
-      "userName": "janedoe",
-      "followersCount": 1,
-      "follower": [],
-      "following": [],
-      "post": []
-    },
-    {
-      "userId": 3,
-      "userName": "bobsmith",
-      "followersCount": 0,
-      "follower": [],
-      "following": [],
-      "post": []
-    }
-  ],
-  "following": [
-    {
-      "userId": 4,
-      "userName": "alicewhite",
-      "followersCount": 5,
-      "follower": [],
-      "following": [],
-      "post": []
-    }
-  ],
-  "post": [
-    {
-      "userId": 1,
-      "postId": 101,
-      "date": "2025-04-15",
-      "product": {
-        "productId": 501,
-        "productName": "Sneakers",
-        "type": "Footwear",
-        "brand": "Nike",
-        "color": "Red",
-        "notes": "Limited edition"
+[
+  {
+    "userId": 1,
+    "userName": "johndoe",
+    "followersCount": 2,
+    "follower": [
+      {
+        "userId": 2,
+        "userName": "janedoe",
+        "followersCount": 1,
+        "follower": [],
+        "following": [],
+        "post": []
       },
-      "category": 10,
-      "price": 199.99
-    }
-  ]
-}
+      {
+        "userId": 3,
+        "userName": "bobsmith",
+        "followersCount": 0,
+        "follower": [],
+        "following": [],
+        "post": []
+      }
+    ],
+    "following": [
+      {
+        "userId": 4,
+        "userName": "alicewhite",
+        "followersCount": 5,
+        "follower": [],
+        "following": [],
+        "post": [
+          {
+            "userId": 4,
+            "postId": 102,
+            "date": "2025-04-16",
+            "product": {
+              "productId": 502,
+              "productName": "Running Shoes",
+              "type": "Footwear",
+              "brand": "Adidas",
+              "color": "Blue",
+              "notes": ""
+            },
+            "category": 10,
+            "price": 129.99
+          }
+        ]
+      }
+    ],
+    "post": [
+      {
+        "userId": 1,
+        "postId": 101,
+        "date": "2025-04-15",
+        "product": {
+          "productId": 501,
+          "productName": "Sneakers",
+          "type": "Footwear",
+          "brand": "Nike",
+          "color": "Red",
+          "notes": "Limited edition"
+        },
+        "category": 10,
+        "price": 199.99
+      }
+    ]
+  },
+  {
+    "userId": 4,
+    "userName": "alicewhite",
+    "followersCount": 5,
+    "follower": [],
+    "following": [],
+    "post": [
+      {
+        "userId": 4,
+        "postId": 102,
+        "date": "2025-04-16",
+        "product": {
+          "productId": 502,
+          "productName": "Running Shoes",
+          "type": "Footwear",
+          "brand": "Adidas",
+          "color": "Blue",
+          "notes": ""
+        },
+        "category": 10,
+        "price": 129.99
+      },
+      {
+        "userId": 4,
+        "postId": 103,
+        "date": "2022-04-16",
+        "product": {
+          "productId": 502,
+          "productName": "Running Shoes 2!",
+          "type": "Footwear",
+          "brand": "Adidas",
+          "color": "Red",
+          "notes": ""
+        },
+        "category": 10,
+        "price": 129.99
+      }
+    ]
+  }
 ]

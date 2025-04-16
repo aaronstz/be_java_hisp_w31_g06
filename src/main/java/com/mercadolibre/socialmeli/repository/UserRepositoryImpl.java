@@ -2,6 +2,7 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import org.springframework.stereotype.Repository;
@@ -9,12 +10,16 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements IUserRepository {
+
     private List<User> listOfUsers = new ArrayList<>();
 
     public UserRepositoryImpl() throws IOException {
@@ -47,9 +52,28 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public User findUserById(Integer userId) {// TODO ❤️
+    public User findUserById(Integer userId) {
+        return listOfUsers.stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+    }
 
-        return null;
+    @Override
+    public Set<Post> findRecentPostsForUser(Integer userId) {
+        User user = listOfUsers.stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+        if (user == null) {
+            return null;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return user.getPost().stream()
+                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(LocalDate.now().minusDays(14)))
+                .collect(Collectors.toSet());
     }
 
     private void loadDataBase() throws IOException {
@@ -63,5 +87,4 @@ public class UserRepositoryImpl implements IUserRepository {
 
         this.listOfUsers = userList;
     }
-
 }

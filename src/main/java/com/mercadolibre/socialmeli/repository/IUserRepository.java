@@ -1,11 +1,11 @@
 package com.mercadolibre.socialmeli.repository;
 
+import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import java.util.Set;
 
 public interface IUserRepository {
-
 
     void saveFollow(Integer userId, Integer userIdToFollow);
 
@@ -18,4 +18,6 @@ public interface IUserRepository {
     void removeFollow(Integer userId, Integer userIdToUnFollow);
 
     User findUserById(Integer userId);
+
+    public Set<Post> findRecentPostsForUser(Integer userId);
 }
