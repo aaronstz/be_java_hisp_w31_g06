@@ -65,7 +65,8 @@ public class ProductServiceImpl implements IProductService {
 
         if (allRecentPosts.isEmpty()) {
             throw new NotFoundException(
-                    "No se encontraron publicaciones para los seguidos del usuario con ID: " + userId);
+                    "No se encontraron publicaciones de las últimas 2 semanas para los seguidos del usuario con ID: "
+                            + userId);
         }
 
         FollowingPostDto result = new FollowingPostDto();

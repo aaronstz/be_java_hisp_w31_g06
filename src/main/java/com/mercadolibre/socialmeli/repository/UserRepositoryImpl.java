@@ -11,6 +11,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -68,8 +69,10 @@ public class UserRepositoryImpl implements IUserRepository {
             return null;
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         return user.getPost().stream()
-                .filter(p -> p.getDate().isAfter(LocalDate.now().minusDays(14)))
+                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(LocalDate.now().minusDays(14)))
                 .collect(Collectors.toSet());
     }
 

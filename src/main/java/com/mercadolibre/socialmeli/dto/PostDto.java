@@ -14,8 +14,8 @@ import java.time.LocalDate;
 public class PostDto implements Serializable {
     private Integer userId;
     private Integer postId;
-    private LocalDate date;
+    private String date;
     private Product product;
     private Integer category;
-    private Double precio;
+    private Double price;
 }
