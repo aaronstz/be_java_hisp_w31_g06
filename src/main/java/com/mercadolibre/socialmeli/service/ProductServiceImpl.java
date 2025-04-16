@@ -1,6 +1,5 @@
 package com.mercadolibre.socialmeli.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -16,6 +15,9 @@ import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IProductRepository;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
+import com.mercadolibre.socialmeli.dto.ProductDto;
+import com.mercadolibre.socialmeli.entity.Post;
+import com.mercadolibre.socialmeli.entity.Product;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -25,8 +27,20 @@ public class ProductServiceImpl implements IProductService {
     private IUserRepository userRepository;
 
     @Override
-    public void createPost(PostDto post) { // TODO ❤️
+    public List<ProductDto> getAll() {
+        List<Product> allProducts = productRepository.findAll();
 
+        if (allProducts.isEmpty()) {
+            throw new NotFoundException("No se encontraron productos.");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        return allProducts.stream().map(p -> mapper.convertValue(p, ProductDto.class)).toList();
+    }
+
+    @Override
+    public String createPost(Post post) { // TODO ❤️
+        return "";
     }
 
     @Override
@@ -43,7 +57,7 @@ public class ProductServiceImpl implements IProductService {
 
         ObjectMapper mapper = new ObjectMapper();
         List<PostDto> allRecentPosts = followingList.stream()
-                .map(seller -> productRepository.findRecentPostsForUser(seller.getUserId()))
+                .map(seller -> userRepository.findRecentPostsForUser(seller.getUserId()))
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
                 .map(post -> mapper.convertValue(post, PostDto.class))
@@ -59,4 +73,5 @@ public class ProductServiceImpl implements IProductService {
         result.setPostDto(allRecentPosts);
         return result;
     }
+
 }
