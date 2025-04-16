@@ -1,0 +1,50 @@
+{
+  "userId": 1,
+  "userName": "johndoe",
+  "followersCount": 2,
+  "follower": [
+    {
+      "userId": 2,
+      "userName": "janedoe",
+      "followersCount": 1,
+      "follower": [],
+      "following": [],
+      "post": []
+    },
+    {
+      "userId": 3,
+      "userName": "bobsmith",
+      "followersCount": 0,
+      "follower": [],
+      "following": [],
+      "post": []
+    }
+  ],
+  "following": [
+    {
+      "userId": 4,
+      "userName": "alicewhite",
+      "followersCount": 5,
+      "follower": [],
+      "following": [],
+      "post": []
+    }
+  ],
+  "post": [
+    {
+      "userId": 1,
+      "postId": 101,
+      "date": "2025-04-15",
+      "product": {
+        "productId": 501,
+        "productName": "Sneakers",
+        "type": "Footwear",
+        "brand": "Nike",
+        "color": "Red",
+        "notes": "Limited edition"
+      },
+      "category": 10,
+      "precio": 199.99
+    }
+  ]
+}
