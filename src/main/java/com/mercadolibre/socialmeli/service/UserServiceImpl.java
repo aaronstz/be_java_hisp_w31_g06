@@ -26,6 +26,7 @@ public class UserServiceImpl implements IUserService {
     public UserServiceImpl(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     @Override
     public List<UserDto> getAll() {
         List<User> userList = userRepository.findAll();
@@ -39,7 +40,7 @@ public class UserServiceImpl implements IUserService {
         return userList.stream().map(u -> mapper.convertValue(u, UserDto.class)).toList();
     }
 
-    Override
+    @Override
     public String follow(Integer userId, Integer userIdToFollow) {// TODO ❤️
         if (userId.equals(userIdToFollow)) {
             throw new ConflictException("Un usuario no puede seguirse a sí mismo");
@@ -93,5 +94,14 @@ public class UserServiceImpl implements IUserService {
         }
 
         userRepository.removeFollow(user, userToUnFollow);
+    }
+    private List<User> getListOfUsers() {
+        List<User> userList = userRepository.findAll();
+
+        if(userList.isEmpty()) {
+            throw new NotFoundException("No se encontraron productos.");
+        }
+
+        return userList;
     }
 }
