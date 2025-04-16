@@ -1,6 +1,8 @@
 package com.mercadolibre.socialmeli.controller;
 
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
+import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.service.IProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +31,10 @@ public class ProductsController {
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<?> getRecentSellerPostsForUser(@PathVariable Integer userId) {
         return new ResponseEntity<>(productService.getRecentSellerPostsForUser(userId), HttpStatus.OK);
+    }
+
+    @PostMapping("/post")
+    public ResponseEntity<PostDto> createPost(@RequestBody Post post) {
+        return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
 }

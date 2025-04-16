@@ -18,6 +18,7 @@ import com.mercadolibre.socialmeli.repository.IUserRepository;
 import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
+import com.mercadolibre.socialmeli.exception.AlreadyExistsException;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -28,7 +29,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<ProductDto> getAll() {
-        List<Product> allProducts = productRepository.findAll();
+        List<Product> allProducts = productRepository.findAllProducts();
 
         if (allProducts.isEmpty()) {
             throw new NotFoundException("No se encontraron productos.");
@@ -39,8 +40,14 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public String createPost(Post post) { // TODO ❤️
-        return "";
+    public PostDto createPost(Post post) {
+        Boolean saved = productRepository.saveProduct(post.getProduct());
+        if (!saved) {
+            throw new AlreadyExistsException("Ya existe un producto con el id " + post.getProduct().getProductId());
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        post.setPostId(productRepository.findAllPosts().size() + 1);
+        return mapper.convertValue(post, PostDto.class);
     }
 
     @Override
