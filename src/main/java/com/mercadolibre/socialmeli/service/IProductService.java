@@ -4,12 +4,11 @@ import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.Product;
 
 import java.util.List;
 
 public interface IProductService {
     List<ProductDto> getAll();
-    String createPost(Post post);
+    PostDto createPost(Post post);
     FollowingPostDto getPost(Integer userId);
 }
