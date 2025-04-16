@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.repository;
 
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
@@ -18,7 +19,7 @@ public interface IUserRepository {
 
     Set<User> findFollowersList(Integer userId);
 
-    Set<User> findFollowingList(Integer userId);
+    Set<Follow> findFollowingList(Integer userId);
 
     void removeFollow(Integer userId, Integer userIdToUnFollow);
 

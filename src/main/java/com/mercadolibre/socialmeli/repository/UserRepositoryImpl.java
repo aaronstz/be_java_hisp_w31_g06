@@ -83,8 +83,16 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public Set<User> findFollowingList(Integer userId) { // TODO ❤️
-        return null;
+    public Set<Follow> findFollowingList(Integer userId) {
+        User foundUser = findUserById(userId);
+        if (foundUser == null) {
+            return null;
+        }
+        Set<Follow> foundFollowing = foundUser.getFollowing();
+        if (foundFollowing.isEmpty()) {
+            return null;
+        }
+        return foundFollowing;
     }
 
     @Override

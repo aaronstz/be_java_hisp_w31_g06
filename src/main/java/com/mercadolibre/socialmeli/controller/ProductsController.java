@@ -37,4 +37,5 @@ public class ProductsController {
     public ResponseEntity<PostDto> createPost(@RequestBody Post post) {
         return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
+
 }
