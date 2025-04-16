@@ -7,13 +7,14 @@ import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Following;
+import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,8 +32,23 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void follow(Integer userId, Integer userIdToFollow) {// TODO ❤️
+    public String follow(Integer userId, Integer userIdToFollow) {
+        if (userId.equals(userIdToFollow)) {
+            throw new ConflictException("Un usuario no puede seguirse a sí mismo");
+        }
 
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new NotFoundException("No se encontró al seguidor");
+        }
+        if (userRepository.isUserAlreadyFollowing(userId, userIdToFollow)) {
+            throw new ConflictException("El usuario ya sigue al otro");
+        }
+
+        userRepository.saveFollow(userId, userIdToFollow);
+
+        return "El usuario " + userId + " siguio a " + userIdToFollow;
     }
 
     @Override
@@ -69,6 +85,16 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void unFollow(Integer userId, Integer userIdToUnFollow) {// TODO ❤️
 
+    }
+
+    private List<User> getListOfUsers() {
+        List<User> userList = userRepository.findAll();
+
+        if(userList.isEmpty()) {
+            throw new NotFoundException("No se encontraron productos.");
+        }
+
+        return userList;
     }
 
 }

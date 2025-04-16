@@ -12,7 +12,7 @@ public interface IUserService {
 
     List<UserDto> getAll();
 
-    void follow(Integer userId, Integer userIdToFollow);
+    String follow(Integer userId, Integer userIdToFollow);
 
     FollowerCountDto getFollowersCount(Integer userId);
 

@@ -2,15 +2,10 @@ package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
-import com.mercadolibre.socialmeli.dto.UserListDto;
-import com.mercadolibre.socialmeli.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.mercadolibre.socialmeli.service.IUserService;
 
@@ -25,6 +20,11 @@ public class UserController {
     @GetMapping()
     public ResponseEntity<List<UserDto>> getAllPosts() {
         return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+    }
+
+    @PostMapping("/{userId}/follow/{userIdToFollow}")
+    public ResponseEntity<String> follow(@PathVariable int userId, @PathVariable int userIdToFollow) {
+        return new ResponseEntity<>(userService.follow(userId, userIdToFollow), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/followed/list")
