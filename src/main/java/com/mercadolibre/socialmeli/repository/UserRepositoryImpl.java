@@ -45,6 +45,9 @@ public class UserRepositoryImpl implements IUserRepository {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("No se encontró al seguidor"));
 
+
+        userToFollow.setFollowersCount(userToFollow.getFollowersCount() + 1);
+
         Follow newFollower = new Follow(user.getUserId(), user.getUserName());
 
         userToFollow.getFollower().add(newFollower);
