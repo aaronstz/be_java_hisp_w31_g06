@@ -13,7 +13,7 @@ public class User {
     private Integer userId;
     private String userName;
     private Integer followersCount;
-    private Set<User> follower;
-    private Set<User> following;
+    private Set<Follow> follower;
+    private Set<Follow> following;
     private Set<Post> post;
 }
