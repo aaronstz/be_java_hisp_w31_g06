@@ -22,4 +22,5 @@ public interface IUserRepository {
 
     boolean existsById(Integer userId);
 
+    boolean isFollowing(Integer userId, Integer userIdToUnfollow);
 }

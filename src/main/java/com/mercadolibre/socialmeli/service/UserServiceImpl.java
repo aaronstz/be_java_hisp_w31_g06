@@ -42,25 +42,15 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String unFollow(Integer userId, Integer userIdToUnfollow) {
-        if (userId.equals(userIdToUnfollow)) {
-            throw new BadRequestException("No podés dejar de seguirte a vos mismo.");
-        }
 
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Usuario con ID " + userId + " no existe.");
         }
 
-        if (!userRepository.existsById(userIdToUnfollow)) {
-            throw new NotFoundException("Usuario con ID " + userIdToUnfollow + " no existe.");
-        }
-
-        User user = userRepository.findUserById(userId);
-        User toUnfollow = userRepository.findUserById(userIdToUnfollow);
-
-        if (!user.getFollowing().contains(toUnfollow)) {
+        if (!userRepository.isFollowing(userId, userIdToUnfollow)) {
             throw new BadRequestException("El usuario " + userId + " no sigue al usuario " + userIdToUnfollow);
-
         }
+
         userRepository.removeFollow(userId, userIdToUnfollow);
         return "El usuario " + userId + " dejó de seguir a " + userIdToUnfollow + " correctamente.";
 

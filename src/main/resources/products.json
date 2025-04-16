@@ -1,0 +1,82 @@
+[
+  {
+    "productId": 1,
+    "productName": "Silla Gamer Racer X",
+    "type": "Gamer",
+    "brand": "Racer",
+    "color": "Red & Black",
+    "notes": "Special Edition with Lumbar Support"
+  },
+  {
+    "productId": 2,
+    "productName": "Monitor Curvo 27\"",
+    "type": "Display",
+    "brand": "Visionary",
+    "color": "Black",
+    "notes": "144Hz Refresh Rate"
+  },
+  {
+    "productId": 3,
+    "productName": "Teclado Mecánico RGB",
+    "type": "Input Device",
+    "brand": "KeyMaster",
+    "color": "Black",
+    "notes": "Cherry MX Brown Switches"
+  },
+  {
+    "productId": 4,
+    "productName": "Mouse Gamer Inalámbrico",
+    "type": "Input Device",
+    "brand": "SwiftClick",
+    "color": "White",
+    "notes": "High Precision Sensor"
+  },
+  {
+    "productId": 5,
+    "productName": "Auriculares Gamer 7.1",
+    "type": "Audio",
+    "brand": "SoundBlaster",
+    "color": "Black & Green",
+    "notes": "Noise Cancelling Microphone"
+  },
+  {
+    "productId": 6,
+    "productName": "Escritorio Gamer Ergonómico",
+    "type": "Furniture",
+    "brand": "ErgoDesk",
+    "color": "Black & Carbon Fiber",
+    "notes": "Adjustable Height"
+  },
+  {
+    "productId": 7,
+    "productName": "Alfombrilla de Ratón XL",
+    "type": "Accessory",
+    "brand": "SmoothGlide",
+    "color": "Black",
+    "notes": "Water Resistant Surface"
+  },
+  {
+    "productId": 8,
+    "productName": "Soporte para Auriculares RGB",
+    "type": "Accessory",
+    "brand": "HeadRest",
+    "color": "Black",
+    "notes": "Multiple USB Ports"
+  },
+  {
+    "productId": 9,
+    "productName": "Webcam 1080p HD",
+    "type": "Video",
+    "brand": "ClearView",
+    "color": "Black",
+    "notes": "Built-in Microphone"
+  },
+  {
+    "productId": 10,
+    "productName": "Controlador Gamer Inalámbrico",
+    "type": "Input Device",
+    "brand": "GamePro",
+    "color": "Blue & Black",
+    "notes": "Compatible with PC & Consoles"
+  }
+]
