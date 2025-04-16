@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.mercadolibre.socialmeli.entity.Follow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +59,7 @@ public class ProductServiceImpl implements IProductService {
             throw new NotFoundException("No se encontró un usuario con ID: " + userId);
         }
 
-        Set<User> followingList = user.getFollowing();
+        Set<Follow> followingList = user.getFollowing();
         if (followingList == null || followingList.isEmpty()) {
             throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
         }

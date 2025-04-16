@@ -2,9 +2,11 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
+import com.mercadolibre.socialmeli.exception.NotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
@@ -27,9 +29,48 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public void saveFollow(Integer userId, Integer userIdToFollow) { // TODO ❤️
-
+    public List<User> findAll() {
+        return listOfUsers;
     }
+
+    @Override
+    public void saveFollow(Integer userId, Integer userIdToFollow) {
+        User userToFollow = listOfUsers.stream()
+                .filter(utf -> utf.getUserId().equals(userIdToFollow))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No se encontró el usuario a seguir"));
+
+        User user = listOfUsers.stream()
+                .filter(ul -> ul.getUserId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No se encontró al seguidor"));
+
+
+        userToFollow.setFollowersCount(userToFollow.getFollowersCount() + 1);
+
+        Follow newFollower = new Follow(user.getUserId(), user.getUserName());
+
+        userToFollow.getFollower().add(newFollower);
+
+        Follow newFollowing = new Follow(userToFollow.getUserId(), userToFollow.getUserName());
+
+        user.getFollowing().add(newFollowing);
+    }
+
+    @Override
+    public boolean isUserAlreadyFollowing(Integer userId, Integer userIdToFollow) {
+        User userToFollow = listOfUsers.stream()
+                .filter(utf -> utf.getUserId().equals(userIdToFollow))
+                .findFirst()
+                .orElse(null);
+
+        if (userToFollow == null) {
+            return false;
+        }
+
+        return userToFollow.getFollower().stream().anyMatch(utf -> utf.getUserId().equals(userId));
+    }
+
 
     @Override
     public Integer findFollowersCount(Integer userId) { // TODO ❤️
