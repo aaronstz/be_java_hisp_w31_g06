@@ -43,20 +43,16 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public void removeFollow(Integer userId, Integer userIdToUnFollow) { //TODO ❤️
-        User user = listOfUsers.get(userId);
-        User toUnfollow = listOfUsers.get(userIdToUnFollow);
-
-        user.getFollowing().remove(toUnfollow);
-        toUnfollow.getFollowing().remove(user);
+    public void removeFollow(User user, User toUnFollow) { //TODO ❤️
+        user.getFollowing().remove(toUnFollow);
+        toUnFollow.getFollowing().remove(user);
     }
 
     @Override
-    public User findUserById(Integer userId) {//TODO ❤️
+    public Optional<User> findUserById(Integer userId) {//TODO ❤️
         return listOfUsers.stream()
                 .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow(()->new NotFoundException("usuario no encontrado"));
+                .findFirst();
     }
 
     @Override
@@ -68,7 +64,7 @@ public class UserRepositoryImpl implements IUserRepository {
     @Override
     public boolean isFollowing(Integer userId, Integer userIdToUnFollow) {
 
-        User user = listOfUsers.get(userId);
+        User user = findUserById(userId).orElseThrow();
         User toUnfollow = listOfUsers.get(userIdToUnFollow);
 
         return user.getFollowing().contains(toUnfollow);

@@ -16,9 +16,9 @@ public interface IUserRepository {
 
     Set<User> findFollowingList(Integer userId);
 
-    void removeFollow(Integer userId, Integer userIdToUnFollow);
+    void  removeFollow(User user, User toUnFollow) ;
 
-    User findUserById(Integer userId);
+    Optional<User> findUserById(Integer userId);
 
     boolean existsById(Integer userId);
 
