@@ -46,9 +46,7 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("Un usuario no puede seguirse a sí mismo");
         }
 
-        List<User> userList = getListOfUsers();
-
-        User user = userList.stream().filter(ul -> ul.getUserId().equals(userId)).findFirst().orElse(null);
+        User user = userRepository.findUserById(userId);
 
         if (user == null) {
             throw new NotFoundException("No se encontró al seguidor");
