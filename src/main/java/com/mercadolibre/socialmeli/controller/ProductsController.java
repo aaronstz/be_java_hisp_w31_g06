@@ -1,6 +1,8 @@
 package com.mercadolibre.socialmeli.controller;
 
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
+import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.service.IProductService;
 import com.mercadolibre.socialmeli.service.ProductServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -22,5 +24,10 @@ public class ProductsController {
     @GetMapping()
     public ResponseEntity<List<ProductDto>> getAllPosts() {
         return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
+    }
+
+    @PostMapping("/post")
+    public ResponseEntity<PostDto> createPost(@RequestBody Post post) {
+        return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
 }
