@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 @Repository
 public class ProductRepositoryImpl implements IProductRepository {
@@ -30,6 +30,24 @@ public class ProductRepositoryImpl implements IProductRepository {
     @Override
     public List<Post> findAllPosts() {
         return listOfPosts;
+    }
+
+    @Override
+    public Integer createNewId() {
+        if (listOfPosts.isEmpty()) {
+            return 1;
+        }
+        Integer maxId = listOfPosts.stream()
+                .map(Post::getPostId)
+                .filter(Objects::nonNull)
+                .max(Integer::compare)
+                .orElse(0);
+        return maxId + 1;
+    }
+
+    @Override
+    public void savePost(Post post) {
+        listOfPosts.add(post);
     }
 
     @Override

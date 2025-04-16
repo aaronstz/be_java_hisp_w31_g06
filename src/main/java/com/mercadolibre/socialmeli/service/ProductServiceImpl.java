@@ -46,7 +46,8 @@ public class ProductServiceImpl implements IProductService {
             throw new AlreadyExistsException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
         ObjectMapper mapper = new ObjectMapper();
-        post.setPostId(productRepository.findAllPosts().size() + 1);
+        post.setPostId(productRepository.createNewId());
+        productRepository.savePost(post);
         return mapper.convertValue(post, PostDto.class);
     }
 
