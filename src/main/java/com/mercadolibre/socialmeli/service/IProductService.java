@@ -6,5 +6,6 @@ import com.mercadolibre.socialmeli.dto.PostDto;
 public interface IProductService {
 
     void createPost(PostDto post);
-    FollowingPostDto getPost(Integer userId);
+
+    FollowingPostDto getRecentSellerPostsForUser(Integer userId);
 }

@@ -8,7 +8,7 @@ public interface IProductRepository {
 
     void savePost(Post post);
 
-    Set<Post> findPost(Integer userId);
+    Set<Post> findRecentPostsForUser(Integer userId);
 
     Post findPostById(Integer postId);
 
