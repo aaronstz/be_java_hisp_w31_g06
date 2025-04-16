@@ -7,6 +7,7 @@ import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
 import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
+import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
@@ -46,12 +47,22 @@ private UserDto mapToDto(User user){
         return mapper.convertValue(user, UserDto.class);
 }
     @Override
-    public void unFollow(Integer userId, Integer userIdToUnfollow) {
-        User userToUnfollow = userRepository.findUserById(userIdToUnfollow);
-        if (userToUnfollow == null) {
-            throw new NotFoundException("Usuario con ID " + userIdToUnfollow + " no encontrado");
+    public void unFollow(Integer userId, Integer userIdToUnFollow) {
+        if (userId.equals(userIdToUnFollow)) {
+            throw new ConflictException("Un usuario no puede dejar de seguirse.");
         }
 
-        userToUnfollow.getFollowing().remove(userToUnfollow);
+        User user = userRepository.findUserById(userId);
+        User userToUnFollow = userRepository.findUserById(userIdToUnFollow);
+
+        if (user == null || userToUnFollow == null) {
+            throw new NotFoundException("Uno de los usuarios no fue encontrado");
+        }
+
+        if (!userRepository.isFollowing(userId, userIdToUnFollow)) {
+            throw new ConflictException("Ni se puede dejar de seguir a un usuario que no estás siguiendo");
+        }
+
+        userRepository.removeFollow(user, userToUnFollow);
     }
 }

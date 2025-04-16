@@ -52,9 +52,11 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public void removeFollow(User user, User toUnFollow) { //TODO ❤️
-        user.getFollowing().remove(toUnFollow);
-        toUnFollow.getFollowing().remove(user);
+    public void removeFollow(User user, User toUnFollow) {
+        toUnFollow.getFollower().removeIf(f -> f.getUserId().equals(user.getUserId()));
+        toUnFollow.setFollowersCount(toUnFollow.getFollowersCount() - 1);
+
+        user.getFollowing().removeIf(f -> f.getUserId().equals(toUnFollow.getUserId()));
     }
 
     @Override
@@ -90,13 +92,13 @@ public class UserRepositoryImpl implements IUserRepository {
 
     @Override
     public boolean isFollowing(Integer userId, Integer userIdToUnFollow) {
-
         User user = findUserById(userId);
-        User toUnfollow = listOfUsers.get(userIdToUnFollow);
-
-        return user.getFollowing().contains(toUnfollow);
+        if (user == null) {
+            return false;
+        }
+        return user.getFollowing().stream()
+                .anyMatch(f -> f.getUserId().equals(userIdToUnFollow));
     }
-
 
     private void loadDataBase() throws IOException {
         File file;
