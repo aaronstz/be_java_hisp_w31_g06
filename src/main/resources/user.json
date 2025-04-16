@@ -45,6 +45,30 @@
             "price": 129.99
           }
         ]
+      },
+      {
+        "userId": 2,
+        "userName": "charliebrown",
+        "followersCount": 3,
+        "follower": [],
+        "following": [],
+        "post": [
+          {
+            "userId": 2,
+            "postId": 105,
+            "date": "2025-04-18",
+            "product": {
+              "productId": 504,
+              "productName": "Formal Shoes",
+              "type": "Footwear",
+              "brand": "Clarks",
+              "color": "Brown",
+              "notes": ""
+            },
+            "category": 10,
+            "price": 149.99
+          }
+        ]
       }
     ],
     "post": [
@@ -90,7 +114,7 @@
       {
         "userId": 4,
         "postId": 103,
-        "date": "2022-04-16",
+        "date": "2025-04-15",
         "product": {
           "productId": 502,
           "productName": "Running Shoes 2!",
@@ -103,5 +127,37 @@
         "price": 129.99
       }
     ]
+  },
+  {
+    "userId": 2,
+    "userName": "janedoe",
+    "followersCount": 1,
+    "follower": [],
+    "following": [],
+    "post": [
+      {
+        "userId": 2,
+        "postId": 104,
+        "date": "2025-04-17",
+        "product": {
+          "productId": 503,
+          "productName": "Casual Shoes",
+          "type": "Footwear",
+          "brand": "Puma",
+          "color": "Black",
+          "notes": ""
+        },
+        "category": 10,
+        "price": 89.99
+      }
+    ]
+  },
+  {
+    "userId": 3,
+    "userName": "bobsmith",
+    "followersCount": 0,
+    "follower": [],
+    "following": [],
+    "post": []
   }
 ]

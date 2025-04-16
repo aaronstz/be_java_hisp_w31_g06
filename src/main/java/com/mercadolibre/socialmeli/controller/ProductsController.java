@@ -24,13 +24,14 @@ public class ProductsController {
         return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
     }
 
-    /*
-     * US 006: Obtener un listado de las publicaciones realizadas por los vendedores
-     * que un usuario sigue en las últimas dos semanas
-     */
     @GetMapping("/followed/{userId}/list")
-    public ResponseEntity<?> getRecentSellerPostsForUser(@PathVariable Integer userId) {
-        return new ResponseEntity<>(productService.getRecentSellerPostsForUser(userId), HttpStatus.OK);
+    public ResponseEntity<?> getRecentSellerPostsForUser(@PathVariable Integer userId,
+            @RequestParam(defaultValue = "date_asc") String order) {
+
+        if (!order.equals("date_asc") && !order.equals("date_desc")) {
+            return new ResponseEntity<>("El orden solo puede ser 'date_asc' o 'date_desc'", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(productService.getRecentSellerPostsForUser(userId, order), HttpStatus.OK);
     }
 
     @PostMapping("/post")
