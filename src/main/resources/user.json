@@ -1,4 +1,4 @@
-{
+[{
   "userId": 1,
   "userName": "johndoe",
   "followersCount": 2,
@@ -44,7 +44,8 @@
         "notes": "Limited edition"
       },
       "category": 10,
-      "precio": 199.99
+      "price": 199.99
     }
   ]
 }
+]

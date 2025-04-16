@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 public interface IProductRepository {
-    List<Product> findAll();
+    List<Product> findAllProducts();
+    List<Post> findAllPosts();
 
-    void savePost(Post post);
+    Boolean saveProduct(Product product);
 
     Set<Post> findPost(Integer userId);
 
