@@ -7,10 +7,11 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class UserRepositoryImpl implements IUserRepository{
+
+    private  final Map<Integer, User> users =new HashMap<>();
     @Override
     public void saveFollow(Integer userId, Integer userIdToFollow) { //TODO ❤️
 
@@ -33,13 +34,28 @@ public class UserRepositoryImpl implements IUserRepository{
 
     @Override
     public void removeFollow(Integer userId, Integer userIdToUnFollow) { //TODO ❤️
+        User user = users.get(userId);
+        User toUnfollow = users.get(userIdToUnFollow);
 
+        user.getFollowing().remove(toUnfollow);
+        toUnfollow.getFollowing().remove(user);
     }
 
     @Override
     public User findUserById(Integer userId) {//TODO ❤️
-
-        return null;
+        return users.get(userId);
     }
 
-}
+    @Override
+    public boolean existsById(Integer userId) {
+        return users.containsKey(userId);
+    }
+
+
+    }
+
+
+
+
+
+

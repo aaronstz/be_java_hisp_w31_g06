@@ -13,6 +13,6 @@ public interface IUserService {
 
     UserListDto getFollowedList(Integer userId);
 
-    void unFollow(Integer userId, Integer userIdToUnFollow);
+    String unFollow(Integer userId, Integer userIdToUnFollow);
 
 }

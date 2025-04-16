@@ -2,6 +2,7 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.mercadolibre.socialmeli.entity.User;
 
+import java.util.Optional;
 import java.util.Set;
 
 public interface IUserRepository {
@@ -18,4 +19,7 @@ public interface IUserRepository {
     void removeFollow(Integer userId, Integer userIdToUnFollow);
 
     User findUserById(Integer userId);
+
+    boolean existsById(Integer userId);
+
 }
