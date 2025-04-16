@@ -73,8 +73,8 @@ public class UserRepositoryImpl implements IUserRepository {
 
 
     @Override
-    public Integer findFollowersCount(Integer userId) { // TODO ❤️
-        return null;
+    public User findFollowersCount(Integer userId) {
+        return findUserById(userId);
     }
 
     @Override

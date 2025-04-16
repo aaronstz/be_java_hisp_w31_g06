@@ -14,7 +14,7 @@ public interface IUserRepository {
 
     boolean isUserAlreadyFollowing(Integer userId, Integer userIdToFollow);
 
-    Integer findFollowersCount(Integer userId);
+    User findFollowersCount(Integer userId);
 
     Set<User> findFollowersList(Integer userId);
 
