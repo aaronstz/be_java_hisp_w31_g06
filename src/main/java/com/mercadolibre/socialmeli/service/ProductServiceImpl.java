@@ -56,7 +56,7 @@ public class ProductServiceImpl implements IProductService {
     private List<PostDto> orderPosts(List<PostDto> posts, String order) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        if (order.equalsIgnoreCase("date_desc")) {
+        if (order.equalsIgnoreCase("date_asc")) {
             return posts.stream()
                     .sorted((p1, p2) -> LocalDate.parse(p1.getDate(), formatter).compareTo(LocalDate.parse(p2.getDate(),
                             formatter)))

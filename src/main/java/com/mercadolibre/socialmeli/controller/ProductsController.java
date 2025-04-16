@@ -26,7 +26,7 @@ public class ProductsController {
 
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<?> getRecentSellerPostsForUser(@PathVariable Integer userId,
-            @RequestParam(defaultValue = "date_asc") String order) {
+            @RequestParam(defaultValue = "date_desc") String order) {
 
         if (!order.equals("date_asc") && !order.equals("date_desc")) {
             return new ResponseEntity<>("El orden solo puede ser 'date_asc' o 'date_desc'", HttpStatus.BAD_REQUEST);
