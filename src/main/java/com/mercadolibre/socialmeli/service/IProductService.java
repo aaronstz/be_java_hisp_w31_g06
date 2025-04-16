@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface IProductService {
     List<ProductDto> getAll();
+
     PostDto createPost(Post post);
-    FollowingPostDto getPost(Integer userId);
+
+    FollowingPostDto getRecentSellerPostsForUser(Integer userId);
 }

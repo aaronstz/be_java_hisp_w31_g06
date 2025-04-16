@@ -14,7 +14,7 @@ public interface IProductRepository {
 
     Boolean saveProduct(Product product);
 
-    Set<Post> findPost(Integer userId);
+    Set<Post> findRecentPostsForUser(Integer userId);
 
     Post findPostById(Integer postId);
 

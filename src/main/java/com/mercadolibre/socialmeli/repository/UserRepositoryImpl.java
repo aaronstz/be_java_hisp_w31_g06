@@ -2,20 +2,29 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import com.mercadolibre.socialmeli.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Repository
 public class UserRepositoryImpl implements IUserRepository {
+
+
     private List<User> listOfUsers = new ArrayList<>();
 
     public UserRepositoryImpl() throws IOException {
@@ -49,10 +58,28 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public Optional<User> findUserById(Integer userId) {//TODO ❤️
+    public User findUserById(Integer userId) {
         return listOfUsers.stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst();
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public Set<Post> findRecentPostsForUser(Integer userId) {
+        User user = listOfUsers.stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+        if (user == null) {
+            return null;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return user.getPost().stream()
+                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(LocalDate.now().minusDays(14)))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -64,7 +91,7 @@ public class UserRepositoryImpl implements IUserRepository {
     @Override
     public boolean isFollowing(Integer userId, Integer userIdToUnFollow) {
 
-        User user = findUserById(userId).orElseThrow();
+        User user = findUserById(userId);
         User toUnfollow = listOfUsers.get(userIdToUnFollow);
 
         return user.getFollowing().contains(toUnfollow);
@@ -82,6 +109,5 @@ public class UserRepositoryImpl implements IUserRepository {
 
         this.listOfUsers = userList;
     }
-
 }
 

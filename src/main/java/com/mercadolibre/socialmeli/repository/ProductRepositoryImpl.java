@@ -7,13 +7,14 @@ import com.mercadolibre.socialmeli.entity.Product;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
+import java.util.List;
+import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 @Repository
-public class ProductRepositoryImpl implements IProductRepository{
-
+public class ProductRepositoryImpl implements IProductRepository {
     private List<Product> listOfProducts = new ArrayList<>();
     private List<Post> listOfPosts = new ArrayList<>();
 
@@ -65,12 +66,12 @@ public class ProductRepositoryImpl implements IProductRepository{
     }
 
     @Override
-    public Set<Post> findPost(Integer userId) { //TODO ❤️
+    public Set<Post> findRecentPostsForUser(Integer userId) {
         return null;
     }
 
     @Override
-    public Post findPostById(Integer postId) { //TODO ❤️
+    public Post findPostById(Integer postId) { // TODO ❤️
         return null;
     }
 
@@ -82,9 +83,11 @@ public class ProductRepositoryImpl implements IProductRepository{
         List<Post> postLists;
 
         productsFile = ResourceUtils.getFile("classpath:products.json");
-        productList = mapper.readValue(productsFile, new TypeReference<List<Product>>() {});
+        productList = mapper.readValue(productsFile, new TypeReference<List<Product>>() {
+        });
         postsFile = ResourceUtils.getFile("classpath:posts.json");
-        postLists = mapper.readValue(postsFile, new TypeReference<List<Post>>() {});
+        postLists = mapper.readValue(postsFile, new TypeReference<List<Post>>() {
+        });
 
         listOfProducts = productList;
         listOfPosts = postLists;
