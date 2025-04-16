@@ -9,6 +9,8 @@ import java.util.Set;
 public interface IProductRepository {
     List<Product> findAllProducts();
     List<Post> findAllPosts();
+    Integer createNewId();
+    void savePost(Post post);
 
     Boolean saveProduct(Product product);
 
