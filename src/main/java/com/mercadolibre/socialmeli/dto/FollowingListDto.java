@@ -1,6 +1,6 @@
 package com.mercadolibre.socialmeli.dto;
 
-import com.mercadolibre.socialmeli.entity.Following;
+import com.mercadolibre.socialmeli.entity.Follow;
 import lombok.Data;
 
 import java.util.Set;
@@ -9,5 +9,5 @@ import java.util.Set;
 public class FollowingListDto {
     private Integer userId;
     private String userName;
-    private Set<Following> followed;
+    private Set<Follow> followed;
 }

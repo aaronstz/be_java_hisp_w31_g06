@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,6 @@ import com.mercadolibre.socialmeli.repository.IUserRepository;
 import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
-import com.mercadolibre.socialmeli.exception.AlreadyExistsException;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -46,10 +46,15 @@ public class ProductServiceImpl implements IProductService {
     public PostDto createPost(Post post) {
         Boolean saved = productRepository.saveProduct(post.getProduct());
         if (!saved) {
-            throw new AlreadyExistsException("Ya existe un producto con el id " + post.getProduct().getProductId());
+            throw new ConflictException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
+
+        if(!userRepository.addPostToUser(post)) throw new NotFoundException("No se encontró al usuario");
+
+        productRepository.savePost(post);
         ObjectMapper mapper = new ObjectMapper();
         post.setPostId(productRepository.findAllPosts().size() + 1);
+
         return mapper.convertValue(post, PostDto.class);
     }
 

@@ -17,6 +17,10 @@
       {
         "userId": 4,
         "userName": "alicewhite"
+      },
+      {
+        "userId": 3,
+        "userName": "bobsmith"
       }
     ],
     "post": [
@@ -112,7 +116,7 @@
   {
     "userId": 4,
     "userName": "alicewhite",
-    "followersCount": 2,
+    "followersCount": 3,
     "follower": [
       {
         "userId": 1,

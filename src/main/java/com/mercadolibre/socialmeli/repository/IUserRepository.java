@@ -31,5 +31,7 @@ public interface IUserRepository {
 
     boolean isFollowing(Integer userId, Integer userIdToUnfollow);
 
-    public Set<Post> findRecentPostsForUser(Integer userId);
+    Set<Post> findRecentPostsForUser(Integer userId);
+
+    boolean addPostToUser(Post post);
 }

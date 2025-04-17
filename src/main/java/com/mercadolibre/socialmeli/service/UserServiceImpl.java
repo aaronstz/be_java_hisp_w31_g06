@@ -6,9 +6,8 @@ import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
 import com.mercadolibre.socialmeli.entity.Follow;
-import com.mercadolibre.socialmeli.entity.Following;
 import com.mercadolibre.socialmeli.entity.User;
-import com.mercadolibre.socialmeli.exception.BadRequestException;
+
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
@@ -16,7 +15,6 @@ import com.mercadolibre.socialmeli.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,8 +79,8 @@ public class UserServiceImpl implements IUserService {
         if(foundFollowing == null) {
             throw new NotFoundException("No se encontraron seguidos");
         }
-        Set<Following> foundFollowed = foundFollowing.stream().map(f -> {
-            Following foundFollow = new Following();
+        Set<Follow> foundFollowed = foundFollowing.stream().map(f -> {
+            Follow foundFollow = new Follow();
             foundFollow.setUserId(f.getUserId());
             foundFollow.setUserName(f.getUserName());
             return foundFollow;

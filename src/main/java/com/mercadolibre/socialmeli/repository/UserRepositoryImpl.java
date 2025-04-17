@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Repository
 public class UserRepositoryImpl implements IUserRepository {
 
-
     private List<User> listOfUsers = new ArrayList<>();
 
     public UserRepositoryImpl() throws IOException {
@@ -129,6 +128,18 @@ public class UserRepositoryImpl implements IUserRepository {
         return user.getPost().stream()
                 .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(LocalDate.now().minusDays(14)))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public boolean addPostToUser(Post post) {
+        User user = listOfUsers.stream().filter(u -> u.getUserId().equals(post.getUserId())).findFirst()
+                .orElse(null);
+
+        if(user == null) return false;
+
+        user.getPost().add(post);
+
+        return true;
     }
 
     @Override
