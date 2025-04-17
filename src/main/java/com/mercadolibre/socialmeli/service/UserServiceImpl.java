@@ -6,21 +6,21 @@ import com.mercadolibre.socialmeli.dto.FollowerCountDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
 import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements IUserService {
-
+    @Autowired
     IUserRepository userRepository;
 
     public UserServiceImpl(IUserRepository userRepository) {
@@ -89,10 +89,24 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void unFollow(Integer userId, Integer userIdToUnFollow) {// TODO ❤️
+    public void unFollow(Integer userId, Integer userIdToUnFollow) {
+        if (userId.equals(userIdToUnFollow)) {
+            throw new ConflictException("Un usuario no puede dejar de seguirse.");
+        }
 
+        User user = userRepository.findUserById(userId);
+        User userToUnFollow = userRepository.findUserById(userIdToUnFollow);
+
+        if (user == null || userToUnFollow == null) {
+            throw new NotFoundException("Uno de los usuarios no fue encontrado");
+        }
+
+        if (!userRepository.isFollowing(userId, userIdToUnFollow)) {
+            throw new ConflictException("Ni se puede dejar de seguir a un usuario que no estás siguiendo");
+        }
+
+        userRepository.removeFollow(user, userToUnFollow);
     }
-
     private List<User> getListOfUsers() {
         List<User> userList = userRepository.findAll();
 
@@ -102,5 +116,4 @@ public class UserServiceImpl implements IUserService {
 
         return userList;
     }
-
 }

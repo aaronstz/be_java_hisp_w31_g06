@@ -14,14 +14,16 @@ public class ExceptionController {
         return new ResponseEntity<>(exceptionDto, HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<?> alreadyExists(AlreadyExistsException e) {
         ExceptionDto exceptionDto = new ExceptionDto(e.getMessage());
         return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
     }
 
+
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<?> notFound(ConflictException e){
+    public ResponseEntity<?> alreadyExists(ConflictException e) {
         ExceptionDto exceptionDto = new ExceptionDto(e.getMessage());
         return new ResponseEntity<>(exceptionDto, HttpStatus.CONFLICT);
     }

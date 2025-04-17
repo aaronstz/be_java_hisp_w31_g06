@@ -7,11 +7,13 @@ import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import com.mercadolibre.socialmeli.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,15 +21,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
 @Repository
 public class UserRepositoryImpl implements IUserRepository {
+
 
     private List<User> listOfUsers = new ArrayList<>();
 
     public UserRepositoryImpl() throws IOException {
         loadDataBase();
     }
-
     @Override
     public List<User> findAll() {
         return listOfUsers;
@@ -88,8 +91,11 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public void removeFollow(Integer userId, Integer userIdToUnFollow) { // TODO ❤️
+    public void removeFollow(User user, User toUnFollow) {
+        toUnFollow.getFollower().removeIf(f -> f.getUserId().equals(user.getUserId()));
+        toUnFollow.setFollowersCount(toUnFollow.getFollowersCount() - 1);
 
+        user.getFollowing().removeIf(f -> f.getUserId().equals(toUnFollow.getUserId()));
     }
 
     @Override
@@ -117,6 +123,22 @@ public class UserRepositoryImpl implements IUserRepository {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public boolean existsById(Integer userId) {
+        return listOfUsers.stream()
+                .anyMatch(user -> user.getUserId().equals(userId));
+    }
+
+    @Override
+    public boolean isFollowing(Integer userId, Integer userIdToUnFollow) {
+        User user = findUserById(userId);
+        if (user == null) {
+            return false;
+        }
+        return user.getFollowing().stream()
+                .anyMatch(f -> f.getUserId().equals(userIdToUnFollow));
+    }
+
     private void loadDataBase() throws IOException {
         File file;
         ObjectMapper mapper = new ObjectMapper();
@@ -128,4 +150,6 @@ public class UserRepositoryImpl implements IUserRepository {
 
         this.listOfUsers = userList;
     }
+
 }
+

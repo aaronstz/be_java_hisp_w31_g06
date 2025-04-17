@@ -4,11 +4,13 @@ import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface IUserRepository {
 
     List<User> findAll();
+
 
     void saveFollow(Integer userId, Integer userIdToFollow);
 
@@ -20,9 +22,13 @@ public interface IUserRepository {
 
     Set<User> findFollowingList(Integer userId);
 
-    void removeFollow(Integer userId, Integer userIdToUnFollow);
+    void  removeFollow(User user, User toUnFollow) ;
 
     User findUserById(Integer userId);
+
+    boolean existsById(Integer userId);
+
+    boolean isFollowing(Integer userId, Integer userIdToUnfollow);
 
     public Set<Post> findRecentPostsForUser(Integer userId);
 }

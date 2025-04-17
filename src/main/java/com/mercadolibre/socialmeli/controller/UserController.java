@@ -11,9 +11,7 @@ import com.mercadolibre.socialmeli.service.IUserService;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/users")
 public class UserController {
-
     @Autowired
     private IUserService userService;
 
@@ -30,7 +28,14 @@ public class UserController {
     public ResponseEntity<?> follow(@PathVariable int userId, @PathVariable int userIdToFollow){
         return new ResponseEntity<>(userService.follow(userId, userIdToFollow), HttpStatus.OK);
     }
-
+  
+    @PutMapping("/users/{userId}/unfollow/{userIdToUnfollow}")
+    public ResponseEntity<?> unfollowUser(@PathVariable int userId,
+                                          @PathVariable int userIdToUnfollow ){
+        userService.unFollow(userId, userIdToUnfollow);
+        return new ResponseEntity<>( "Fue eliminado exitosamente el usuario",HttpStatus.OK);
+    }
+  
     @GetMapping("/{userId}/followers/count")
     public ResponseEntity<?> getFollowersCount(@PathVariable int userId) {
         return new ResponseEntity<>(userService.getFollowersCount(userId), HttpStatus.OK);
