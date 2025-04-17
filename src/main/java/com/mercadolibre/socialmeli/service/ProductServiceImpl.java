@@ -1,5 +1,7 @@
 package com.mercadolibre.socialmeli.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -47,13 +49,27 @@ public class ProductServiceImpl implements IProductService {
             throw new AlreadyExistsException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
         ObjectMapper mapper = new ObjectMapper();
-        post.setPostId(productRepository.createNewId());
-        productRepository.savePost(post);
+        post.setPostId(productRepository.findAllPosts().size() + 1);
         return mapper.convertValue(post, PostDto.class);
     }
 
+    private List<PostDto> orderPosts(List<PostDto> posts, String order) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        if (order.equalsIgnoreCase("date_asc")) {
+            return posts.stream()
+                    .sorted((p1, p2) -> LocalDate.parse(p1.getDate(), formatter).compareTo(LocalDate.parse(p2.getDate(),
+                            formatter)))
+                    .collect(Collectors.toList());
+        }
+        return posts.stream()
+                .sorted((p1, p2) -> LocalDate.parse(p2.getDate(), formatter).compareTo(LocalDate.parse(p1.getDate(),
+                        formatter)))
+                .collect(Collectors.toList());
+    }
+
     @Override
-    public FollowingPostDto getRecentSellerPostsForUser(Integer userId) {
+    public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
         User user = userRepository.findUserById(userId);
         if (user == null) {
             throw new NotFoundException("No se encontró un usuario con ID: " + userId);
@@ -80,8 +96,7 @@ public class ProductServiceImpl implements IProductService {
 
         FollowingPostDto result = new FollowingPostDto();
         result.setUserId(userId);
-        result.setPostDto(allRecentPosts);
+        result.setPostDto(orderPosts(allRecentPosts, order));
         return result;
     }
-
 }
