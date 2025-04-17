@@ -1,47 +1,40 @@
 package com.mercadolibre.socialmeli.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
+import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
+import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.entity.Following;
 import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
-import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements IUserService {
+  
     @Autowired
-    IUserRepository userRepository;
-
-    public UserServiceImpl(IUserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
+    private IUserRepository userRepository;
+  
     @Override
     public List<UserDto> getAll() {
-        List<User> userList = userRepository.findAll();
-
-        if(userList.isEmpty()) {
-            throw new NotFoundException("No se encontraron productos.");
-        }
         ObjectMapper mapper = new ObjectMapper();
-
-
-        return userList.stream().map(u -> mapper.convertValue(u, UserDto.class)).toList();
+        return userRepository.findAll().stream().map(u -> mapper.convertValue(u, UserDto.class)).toList();
     }
 
     @Override
-    public String follow(Integer userId, Integer userIdToFollow) {// TODO ❤️
+    public String follow(Integer userId, Integer userIdToFollow) {
         if (userId.equals(userIdToFollow)) {
             throw new ConflictException("Un usuario no puede seguirse a sí mismo");
         }
@@ -51,7 +44,6 @@ public class UserServiceImpl implements IUserService {
         if (user == null) {
             throw new NotFoundException("No se encontró al seguidor");
         }
-
         if (userRepository.isUserAlreadyFollowing(userId, userIdToFollow)) {
             throw new ConflictException("El usuario ya sigue al otro");
         }
@@ -84,8 +76,24 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserListDto getFollowedList(Integer userId) {// TODO ❤️
-        return null;
+    public FollowingListDto getFollowedList(Integer userId) {
+        Set<Follow> foundFollowing = userRepository.findFollowingList(userId);
+        if(foundFollowing == null) {
+            throw new NotFoundException("No se encontraron seguidos");
+        }
+        Set<Following> foundFollowed = foundFollowing.stream().map(f -> {
+            Following foundFollow = new Following();
+            foundFollow.setUserId(f.getUserId());
+            foundFollow.setUserName(f.getUserName());
+            return foundFollow;
+        }).collect(Collectors.toSet());
+
+        FollowingListDto foundList = new FollowingListDto();
+        foundList.setUserId(userId);
+        foundList.setUserName(userRepository.findUserById(userId).getUserName());
+        foundList.setFollowed(foundFollowed);
+
+        return foundList;
     }
 
     @Override
