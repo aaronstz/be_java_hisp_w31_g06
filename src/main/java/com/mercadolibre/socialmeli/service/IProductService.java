@@ -12,5 +12,5 @@ public interface IProductService {
 
     PostDto createPost(Post post);
 
-    FollowingPostDto getRecentSellerPostsForUser(Integer userId);
+    FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order);
 }

@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> notFound(NotFoundException e){
+    public ResponseEntity<?> notFound(NotFoundException e) {
         ExceptionDto exceptionDto = new ExceptionDto(e.getMessage());
         return new ResponseEntity<>(exceptionDto, HttpStatus.NOT_FOUND);
     }
+
 
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<?> alreadyExists(AlreadyExistsException e) {
@@ -20,8 +21,9 @@ public class ExceptionController {
         return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
     }
 
+
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<?> notFound(ConflictException e){
+    public ResponseEntity<?> alreadyExists(ConflictException e) {
         ExceptionDto exceptionDto = new ExceptionDto(e.getMessage());
         return new ResponseEntity<>(exceptionDto, HttpStatus.CONFLICT);
     }
