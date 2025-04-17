@@ -62,8 +62,20 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public FollowerCountDto getFollowersCount(Integer userId) {// TODO ❤️
-        return null;
+    public FollowerCountDto getFollowersCount(Integer userId) {
+
+        User user = userRepository.findFollowersCount(userId);
+
+        if(user == null) {
+            throw new NotFoundException("No se encontró al usuario " + userId);
+        }
+
+        FollowerCountDto followerCountDto = new FollowerCountDto();
+        followerCountDto.setUserId(user.getUserId());
+        followerCountDto.setUserName(user.getUserName());
+        followerCountDto.setFollowersCount(user.getFollowersCount());
+
+        return followerCountDto;
     }
 
     @Override
