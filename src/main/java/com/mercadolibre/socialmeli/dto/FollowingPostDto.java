@@ -11,8 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class FollowingPostDto implements Serializable {
-
         private Integer userId;
         private List<PostDto> postDto;
-
 }

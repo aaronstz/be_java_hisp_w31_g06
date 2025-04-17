@@ -17,6 +17,10 @@
       {
         "userId": 4,
         "userName": "alicewhite"
+      },
+      {
+        "userId": 3,
+        "userName": "bobsmith"
       }
     ],
     "post": [
@@ -112,7 +116,7 @@
   {
     "userId": 4,
     "userName": "alicewhite",
-    "followersCount": 2,
+    "followersCount": 3,
     "follower": [
       {
         "userId": 1,
@@ -156,7 +160,7 @@
       {
         "userId": 4,
         "postId": 103,
-        "date": "2022-04-16",
+        "date": "2025-04-15",
         "product": {
           "productId": 502,
           "productName": "Running Shoes 2!",
