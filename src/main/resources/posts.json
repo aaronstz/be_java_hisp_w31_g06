@@ -11,6 +11,8 @@
       "notes": "vintage"
     },
     "category": 101,
-    "price": 350.99
+    "price": 350.99,
+    "hasPromo": false,
+    "discount": 0.25
   }
 ]

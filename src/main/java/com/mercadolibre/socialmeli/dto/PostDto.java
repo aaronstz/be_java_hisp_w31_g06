@@ -18,4 +18,6 @@ public class PostDto implements Serializable {
     private Product product;
     private Integer category;
     private Double price;
+    private Boolean hasPromo;
+    private Double discount;
 }
