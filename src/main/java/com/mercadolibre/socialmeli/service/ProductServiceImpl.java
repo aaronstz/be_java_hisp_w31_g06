@@ -54,6 +54,9 @@ public class ProductServiceImpl implements IProductService {
             throw new ConflictException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
 
+        if(post.getHasPromo() == null) post.setHasPromo(false);
+        if(post.getDiscount() == null) post.setDiscount(0D);
+
         if(!userRepository.addPostToUser(post)) throw new NotFoundException("No se encontró al usuario");
 
         productRepository.savePost(post);
