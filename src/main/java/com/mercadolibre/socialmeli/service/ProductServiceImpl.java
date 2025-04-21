@@ -131,4 +131,14 @@ public class ProductServiceImpl implements IProductService {
                 .collect(Collectors.toSet()).size();
         return new PromoPostCountDto(user_id, user.getUserName(), count);
     }
+
+    @Override
+    public List<PostDto> getPromosBySeller(Integer userId) {
+        List<Post> promoPosts = productRepository.findPromosBySeller(userId);
+        if (promoPosts.isEmpty()) {
+            throw new NotFoundException("No se encontraron promociones del vendedor con id " + userId);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
+    }
 }
