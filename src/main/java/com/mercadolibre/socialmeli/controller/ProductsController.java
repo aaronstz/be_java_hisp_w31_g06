@@ -35,7 +35,13 @@ public class ProductsController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<PostDto> createPost(@RequestBody Post post) {
+    public ResponseEntity<PostDto> createPost(@RequestBody PostDto post) {
+        return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
+    }
+
+
+    @PostMapping("/promo-post")
+    public ResponseEntity<PostDto> createPostWithDiscount(@RequestBody PostDto post) {
         return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
 
