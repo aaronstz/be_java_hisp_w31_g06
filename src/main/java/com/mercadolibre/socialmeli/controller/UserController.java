@@ -2,6 +2,7 @@ package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
+import com.mercadolibre.socialmeli.dto.UserListDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,13 @@ public class UserController {
     public ResponseEntity<FollowingListDto> getFollowersList(@PathVariable Integer userId) {
         return new ResponseEntity<>(userService.getFollowedList(userId), HttpStatus.OK);
     }
+
+    @GetMapping("/{userId}/followers/list")
+    public ResponseEntity<UserListDto> getFollowerList(@PathVariable Integer userId) {
+        return new ResponseEntity<>(userService.getFollowersList(userId), HttpStatus.OK);
+    }
+
+
   
     @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public ResponseEntity<?> unfollowUser(@PathVariable int userId,
