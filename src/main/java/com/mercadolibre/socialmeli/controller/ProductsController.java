@@ -2,7 +2,6 @@ package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
-import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.service.IProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +33,23 @@ public class ProductsController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<PostDto> createPost(@RequestBody Post post) {
+    public ResponseEntity<PostDto> createPost(@RequestBody PostDto post) {
+        return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
+    }
+
+    @PostMapping("/promo-post")
+    public ResponseEntity<PostDto> createPostWithDiscount(@RequestBody PostDto post) {
         return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
 
     @GetMapping("/promo-post/count")
-    public ResponseEntity<?> getPromoPostCount(@RequestParam int userId) {
-        return new ResponseEntity<>(productService.getPromoPostCount(userId), HttpStatus.OK);
+    public ResponseEntity<?> getPromoPostCount(@RequestParam int user_id) {
+        return new ResponseEntity<>(productService.getPromoPostCount(user_id), HttpStatus.OK);
+    }
+
+    @GetMapping("/promo-post/list")
+    public ResponseEntity<List<PostDto>> getPromosBySeller(@RequestParam Integer userId) {
+        return new ResponseEntity<>(productService.getPromosBySeller(userId), HttpStatus.OK);
     }
 
     @GetMapping("/followed/{userId}/filterByKeyword")

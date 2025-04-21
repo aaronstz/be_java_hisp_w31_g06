@@ -12,6 +12,22 @@
     },
     "category": 101,
     "price": 350.99,
-    "has_promo": true
+    "hasPromo": true,
+    "discount": 10
+  },
+  {
+    "userId": 2,
+    "postId": 2,
+    "date": "01-01-2023",
+    "product": {
+      "productId": 2,
+      "productName": "algo sin descuento",
+      "type": "utensilio",
+      "color": "negro",
+      "notes": "raro"
+    },
+    "category": 90,
+    "price": 200,
+    "hasPromo": false
   }
 ]

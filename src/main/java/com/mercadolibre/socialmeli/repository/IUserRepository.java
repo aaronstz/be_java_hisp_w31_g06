@@ -17,7 +17,7 @@ public interface IUserRepository {
 
     User findFollowersCount(Integer userId);
 
-    Set<User> findFollowersList(Integer userId);
+    Set<Follow> findFollowersList(Integer userId);
 
     Set<Follow> findFollowingList(Integer userId);
 

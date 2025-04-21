@@ -44,7 +44,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public PostDto createPost(Post post) {
+    public PostDto createPost(PostDto postDto) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Post post = mapper.convertValue(postDto, Post.class);
+
         Boolean saved = productRepository.saveProduct(post.getProduct());
         if (!saved) {
             throw new ConflictException("Ya existe un producto con el id " + post.getProduct().getProductId());
@@ -52,9 +56,15 @@ public class ProductServiceImpl implements IProductService {
 
         if (!userRepository.addPostToUser(post))
             throw new NotFoundException("No se encontró al usuario");
+        if (post.getHasPromo() == null)
+            post.setHasPromo(false);
+        if (post.getDiscount() == null)
+            post.setDiscount(0D);
+
+        if (!userRepository.addPostToUser(post))
+            throw new NotFoundException("No se encontró al usuario");
 
         productRepository.savePost(post);
-        ObjectMapper mapper = new ObjectMapper();
         post.setPostId(productRepository.findAllPosts().size() + 1);
 
         return mapper.convertValue(post, PostDto.class);
@@ -123,6 +133,16 @@ public class ProductServiceImpl implements IProductService {
                 .filter(post -> post.getHasPromo())
                 .collect(Collectors.toSet()).size();
         return new PromoPostCountDto(user_id, user.getUserName(), count);
+    }
+
+    @Override
+    public List<PostDto> getPromosBySeller(Integer userId) {
+        List<Post> promoPosts = productRepository.findPromosBySeller(userId);
+        if (promoPosts.isEmpty()) {
+            throw new NotFoundException("No se encontraron promociones del vendedor con id " + userId);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
     }
 
     @Override

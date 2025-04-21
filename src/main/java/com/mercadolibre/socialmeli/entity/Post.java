@@ -15,4 +15,5 @@ public class Post {
     private Integer category;
     private Double price;
     private Boolean hasPromo;
+    private Double discount;
 }

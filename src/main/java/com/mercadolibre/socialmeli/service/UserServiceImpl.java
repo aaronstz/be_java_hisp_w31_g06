@@ -8,6 +8,7 @@ import com.mercadolibre.socialmeli.dto.UserListDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
 
+import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
@@ -15,6 +16,8 @@ import com.mercadolibre.socialmeli.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,30 +73,66 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserListDto getFollowersList(Integer userId) {
-        return null;
-    }
 
-    @Override
-    public FollowingListDto getFollowedList(Integer userId) {
-        Set<Follow> foundFollowing = userRepository.findFollowingList(userId);
-        if (foundFollowing == null) {
-            throw new NotFoundException("No se encontraron seguidos");
+        Set<Follow> foundFollower = userRepository.findFollowersList(userId);
+
+
+        if(foundFollower == null) {
+            throw new NotFoundException("No se encontraron seguidores");
         }
-        Set<Follow> foundFollowed = foundFollowing.stream().map(f -> {
+
+        Set<Follow> filterFoundFollowers = foundFollower.stream().map(f -> {
             Follow foundFollow = new Follow();
             foundFollow.setUserId(f.getUserId());
             foundFollow.setUserName(f.getUserName());
             return foundFollow;
         }).collect(Collectors.toSet());
 
+        UserListDto foundList = new UserListDto();
+        foundList.setUserId(userId);
+        foundList.setUserName(userRepository.findUserById(userId).getUserName());
+        foundList.setFollower(filterFoundFollowers);
+
+        return foundList;
+
+    }
+
+    @Override
+    public FollowingListDto getFollowedList(Integer userId, String order) {
+        Set<Follow> foundFollowing = userRepository.findFollowingList(userId);
+        if (foundFollowing == null) {
+            throw new NotFoundException("No se encontraron seguidos");
+        }
+        List<Follow> followedList = foundFollowing.stream().map(f -> {
+            Follow foundFollow = new Follow();
+            foundFollow.setUserId(f.getUserId());
+            foundFollow.setUserName(f.getUserName());
+            return foundFollow;
+        }).collect(Collectors.toList());
+
+        sortFollowListByName(followedList, order);
+
+        Set<Follow> orderedFollowedSet = new LinkedHashSet<>(followedList);
+
         FollowingListDto foundList = new FollowingListDto();
         foundList.setUserId(userId);
         foundList.setUserName(userRepository.findUserById(userId).getUserName());
-        foundList.setFollowed(foundFollowed);
+        foundList.setFollowed(orderedFollowedSet);
 
         return foundList;
     }
-
+    private void sortFollowListByName(List<Follow> list, String order) {
+        switch (order.toLowerCase()) {
+            case "name_desc":
+                list.sort(Comparator.comparing(Follow::getUserName).reversed());
+                break;
+            case "name_asc":
+                list.sort(Comparator.comparing(Follow::getUserName));
+                break;
+            default:
+                throw new BadRequestException("Parámetro 'order' inválido. Valores permitidos: name_asc, name_desc");
+        }
+    }
     @Override
     public void unFollow(Integer userId, Integer userIdToUnFollow) {
         if (userId.equals(userIdToUnFollow)) {
