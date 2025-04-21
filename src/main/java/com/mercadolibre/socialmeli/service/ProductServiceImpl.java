@@ -1,11 +1,14 @@
 package com.mercadolibre.socialmeli.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +22,6 @@ import com.mercadolibre.socialmeli.repository.IUserRepository;
 import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
-import com.mercadolibre.socialmeli.exception.AlreadyExistsException;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -44,16 +46,35 @@ public class ProductServiceImpl implements IProductService {
     public PostDto createPost(Post post) {
         Boolean saved = productRepository.saveProduct(post.getProduct());
         if (!saved) {
-            throw new AlreadyExistsException("Ya existe un producto con el id " + post.getProduct().getProductId());
+            throw new ConflictException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
-        ObjectMapper mapper = new ObjectMapper();
-        post.setPostId(productRepository.createNewId());
+
+        if(!userRepository.addPostToUser(post)) throw new NotFoundException("No se encontró al usuario");
+
         productRepository.savePost(post);
+        ObjectMapper mapper = new ObjectMapper();
+        post.setPostId(productRepository.findAllPosts().size() + 1);
+
         return mapper.convertValue(post, PostDto.class);
     }
 
+    private List<PostDto> orderPosts(List<PostDto> posts, String order) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        if (order.equalsIgnoreCase("date_asc")) {
+            return posts.stream()
+                    .sorted((p1, p2) -> LocalDate.parse(p1.getDate(), formatter).compareTo(LocalDate.parse(p2.getDate(),
+                            formatter)))
+                    .collect(Collectors.toList());
+        }
+        return posts.stream()
+                .sorted((p1, p2) -> LocalDate.parse(p2.getDate(), formatter).compareTo(LocalDate.parse(p1.getDate(),
+                        formatter)))
+                .collect(Collectors.toList());
+    }
+
     @Override
-    public FollowingPostDto getRecentSellerPostsForUser(Integer userId) {
+    public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
         User user = userRepository.findUserById(userId);
         if (user == null) {
             throw new NotFoundException("No se encontró un usuario con ID: " + userId);
@@ -80,8 +101,7 @@ public class ProductServiceImpl implements IProductService {
 
         FollowingPostDto result = new FollowingPostDto();
         result.setUserId(userId);
-        result.setPostDto(allRecentPosts);
+        result.setPostDto(orderPosts(allRecentPosts, order));
         return result;
     }
-
 }

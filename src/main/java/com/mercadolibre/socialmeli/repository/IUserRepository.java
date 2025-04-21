@@ -1,28 +1,37 @@
 package com.mercadolibre.socialmeli.repository;
 
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface IUserRepository {
 
     List<User> findAll();
 
+
     void saveFollow(Integer userId, Integer userIdToFollow);
 
     boolean isUserAlreadyFollowing(Integer userId, Integer userIdToFollow);
 
-    Integer findFollowersCount(Integer userId);
+    User findFollowersCount(Integer userId);
 
     Set<User> findFollowersList(Integer userId);
 
-    Set<User> findFollowingList(Integer userId);
+    Set<Follow> findFollowingList(Integer userId);
 
-    void removeFollow(Integer userId, Integer userIdToUnFollow);
+    void  removeFollow(User user, User toUnFollow) ;
 
     User findUserById(Integer userId);
 
-    public Set<Post> findRecentPostsForUser(Integer userId);
+    boolean existsById(Integer userId);
+
+    boolean isFollowing(Integer userId, Integer userIdToUnfollow);
+
+    Set<Post> findRecentPostsForUser(Integer userId);
+
+    boolean addPostToUser(Post post);
 }
