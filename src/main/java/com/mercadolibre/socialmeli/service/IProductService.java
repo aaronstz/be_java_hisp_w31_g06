@@ -16,4 +16,6 @@ public interface IProductService {
     FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order);
 
     PromoPostCountDto getPromoPostCount(Integer user_id);
+
+    List<PostDto> getPromosBySeller(Integer userId);
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class ProductRepositoryImpl implements IProductRepository {
@@ -75,6 +76,14 @@ public class ProductRepositoryImpl implements IProductRepository {
     @Override
     public Post findPostById(Integer postId) {
         return null;
+    }
+
+    @Override
+    public List<Post> findPromosBySeller(Integer userId) {
+        return listOfPosts.stream()
+                .filter(p -> p.getUserId().equals(userId))
+                .filter(p -> p.getHasPromo() && p.getDiscount() != null)
+                .collect(Collectors.toList());
     }
 
     private void loadDataBase() throws IOException {
