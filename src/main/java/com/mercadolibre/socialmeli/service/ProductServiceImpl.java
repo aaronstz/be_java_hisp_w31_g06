@@ -43,8 +43,13 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public PostDto createPost(Post post) {
+    public PostDto createPost(PostDto postDto) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Post post = mapper.convertValue(postDto, Post.class);
+
         Boolean saved = productRepository.saveProduct(post.getProduct());
+
         if (!saved) {
             throw new ConflictException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
@@ -52,7 +57,6 @@ public class ProductServiceImpl implements IProductService {
         if(!userRepository.addPostToUser(post)) throw new NotFoundException("No se encontró al usuario");
 
         productRepository.savePost(post);
-        ObjectMapper mapper = new ObjectMapper();
         post.setPostId(productRepository.findAllPosts().size() + 1);
 
         return mapper.convertValue(post, PostDto.class);
