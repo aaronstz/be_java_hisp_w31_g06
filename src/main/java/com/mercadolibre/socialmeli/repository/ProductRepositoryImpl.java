@@ -79,6 +79,13 @@ public class ProductRepositoryImpl implements IProductRepository {
     }
 
     @Override
+    public List<Post> getAllPromos() {
+        return listOfPosts.stream()
+                .filter(p -> p.getHasPromo() && p.getDiscount() != null)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Post> findPromosBySeller(Integer userId) {
         return listOfPosts.stream()
                 .filter(p -> p.getUserId().equals(userId))

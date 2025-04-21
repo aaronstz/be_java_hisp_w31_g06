@@ -21,5 +21,6 @@ public interface IProductRepository {
 
     Post findPostById(Integer postId);
 
+    List<Post> getAllPromos();
     List<Post> findPromosBySeller(Integer userId);
 }
