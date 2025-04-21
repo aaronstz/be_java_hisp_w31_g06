@@ -7,20 +7,17 @@ import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import com.mercadolibre.socialmeli.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 
 @Repository
 public class UserRepositoryImpl implements IUserRepository {
@@ -30,6 +27,7 @@ public class UserRepositoryImpl implements IUserRepository {
     public UserRepositoryImpl() throws IOException {
         loadDataBase();
     }
+
     @Override
     public List<User> findAll() {
         return listOfUsers;
@@ -46,7 +44,6 @@ public class UserRepositoryImpl implements IUserRepository {
                 .filter(ul -> ul.getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("No se encontró al seguidor"));
-
 
         userToFollow.setFollowersCount(userToFollow.getFollowersCount() + 1);
 
@@ -72,7 +69,6 @@ public class UserRepositoryImpl implements IUserRepository {
 
         return userToFollow.getFollower().stream().anyMatch(utf -> utf.getUserId().equals(userId));
     }
-
 
     @Override
     public User findFollowersCount(Integer userId) {
@@ -135,7 +131,8 @@ public class UserRepositoryImpl implements IUserRepository {
         User user = listOfUsers.stream().filter(u -> u.getUserId().equals(post.getUserId())).findFirst()
                 .orElse(null);
 
-        if(user == null) return false;
+        if (user == null)
+            return false;
 
         user.getPost().add(post);
 
@@ -171,4 +168,3 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
 }
-
