@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.controller;
 
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.service.IProductService;
@@ -53,7 +54,9 @@ public class ProductsController {
     }
 
     @GetMapping("/followed/{userId}/filterByKeyword")
-    public ResponseEntity<?> getSellerPostsForUserByKeyword(@PathVariable int userId, @RequestParam String keyword) {
-        return new ResponseEntity<>(productService.getSellerPostsForUserByKeyword(userId, keyword), HttpStatus.OK);
+    public ResponseEntity<FollowingPostDto> getSellerPostsForUserByKeyword(@PathVariable int userId,
+            @RequestParam String keyword) {
+        return new ResponseEntity<>(productService.getSellerPostsForUserByKeyword(userId, keyword),
+                HttpStatus.OK);
     }
 }
