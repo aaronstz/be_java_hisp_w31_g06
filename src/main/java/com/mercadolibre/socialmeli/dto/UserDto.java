@@ -1,8 +1,6 @@
 package com.mercadolibre.socialmeli.dto;
 
-import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

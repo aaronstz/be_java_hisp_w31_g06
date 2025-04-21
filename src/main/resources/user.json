@@ -37,7 +37,8 @@
           "notes": "Limited edition"
         },
         "category": 10,
-        "price": 199.99
+        "price": 199.99,
+        "has_promo": true
       }
     ]
   },
@@ -75,7 +76,8 @@
           "notes": "Limited edition"
         },
         "category": 10,
-        "price": 199.99
+        "price": 199.99,
+        "has_promo": false
       }
     ]
   },
@@ -109,7 +111,8 @@
           "notes": "Limited edition"
         },
         "category": 10,
-        "price": 199.99
+        "price": 199.99,
+        "has_promo": false
       }
     ]
   },
@@ -155,7 +158,8 @@
           "notes": ""
         },
         "category": 10,
-        "price": 129.99
+        "price": 129.99,
+        "has_promo": false
       },
       {
         "userId": 4,
@@ -170,7 +174,8 @@
           "notes": ""
         },
         "category": 10,
-        "price": 129.99
+        "price": 129.99,
+        "has_promo": true
       }
     ]
   }
