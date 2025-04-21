@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements IUserService {
-  
+
     @Autowired
     private IUserRepository userRepository;
-  
+
     @Override
     public List<UserDto> getAll() {
         ObjectMapper mapper = new ObjectMapper();
@@ -59,7 +59,7 @@ public class UserServiceImpl implements IUserService {
 
         User user = userRepository.findFollowersCount(userId);
 
-        if(user == null) {
+        if (user == null) {
             throw new NotFoundException("No se encontró al usuario " + userId);
         }
 
@@ -72,14 +72,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserListDto getFollowersList(Integer userId) {// TODO ❤️
+    public UserListDto getFollowersList(Integer userId) {
         return null;
     }
 
     @Override
     public FollowingListDto getFollowedList(Integer userId, String order) {
         Set<Follow> foundFollowing = userRepository.findFollowingList(userId);
-        if(foundFollowing == null) {
+        if (foundFollowing == null) {
             throw new NotFoundException("No se encontraron seguidos");
         }
         List<Follow> followedList = foundFollowing.stream().map(f -> {
@@ -132,10 +132,11 @@ public class UserServiceImpl implements IUserService {
 
         userRepository.removeFollow(user, userToUnFollow);
     }
+
     private List<User> getListOfUsers() {
         List<User> userList = userRepository.findAll();
 
-        if(userList.isEmpty()) {
+        if (userList.isEmpty()) {
             throw new NotFoundException("No se encontraron productos.");
         }
 
