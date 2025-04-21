@@ -11,7 +11,7 @@ import java.util.List;
 public interface IProductService {
     List<ProductDto> getAll();
 
-    PostDto createPost(Post post);
+    PostDto createPost(PostDto post);
 
     FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order);
 

@@ -12,6 +12,7 @@
     },
     "category": 101,
     "price": 350.99,
-    "has_promo": true
+    "hasPromo": false,
+    "discount": 0.25
   }
 ]
