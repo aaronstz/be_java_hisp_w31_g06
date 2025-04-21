@@ -93,7 +93,6 @@ public class UserServiceImpl implements IUserService {
 
         Set<Follow> orderedFollowedSet = new LinkedHashSet<>(followedList);
 
-        //
         FollowingListDto foundList = new FollowingListDto();
         foundList.setUserId(userId);
         foundList.setUserName(userRepository.findUserById(userId).getUserName());
