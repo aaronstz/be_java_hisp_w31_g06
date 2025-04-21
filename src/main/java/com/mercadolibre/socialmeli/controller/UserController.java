@@ -40,7 +40,7 @@ public class UserController {
         return new ResponseEntity<>(userService.getFollowersList(userId, order), HttpStatus.OK);
     }
   
-//    @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
+    @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public ResponseEntity<?> unfollowUser(@PathVariable int userId,
                                           @PathVariable int userIdToUnfollow ){
         userService.unFollow(userId, userIdToUnfollow);
