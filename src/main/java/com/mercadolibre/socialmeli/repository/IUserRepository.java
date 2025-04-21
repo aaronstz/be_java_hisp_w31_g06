@@ -32,4 +32,6 @@ public interface IUserRepository {
     Set<Post> findRecentPostsForUser(Integer userId);
 
     boolean addPostToUser(Post post);
+
+    Set<Post> findPostsByKeyword(Integer userId, String keyword);
 }

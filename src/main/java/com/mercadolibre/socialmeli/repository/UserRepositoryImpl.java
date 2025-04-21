@@ -175,4 +175,19 @@ public class UserRepositoryImpl implements IUserRepository {
         this.listOfUsers = userList;
     }
 
+    @Override
+    public Set<Post> findPostsByKeyword(Integer userId, String keyword) {
+        User user = listOfUsers.stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+        if (user == null) {
+            return null;
+        }
+
+        return user.getPost().stream()
+                .filter(p -> p.getProduct().getProductName().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toSet());
+    }
+
 }

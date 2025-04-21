@@ -56,10 +56,13 @@ public class ProductServiceImpl implements IProductService {
 
         if (!userRepository.addPostToUser(post))
             throw new NotFoundException("No se encontró al usuario");
-        if(post.getHasPromo() == null) post.setHasPromo(false);
-        if(post.getDiscount() == null) post.setDiscount(0D);
+        if (post.getHasPromo() == null)
+            post.setHasPromo(false);
+        if (post.getDiscount() == null)
+            post.setDiscount(0D);
 
-        if(!userRepository.addPostToUser(post)) throw new NotFoundException("No se encontró al usuario");
+        if (!userRepository.addPostToUser(post))
+            throw new NotFoundException("No se encontró al usuario");
 
         productRepository.savePost(post);
         post.setPostId(productRepository.findAllPosts().size() + 1);
@@ -140,5 +143,37 @@ public class ProductServiceImpl implements IProductService {
         }
         ObjectMapper mapper = new ObjectMapper();
         return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
+    }
+
+    @Override
+    public FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("No se encontró un usuario con ID: " + userId);
+        }
+
+        Set<Follow> followingList = user.getFollowing();
+        if (followingList == null || followingList.isEmpty()) {
+            throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<PostDto> filteredPosts = followingList.stream()
+                .map(seller -> userRepository.findPostsByKeyword(seller.getUserId(), keyword))
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .map(post -> mapper.convertValue(post, PostDto.class))
+                .collect(Collectors.toList());
+
+        if (filteredPosts.isEmpty()) {
+            throw new NotFoundException(
+                    "No se encontraron publicaciones que contengan la palabra clave '" + keyword
+                            + "' para los seguidos del usuario con ID: " + userId);
+        }
+
+        FollowingPostDto result = new FollowingPostDto();
+        result.setUserId(userId);
+        result.setPostDto(filteredPosts);
+        return result;
     }
 }

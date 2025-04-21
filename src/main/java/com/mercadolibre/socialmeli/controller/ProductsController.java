@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.controller;
 
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.service.IProductService;
@@ -13,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/products")
-
 public class ProductsController {
     @Autowired
     IProductService productService;
@@ -51,5 +51,12 @@ public class ProductsController {
     @GetMapping("/promo-post/list")
     public ResponseEntity<List<PostDto>> getPromosBySeller(@RequestParam Integer userId) {
         return new ResponseEntity<>(productService.getPromosBySeller(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/followed/{userId}/filterByKeyword")
+    public ResponseEntity<FollowingPostDto> getSellerPostsForUserByKeyword(@PathVariable int userId,
+            @RequestParam String keyword) {
+        return new ResponseEntity<>(productService.getSellerPostsForUserByKeyword(userId, keyword),
+                HttpStatus.OK);
     }
 }
