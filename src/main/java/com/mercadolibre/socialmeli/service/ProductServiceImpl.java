@@ -20,6 +20,7 @@ import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IProductRepository;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
 import com.mercadolibre.socialmeli.dto.ProductDto;
+import com.mercadolibre.socialmeli.dto.PromoPostCountDto;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
 
@@ -49,11 +50,12 @@ public class ProductServiceImpl implements IProductService {
         Post post = mapper.convertValue(postDto, Post.class);
 
         Boolean saved = productRepository.saveProduct(post.getProduct());
-
         if (!saved) {
             throw new ConflictException("Ya existe un producto con el id " + post.getProduct().getProductId());
         }
 
+        if (!userRepository.addPostToUser(post))
+            throw new NotFoundException("No se encontró al usuario");
         if(post.getHasPromo() == null) post.setHasPromo(false);
         if(post.getDiscount() == null) post.setDiscount(0D);
 
@@ -110,5 +112,23 @@ public class ProductServiceImpl implements IProductService {
         result.setUserId(userId);
         result.setPostDto(orderPosts(allRecentPosts, order));
         return result;
+    }
+
+    @Override
+    public PromoPostCountDto getPromoPostCount(Integer user_id) {
+        User user = userRepository.findUserById(user_id);
+        if (user == null) {
+            throw new NotFoundException("No se encontró un usuario con ID: " + user_id);
+        }
+
+        Set<Post> posts = userRepository.findRecentPostsForUser(user_id);
+        if (posts == null || posts.isEmpty()) {
+            throw new NotFoundException("No se encontraron publicaciones para el usuario con ID " + user_id);
+        }
+
+        Integer count = posts.stream()
+                .filter(post -> post.getHasPromo())
+                .collect(Collectors.toSet()).size();
+        return new PromoPostCountDto(user_id, user.getUserName(), count);
     }
 }
