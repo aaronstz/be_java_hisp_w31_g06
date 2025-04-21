@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -187,6 +185,26 @@ public class UserRepositoryImpl implements IUserRepository {
 
         return user.getPost().stream()
                 .filter(p -> p.getProduct().getProductName().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Post> findPostsByFollowedUsersAndCategory(Integer userId, Integer categoryId) {
+        User user = this.findUserById(userId);
+        if (user == null || user.getFollowing() == null) return Collections.emptySet();
+
+        return user.getFollowing().stream()
+                .map(follow -> findPostsForUserByCategory(follow.getUserId(), categoryId))
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+    private Set<Post> findPostsForUserByCategory(Integer sellerId, Integer categoryId) {
+        User seller = this.findUserById(sellerId);
+        if (seller == null || seller.getPost() == null) return Collections.emptySet();
+
+        return seller.getPost().stream()
+                .filter(post -> Objects.equals(post.getCategory(), categoryId))
                 .collect(Collectors.toSet());
     }
 

@@ -20,4 +20,6 @@ public interface IProductService {
     FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword);
 
     List<PostDto> getPromosBySeller(Integer userId);
+
+    FollowingPostDto getSellerPostsForUserByCategory(Integer userId, Integer categoryId);
 }

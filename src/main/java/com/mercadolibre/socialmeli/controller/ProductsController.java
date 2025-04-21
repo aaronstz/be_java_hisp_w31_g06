@@ -59,4 +59,11 @@ public class ProductsController {
         return new ResponseEntity<>(productService.getSellerPostsForUserByKeyword(userId, keyword),
                 HttpStatus.OK);
     }
+
+    @GetMapping("/followed/{userId}/filterByCategory")
+    public ResponseEntity<FollowingPostDto> getSellerPostsByCategory(
+            @PathVariable Integer userId,
+            @RequestParam Integer filterCategory) {
+        return new ResponseEntity<>(productService.getSellerPostsForUserByCategory(userId, filterCategory), HttpStatus.OK);
+    }
 }
