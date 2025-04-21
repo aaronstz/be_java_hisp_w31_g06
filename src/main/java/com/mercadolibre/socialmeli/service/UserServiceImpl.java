@@ -72,7 +72,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserListDto getFollowersList(Integer userId) {
+    public UserListDto getFollowersList(Integer userId, String order) {
 
         Set<Follow> foundFollower = userRepository.findFollowersList(userId);
 
@@ -81,17 +81,21 @@ public class UserServiceImpl implements IUserService {
             throw new NotFoundException("No se encontraron seguidores");
         }
 
-        Set<Follow> filterFoundFollowers = foundFollower.stream().map(f -> {
+        List<Follow> filterFoundFollowers = foundFollower.stream().map(f -> {
             Follow foundFollow = new Follow();
             foundFollow.setUserId(f.getUserId());
             foundFollow.setUserName(f.getUserName());
             return foundFollow;
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
+
+        sortFollowListByName(filterFoundFollowers, order);
+
+        Set<Follow> orderedFollowerSet = new LinkedHashSet<>(filterFoundFollowers);
 
         UserListDto foundList = new UserListDto();
         foundList.setUserId(userId);
         foundList.setUserName(userRepository.findUserById(userId).getUserName());
-        foundList.setFollower(filterFoundFollowers);
+        foundList.setFollower(orderedFollowerSet);
 
         return foundList;
 
