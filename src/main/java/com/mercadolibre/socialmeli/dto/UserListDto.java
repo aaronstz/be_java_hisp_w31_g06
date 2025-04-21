@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.dto;
 
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,6 @@ public class UserListDto implements Serializable {
 
     private Integer userId;
     private String userName;
-    private Set<User> follower;
+    private Set<Follow> follower;
 
 }

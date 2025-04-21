@@ -70,7 +70,28 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserListDto getFollowersList(Integer userId) {
-        return null;
+
+        Set<Follow> foundFollower = userRepository.findFollowersList(userId);
+
+
+        if(foundFollower == null) {
+            throw new NotFoundException("No se encontraron seguidores");
+        }
+
+        Set<Follow> filterFoundFollowers = foundFollower.stream().map(f -> {
+            Follow foundFollow = new Follow();
+            foundFollow.setUserId(f.getUserId());
+            foundFollow.setUserName(f.getUserName());
+            return foundFollow;
+        }).collect(Collectors.toSet());
+
+        UserListDto foundList = new UserListDto();
+        foundList.setUserId(userId);
+        foundList.setUserName(userRepository.findUserById(userId).getUserName());
+        foundList.setFollower(filterFoundFollowers);
+
+        return foundList;
+
     }
 
     @Override

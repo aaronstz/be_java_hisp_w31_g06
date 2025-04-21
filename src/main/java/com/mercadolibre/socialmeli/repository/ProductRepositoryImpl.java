@@ -42,6 +42,8 @@ public class ProductRepositoryImpl implements IProductRepository {
                 .filter(Objects::nonNull)
                 .max(Integer::compare)
                 .orElse(0);
+
+
         return maxId + 1;
     }
 
