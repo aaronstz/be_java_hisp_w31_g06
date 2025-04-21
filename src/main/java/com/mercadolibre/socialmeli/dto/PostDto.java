@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mercadolibre.socialmeli.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PostDto implements Serializable {
     private Integer userId;
     private Integer postId;

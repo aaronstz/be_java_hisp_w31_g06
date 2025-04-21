@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/products")
-
 public class ProductsController {
     @Autowired
     IProductService productService;
@@ -40,8 +39,12 @@ public class ProductsController {
     }
 
     @GetMapping("/promo-post/count")
-    public ResponseEntity<?> getPromoPostCount(@RequestParam int user_id) {
-        return new ResponseEntity<>(productService.getPromoPostCount(user_id), HttpStatus.OK);
+    public ResponseEntity<?> getPromoPostCount(@RequestParam int userId) {
+        return new ResponseEntity<>(productService.getPromoPostCount(userId), HttpStatus.OK);
     }
 
+    @GetMapping("/followed/{userId}/filterByKeyword")
+    public ResponseEntity<?> getSellerPostsForUserByKeyword(@PathVariable int userId, @RequestParam String keyword) {
+        return new ResponseEntity<>(productService.getSellerPostsForUserByKeyword(userId, keyword), HttpStatus.OK);
+    }
 }

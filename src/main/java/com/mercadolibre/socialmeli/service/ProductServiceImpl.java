@@ -124,4 +124,36 @@ public class ProductServiceImpl implements IProductService {
                 .collect(Collectors.toSet()).size();
         return new PromoPostCountDto(user_id, user.getUserName(), count);
     }
+
+    @Override
+    public FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("No se encontró un usuario con ID: " + userId);
+        }
+
+        Set<Follow> followingList = user.getFollowing();
+        if (followingList == null || followingList.isEmpty()) {
+            throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<PostDto> filteredPosts = followingList.stream()
+                .map(seller -> userRepository.findPostsByKeyword(seller.getUserId(), keyword))
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .map(post -> mapper.convertValue(post, PostDto.class))
+                .collect(Collectors.toList());
+
+        if (filteredPosts.isEmpty()) {
+            throw new NotFoundException(
+                    "No se encontraron publicaciones que contengan la palabra clave '" + keyword
+                            + "' para los seguidos del usuario con ID: " + userId);
+        }
+
+        FollowingPostDto result = new FollowingPostDto();
+        result.setUserId(userId);
+        result.setPostDto(filteredPosts);
+        return result;
+    }
 }
