@@ -16,7 +16,7 @@ public interface IUserService {
 
     FollowerCountDto getFollowersCount(Integer userId);
 
-    UserListDto getFollowersList(Integer userId);
+    UserListDto getFollowersList(Integer userId, String order);
 
     FollowingListDto getFollowedList(Integer userId, String order);
 
