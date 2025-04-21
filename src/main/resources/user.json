@@ -38,7 +38,8 @@
         },
         "category": 10,
         "price": 199.99,
-        "hasPromo": true
+        "hasPromo": false,
+        "discount": 0.25
       }
     ]
   },
@@ -77,7 +78,8 @@
         },
         "category": 10,
         "price": 199.99,
-        "hasPromo": false
+        "hasPromo": false,
+        "discount": 0.25
       }
     ]
   },
@@ -112,7 +114,8 @@
         },
         "category": 10,
         "price": 199.99,
-        "hasPromo": false
+        "hasPromo": false,
+        "discount": 0.25
       }
     ]
   },
@@ -159,7 +162,8 @@
         },
         "category": 10,
         "price": 129.99,
-        "hasPromo": false
+        "hasPromo": false,
+        "discount": 0.25
       },
       {
         "userId": 4,
@@ -175,7 +179,8 @@
         },
         "category": 10,
         "price": 129.99,
-        "hasPromo": true
+        "hasPromo": false,
+        "discount": 0.25
       }
     ]
   }
