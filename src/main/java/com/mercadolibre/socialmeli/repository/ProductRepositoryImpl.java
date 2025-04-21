@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
-import com.mercadolibre.socialmeli.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
@@ -75,7 +73,7 @@ public class ProductRepositoryImpl implements IProductRepository {
     }
 
     @Override
-    public Post findPostById(Integer postId) { // TODO ❤️
+    public Post findPostById(Integer postId) {
         return null;
     }
 

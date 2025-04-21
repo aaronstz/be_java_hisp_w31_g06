@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,4 +17,6 @@ public class PostDto implements Serializable {
     private Product product;
     private Integer category;
     private Double price;
+    private Boolean hasPromo;
+    private Double discount;
 }
