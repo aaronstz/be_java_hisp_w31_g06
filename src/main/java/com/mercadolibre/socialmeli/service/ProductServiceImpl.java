@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
@@ -15,14 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolibre.socialmeli.dto.FollowingPostDto;
-import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IProductRepository;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
-import com.mercadolibre.socialmeli.dto.ProductDto;
-import com.mercadolibre.socialmeli.dto.PromoPostCountDto;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
 
@@ -33,6 +30,9 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IUserRepository userRepository;
 
+    final ObjectMapper mapper = new ObjectMapper();
+
+
     @Override
     public List<ProductDto> getAll() {
         List<Product> allProducts = productRepository.findAllProducts();
@@ -41,14 +41,11 @@ public class ProductServiceImpl implements IProductService {
             throw new NotFoundException("No se encontraron productos.");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
         return allProducts.stream().map(p -> mapper.convertValue(p, ProductDto.class)).toList();
     }
 
     @Override
     public PostDto createPost(PostDto postDto) {
-        ObjectMapper mapper = new ObjectMapper();
-
         Post post = mapper.convertValue(postDto, Post.class);
 
         Boolean saved = productRepository.saveProduct(post.getProduct());
@@ -102,7 +99,6 @@ public class ProductServiceImpl implements IProductService {
             throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
         List<PostDto> allRecentPosts = followingList.stream()
                 .map(seller -> userRepository.findRecentPostsForUser(seller.getUserId()))
                 .filter(Objects::nonNull)
@@ -141,13 +137,25 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<PostDto> getPromosBySeller(Integer userId) {
+    public PromoPostDto getPromosBySeller(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("No se encontró el usuario con id " + userId);
+        }
         List<Post> promoPosts = productRepository.findPromosBySeller(userId);
         if (promoPosts.isEmpty()) {
             throw new NotFoundException("No se encontraron promociones del vendedor con id " + userId);
         }
-        ObjectMapper mapper = new ObjectMapper();
-        return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
+        PromoPostDto foundPromo = new PromoPostDto();
+        foundPromo.setUserId(userId);
+        foundPromo.setUserName(userRepository.findUserById(userId).getUserName());
+
+        List<PostDto> mappedPosts = promoPosts.stream()
+                .map(p -> mapper.convertValue(p, PostDto.class))
+                .collect(Collectors.toList());;
+
+        foundPromo.setPosts(mappedPosts);
+        return foundPromo;
     }
 
     @Override
@@ -156,7 +164,6 @@ public class ProductServiceImpl implements IProductService {
         if (promoPosts.isEmpty()) {
             throw new NotFoundException("No se encontraron promociones");
         }
-        ObjectMapper mapper = new ObjectMapper();
         return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
     }
 
@@ -169,7 +176,6 @@ public class ProductServiceImpl implements IProductService {
             throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
         List<PostDto> filteredPosts = followingList.stream()
                 .map(seller -> userRepository.findPostsByKeyword(seller.getUserId(), keyword))
                 .filter(Objects::nonNull)
@@ -206,7 +212,6 @@ public class ProductServiceImpl implements IProductService {
             throw new NotFoundException("No se encontraron publicaciones para la categoría proporcionada.");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
         List<PostDto> postDtos = posts.stream()
                 .map(post -> mapper.convertValue(post, PostDto.class))
                 .collect(Collectors.toList());
