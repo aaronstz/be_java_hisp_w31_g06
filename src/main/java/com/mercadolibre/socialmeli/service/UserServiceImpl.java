@@ -128,7 +128,7 @@ public class UserServiceImpl implements IUserService {
         }
     }
     @Override
-    public void unFollow(Integer userId, Integer userIdToUnFollow) {
+    public MensajeDto unFollow(Integer userId, Integer userIdToUnFollow) {
         if (userId.equals(userIdToUnFollow)) {
             throw new ConflictException("Un usuario no puede dejar de seguirse.");
         }
@@ -143,6 +143,8 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("Ni se puede dejar de seguir a un usuario que no estás siguiendo");
         }
         userRepository.removeFollow(user, userToUnFollow);
+
+        return new MensajeDto("Fue eliminado exitosamente el usuario");
     }
 
     private List<User> getListOfUsers() {

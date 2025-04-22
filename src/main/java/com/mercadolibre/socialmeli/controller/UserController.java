@@ -42,10 +42,10 @@ public class UserController {
     }
   
     @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
-    public ResponseEntity<?> unfollowUser(@PathVariable int userId,
+    public ResponseEntity<MensajeDto> unfollowUser(@PathVariable int userId,
                                           @PathVariable int userIdToUnfollow ){
-        userService.unFollow(userId, userIdToUnfollow);
-        return new ResponseEntity<>( "Fue eliminado exitosamente el usuario",HttpStatus.OK);
+
+        return new ResponseEntity<>( userService.unFollow(userId, userIdToUnfollow), HttpStatus.OK);
     }
   
     @GetMapping("/{userId}/followers/count")
