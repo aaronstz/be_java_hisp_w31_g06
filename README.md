@@ -165,5 +165,42 @@
 
 **Response:**     
 ```json
-
+{
+    [ 
+        {
+            "userId": 123,
+            "postId": 32,
+            "date": "01-05-2021",
+            "product": {
+                "product_id": 62,
+                "product_name": "Headset RGB Inalámbrico",
+                "type": "Gamer",
+                "brand": "Razer",
+                "color": "Green with RGB",
+                "notes": "Sin Batería"
+            },
+            "category": 120,
+            "price": 2800.69,
+            "hasPromo": true,
+            "discount" 0.25
+        },
+        {
+            "userId": 123,
+            "post_id": 18,
+            "date": "29-04-2021",
+            "product": {
+                "product_id": 1,
+                "productName": "Silla Gamer",
+                "type": "Gamer",
+                "brand": "Racer",
+                "color": "Red & Black",
+                "notes": "Special Edition"
+            },
+            "category": 100,
+            "price": 15000.50
+            "hasPromo": false,
+            "discount" 0
+        }
+    ]
+}
 ```
