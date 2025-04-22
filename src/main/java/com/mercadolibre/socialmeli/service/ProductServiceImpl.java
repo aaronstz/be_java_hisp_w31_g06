@@ -12,8 +12,6 @@ import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -140,7 +138,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         Integer count = posts.stream()
-                .filter(post -> post.getHasPromo())
+                .filter(Post::getHasPromo)
                 .collect(Collectors.toSet()).size();
         return new PromoPostCountDto(user_id, user.getUserName(), count);
     }
