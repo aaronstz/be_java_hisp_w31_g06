@@ -16,10 +16,7 @@ import com.mercadolibre.socialmeli.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,57 +70,53 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserListDto getFollowersList(Integer userId, String order) {
+        Set<Follow> foundFollowers = Optional.ofNullable(userRepository.findFollowersList(userId))
+                .orElseThrow(() -> new NotFoundException("No se encontraron seguidores para el usuario con ID: " + userId));
 
-        Set<Follow> foundFollower = userRepository.findFollowersList(userId);
+        List<Follow> filteredFollowers = createFollowList(foundFollowers);
+        sortFollowListByName(filteredFollowers, order);
 
-
-        if(foundFollower == null) {
-            throw new NotFoundException("No se encontraron seguidores");
-        }
-
-        List<Follow> filterFoundFollowers = foundFollower.stream().map(f -> {
-            Follow foundFollow = new Follow();
-            foundFollow.setUserId(f.getUserId());
-            foundFollow.setUserName(f.getUserName());
-            return foundFollow;
-        }).collect(Collectors.toList());
-
-        sortFollowListByName(filterFoundFollowers, order);
-
-        Set<Follow> orderedFollowerSet = new LinkedHashSet<>(filterFoundFollowers);
-
-        UserListDto foundList = new UserListDto();
-        foundList.setUserId(userId);
-        foundList.setUserName(userRepository.findUserById(userId).getUserName());
-        foundList.setFollower(orderedFollowerSet);
-
-        return foundList;
+        return buildUserListDto(userId, filteredFollowers);
     }
 
     @Override
     public FollowingListDto getFollowedList(Integer userId, String order) {
-        Set<Follow> foundFollowing = userRepository.findFollowingList(userId);
-        if (foundFollowing == null) {
-            throw new NotFoundException("No se encontraron seguidos");
-        }
-        List<Follow> followedList = foundFollowing.stream().map(f -> {
-            Follow foundFollow = new Follow();
-            foundFollow.setUserId(f.getUserId());
-            foundFollow.setUserName(f.getUserName());
-            return foundFollow;
-        }).collect(Collectors.toList());
+        Set<Follow> foundFollowing = Optional.ofNullable(userRepository.findFollowingList(userId))
+                .orElseThrow(() -> new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId));
 
+        List<Follow> followedList = createFollowList(foundFollowing);
         sortFollowListByName(followedList, order);
 
-        Set<Follow> orderedFollowedSet = new LinkedHashSet<>(followedList);
-
-        FollowingListDto foundList = new FollowingListDto();
-        foundList.setUserId(userId);
-        foundList.setUserName(userRepository.findUserById(userId).getUserName());
-        foundList.setFollowed(orderedFollowedSet);
-
-        return foundList;
+        return buildFollowingListDto(userId, followedList);
     }
+
+    private List<Follow> createFollowList(Set<Follow> foundFollowers) {
+        return foundFollowers.stream()
+                .map(f -> {
+                    Follow follow = new Follow();
+                    follow.setUserId(f.getUserId());
+                    follow.setUserName(f.getUserName());
+                    return follow;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private UserListDto buildUserListDto(int userId, List<Follow> followers) {
+        UserListDto userListDto = new UserListDto();
+        userListDto.setUserId(userId);
+        userListDto.setUserName(userRepository.findUserById(userId).getUserName());
+        userListDto.setFollower(new LinkedHashSet<>(followers));
+        return userListDto;
+    }
+
+    private FollowingListDto buildFollowingListDto(int userId, List<Follow> followed) {
+        FollowingListDto followingListDto = new FollowingListDto();
+        followingListDto.setUserId(userId);
+        followingListDto.setUserName(userRepository.findUserById(userId).getUserName());
+        followingListDto.setFollowed(new LinkedHashSet<>(followed));
+        return followingListDto;
+    }
+
     private void sortFollowListByName(List<Follow> list, String order) {
         switch (order.toLowerCase()) {
             case "name_desc":
