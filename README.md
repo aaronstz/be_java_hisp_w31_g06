@@ -165,19 +165,18 @@
 
 **Response:**     
 ```json
-{
-    [ 
-        {
-            "userId": 123,
-            "postId": 32,
-            "date": "01-05-2021",
-            "product": {
-                "product_id": 62,
-                "product_name": "Headset RGB Inalámbrico",
-                "type": "Gamer",
-                "brand": "Razer",
-                "color": "Green with RGB",
-                "notes": "Sin Batería"
+[ 
+    {
+        "userId": 123,
+        "postId": 32,
+        "date": "01-05-2021",
+        "product": {
+            "product_id": 62,
+            "product_name": "Headset RGB Inalámbrico",
+            "type": "Gamer",
+            "brand": "Razer",
+            "color": "Green with RGB",
+            "notes": "Sin Batería"
             },
             "category": 120,
             "price": 2800.69,
@@ -196,11 +195,10 @@
                 "color": "Red & Black",
                 "notes": "Special Edition"
             },
-            "category": 100,
-            "price": 15000.50
-            "hasPromo": false,
-            "discount" 0
-        }
-    ]
-}
+        "category": 100,
+        "price": 15000.50
+        "hasPromo": false,
+        "discount" 0
+    }
+]
 ```
