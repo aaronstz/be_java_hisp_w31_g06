@@ -146,6 +146,16 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public List<PostDto> getAllPromos() {
+        List<Post> promoPosts = productRepository.getAllPromos();
+        if (promoPosts.isEmpty()) {
+            throw new NotFoundException("No se encontraron promociones");
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
+    }
+
+    @Override
     public FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword) {
         User user = userRepository.findUserById(userId);
         if (user == null) {
