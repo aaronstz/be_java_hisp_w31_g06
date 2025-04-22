@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,8 @@ import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,7 +91,13 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
-        User user = userRepository.findUserById(userId);
+
+        if (!order.equals("date_asc") && !order.equals("date_desc")) {
+            throw new BadRequestException("El orden solo puede ser 'date_asc' o 'date_desc'");
+        }
+
+        User user = getUserById(userId);
+
         if (user == null) {
             throw new NotFoundException("No se encontró un usuario con ID: " + userId);
         }
@@ -160,10 +169,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword) {
-        User user = userRepository.findUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("No se encontró un usuario con ID: " + userId);
-        }
+        User user = getUserById(userId);
 
         Set<Follow> followingList = user.getFollowing();
         if (followingList == null || followingList.isEmpty()) {
@@ -188,6 +194,11 @@ public class ProductServiceImpl implements IProductService {
         result.setUserId(userId);
         result.setPostDto(filteredPosts);
         return result;
+    }
+
+    private User getUserById(Integer userId) {
+        return Optional.ofNullable(userRepository.findUserById(userId))
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: " + userId));
     }
 
     @Override
