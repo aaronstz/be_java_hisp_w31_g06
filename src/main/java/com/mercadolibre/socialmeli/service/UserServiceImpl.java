@@ -1,10 +1,8 @@
 package com.mercadolibre.socialmeli.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolibre.socialmeli.dto.FollowerCountDto;
-import com.mercadolibre.socialmeli.dto.FollowingListDto;
-import com.mercadolibre.socialmeli.dto.UserDto;
-import com.mercadolibre.socialmeli.dto.UserListDto;
+import com.mercadolibre.socialmeli.dto.*;
+
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
 
@@ -35,7 +33,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String follow(Integer userId, Integer userIdToFollow) {
+    public MensajeDto follow(Integer userId, Integer userIdToFollow) {
         if (userId.equals(userIdToFollow)) {
             throw new ConflictException("Un usuario no puede seguirse a sí mismo");
         }
@@ -51,7 +49,7 @@ public class UserServiceImpl implements IUserService {
 
         userRepository.saveFollow(userId, userIdToFollow);
 
-        return "El usuario " + userId + " siguio a " + userIdToFollow;
+        return new MensajeDto("El usuario " + userId + " siguió al usuario " + userIdToFollow);
     }
 
     @Override

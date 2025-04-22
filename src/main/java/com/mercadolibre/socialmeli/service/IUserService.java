@@ -1,9 +1,6 @@
 package com.mercadolibre.socialmeli.service;
 
-import com.mercadolibre.socialmeli.dto.FollowerCountDto;
-import com.mercadolibre.socialmeli.dto.FollowingListDto;
-import com.mercadolibre.socialmeli.dto.UserDto;
-import com.mercadolibre.socialmeli.dto.UserListDto;
+import com.mercadolibre.socialmeli.dto.*;
 
 import java.util.List;
 
@@ -12,7 +9,7 @@ public interface IUserService {
 
     List<UserDto> getAll();
 
-    String follow(Integer userId, Integer userIdToFollow);
+    MensajeDto follow(Integer userId, Integer userIdToFollow);
 
     FollowerCountDto getFollowersCount(Integer userId);
 
