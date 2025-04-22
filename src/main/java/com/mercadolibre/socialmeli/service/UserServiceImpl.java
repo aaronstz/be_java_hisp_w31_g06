@@ -146,13 +146,4 @@ public class UserServiceImpl implements IUserService {
 
         return new MensajeDto("Fue eliminado exitosamente el usuario");
     }
-
-    private List<User> getListOfUsers() {
-        List<User> userList = userRepository.findAll();
-
-        if (userList.isEmpty()) {
-            throw new NotFoundException("No se encontraron productos.");
-        }
-        return userList;
-    }
 }
