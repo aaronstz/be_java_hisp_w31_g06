@@ -3,6 +3,7 @@ package com.mercadolibre.socialmeli.controller;
 import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.dto.ProductDto;
+import com.mercadolibre.socialmeli.dto.PromoPostDto;
 import com.mercadolibre.socialmeli.service.IProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class ProductsController {
     }
 
     @GetMapping("/promo-post/list")
-    public ResponseEntity<List<PostDto>> getPromosBySeller(@RequestParam Integer userId) {
+    public ResponseEntity<PromoPostDto> getPromosBySeller(@RequestParam Integer userId) {
         return new ResponseEntity<>(productService.getPromosBySeller(userId), HttpStatus.OK);
     }
 
