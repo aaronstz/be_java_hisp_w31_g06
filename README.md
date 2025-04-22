@@ -181,7 +181,7 @@
             "category": 120,
             "price": 2800.69,
             "hasPromo": true,
-            "discount" 0.25
+            "discount": 0.25
         },
         {
             "userId": 123,
@@ -198,7 +198,7 @@
         "category": 100,
         "price": 15000.50
         "hasPromo": false,
-        "discount" 0
+        "discount": 0
     }
 ]
 ```
