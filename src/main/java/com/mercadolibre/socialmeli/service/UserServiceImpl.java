@@ -98,7 +98,6 @@ public class UserServiceImpl implements IUserService {
         foundList.setFollower(orderedFollowerSet);
 
         return foundList;
-
     }
 
     @Override
@@ -149,11 +148,9 @@ public class UserServiceImpl implements IUserService {
         if (user == null || userToUnFollow == null) {
             throw new NotFoundException("Uno de los usuarios no fue encontrado");
         }
-
         if (!userRepository.isFollowing(userId, userIdToUnFollow)) {
             throw new ConflictException("Ni se puede dejar de seguir a un usuario que no estás siguiendo");
         }
-
         userRepository.removeFollow(user, userToUnFollow);
     }
 
@@ -163,7 +160,6 @@ public class UserServiceImpl implements IUserService {
         if (userList.isEmpty()) {
             throw new NotFoundException("No se encontraron productos.");
         }
-
         return userList;
     }
 }

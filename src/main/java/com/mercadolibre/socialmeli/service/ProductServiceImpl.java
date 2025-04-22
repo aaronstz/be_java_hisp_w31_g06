@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -145,6 +146,8 @@ public class ProductServiceImpl implements IProductService {
         return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
     }
 
+
+
     @Override
     public List<PostDto> getAllPromos() {
         List<Post> promoPosts = productRepository.getAllPromos();
@@ -184,6 +187,29 @@ public class ProductServiceImpl implements IProductService {
         FollowingPostDto result = new FollowingPostDto();
         result.setUserId(userId);
         result.setPostDto(filteredPosts);
+        return result;
+    }
+
+    @Override
+    public FollowingPostDto getSellerPostsForUserByCategory(Integer userId, Integer categoryId) {
+        if (categoryId == null || categoryId <= 0) {
+            throw new BadRequestException("Debe proporcionar una categoría válida.");
+        }
+
+        Set<Post> posts = userRepository.findPostsByFollowedUsersAndCategory(userId, categoryId);
+
+        if (posts == null || posts.isEmpty()) {
+            throw new NotFoundException("No se encontraron publicaciones para la categoría proporcionada.");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<PostDto> postDtos = posts.stream()
+                .map(post -> mapper.convertValue(post, PostDto.class))
+                .collect(Collectors.toList());
+
+        FollowingPostDto result = new FollowingPostDto();
+        result.setUserId(userId);
+        result.setPostDto(postDtos);
         return result;
     }
 }
