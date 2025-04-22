@@ -153,8 +153,6 @@ public class ProductServiceImpl implements IProductService {
         return promoPosts.stream().map(p -> mapper.convertValue(p, PostDto.class)).toList();
     }
 
-
-
     @Override
     public List<PostDto> getAllPromos() {
         List<Post> promoPosts = productRepository.getAllPromos();

@@ -144,6 +144,6 @@ public class UserServiceImpl implements IUserService {
         }
         userRepository.removeFollow(user, userToUnFollow);
 
-        return new MensajeDto("Fue eliminado exitosamente el usuario");
+        return new MensajeDto("El usuario " + userId + " a dejado de seguir al usuario " + userIdToUnFollow);
     }
 }
