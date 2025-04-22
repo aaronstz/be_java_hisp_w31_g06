@@ -63,9 +63,6 @@ public class ProductServiceImpl implements IProductService {
         if (post.getDiscount() == null)
             post.setDiscount(0D);
 
-        if (!userRepository.addPostToUser(post))
-            throw new NotFoundException("No se encontró al usuario");
-
         productRepository.savePost(post);
         post.setPostId(productRepository.findAllPosts().size() + 1);
 

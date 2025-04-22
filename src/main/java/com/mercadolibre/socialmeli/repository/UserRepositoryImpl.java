@@ -146,12 +146,6 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
     @Override
-    public boolean existsById(Integer userId) {
-        return listOfUsers.stream()
-                .anyMatch(user -> user.getUserId().equals(userId));
-    }
-
-    @Override
     public boolean isFollowing(Integer userId, Integer userIdToUnFollow) {
         User user = findUserById(userId);
         if (user == null) {
@@ -199,6 +193,7 @@ public class UserRepositoryImpl implements IUserRepository {
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
     }
+
     private Set<Post> findPostsForUserByCategory(Integer sellerId, Integer categoryId) {
         User seller = this.findUserById(sellerId);
         if (seller == null || seller.getPost() == null) return Collections.emptySet();
@@ -207,5 +202,4 @@ public class UserRepositoryImpl implements IUserRepository {
                 .filter(post -> Objects.equals(post.getCategory(), categoryId))
                 .collect(Collectors.toSet());
     }
-
 }

@@ -8,20 +8,12 @@ import com.mercadolibre.socialmeli.dto.PromoPostCountDto;
 import java.util.List;
 
 public interface IProductService {
-
     List<ProductDto> getAll();
-
     PostDto createPost(PostDto post);
-
     FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order);
-
     PromoPostCountDto getPromoPostCount(Integer userId);
-
     FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword);
-
     List<PostDto> getPromosBySeller(Integer userId);
-
     FollowingPostDto getSellerPostsForUserByCategory(Integer userId, Integer categoryId);
-
     List<PostDto> getAllPromos();
 }

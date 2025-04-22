@@ -34,21 +34,6 @@ public class ProductRepositoryImpl implements IProductRepository {
     }
 
     @Override
-    public Integer createNewId() {
-        if (listOfPosts.isEmpty()) {
-            return 1;
-        }
-        Integer maxId = listOfPosts.stream()
-                .map(Post::getPostId)
-                .filter(Objects::nonNull)
-                .max(Integer::compare)
-                .orElse(0);
-
-
-        return maxId + 1;
-    }
-
-    @Override
     public void savePost(Post post) {
         listOfPosts.add(post);
     }
@@ -66,16 +51,6 @@ public class ProductRepositoryImpl implements IProductRepository {
         Product found = listOfProducts.stream().filter(p -> p.getProductId()
                 .equals(product.getProductId())).findFirst().orElse(null);
         return found != null;
-    }
-
-    @Override
-    public Set<Post> findRecentPostsForUser(Integer userId) {
-        return null;
-    }
-
-    @Override
-    public Post findPostById(Integer postId) {
-        return null;
     }
 
     @Override

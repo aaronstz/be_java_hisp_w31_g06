@@ -127,6 +127,7 @@ public class UserServiceImpl implements IUserService {
                 throw new BadRequestException("Parámetro 'order' inválido. Valores permitidos: name_asc, name_desc");
         }
     }
+
     @Override
     public MensajeDto unFollow(Integer userId, Integer userIdToUnFollow) {
         if (userId.equals(userIdToUnFollow)) {
