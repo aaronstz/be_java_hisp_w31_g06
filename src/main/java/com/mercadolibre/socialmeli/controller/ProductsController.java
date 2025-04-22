@@ -53,6 +53,11 @@ public class ProductsController {
         return new ResponseEntity<>(productService.getPromosBySeller(userId), HttpStatus.OK);
     }
 
+    @GetMapping("/promotions")
+    public ResponseEntity<List<PostDto>> getAllPromos() {
+        return new ResponseEntity<>(productService.getAllPromos(), HttpStatus.OK);
+    }
+
     @GetMapping("/followed/{userId}/filterByKeyword")
     public ResponseEntity<FollowingPostDto> getSellerPostsForUserByKeyword(@PathVariable int userId,
             @RequestParam String keyword) {

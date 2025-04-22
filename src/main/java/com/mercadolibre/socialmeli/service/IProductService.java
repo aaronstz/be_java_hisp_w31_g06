@@ -22,4 +22,6 @@ public interface IProductService {
     List<PostDto> getPromosBySeller(Integer userId);
 
     FollowingPostDto getSellerPostsForUserByCategory(Integer userId, Integer categoryId);
+
+    List<PostDto> getAllPromos();
 }
