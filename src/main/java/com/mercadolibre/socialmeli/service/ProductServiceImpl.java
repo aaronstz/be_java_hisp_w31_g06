@@ -152,7 +152,7 @@ public class ProductServiceImpl implements IProductService {
 
         List<PostDto> mappedPosts = promoPosts.stream()
                 .map(p -> mapper.convertValue(p, PostDto.class))
-                .collect(Collectors.toList());;
+                .collect(Collectors.toList());
 
         foundPromo.setPosts(mappedPosts);
         return foundPromo;
