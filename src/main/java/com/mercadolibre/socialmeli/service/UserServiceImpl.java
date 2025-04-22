@@ -1,10 +1,8 @@
 package com.mercadolibre.socialmeli.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolibre.socialmeli.dto.FollowerCountDto;
-import com.mercadolibre.socialmeli.dto.FollowingListDto;
-import com.mercadolibre.socialmeli.dto.UserDto;
-import com.mercadolibre.socialmeli.dto.UserListDto;
+import com.mercadolibre.socialmeli.dto.*;
+
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
 
@@ -32,7 +30,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String follow(Integer userId, Integer userIdToFollow) {
+    public MensajeDto follow(Integer userId, Integer userIdToFollow) {
         if (userId.equals(userIdToFollow)) {
             throw new ConflictException("Un usuario no puede seguirse a sí mismo");
         }
@@ -48,7 +46,7 @@ public class UserServiceImpl implements IUserService {
 
         userRepository.saveFollow(userId, userIdToFollow);
 
-        return "El usuario " + userId + " siguio a " + userIdToFollow;
+        return new MensajeDto("El usuario " + userId + " siguió al usuario " + userIdToFollow);
     }
 
     @Override
@@ -130,7 +128,7 @@ public class UserServiceImpl implements IUserService {
         }
     }
     @Override
-    public void unFollow(Integer userId, Integer userIdToUnFollow) {
+    public MensajeDto unFollow(Integer userId, Integer userIdToUnFollow) {
         if (userId.equals(userIdToUnFollow)) {
             throw new ConflictException("Un usuario no puede dejar de seguirse.");
         }
@@ -145,14 +143,7 @@ public class UserServiceImpl implements IUserService {
             throw new ConflictException("Ni se puede dejar de seguir a un usuario que no estás siguiendo");
         }
         userRepository.removeFollow(user, userToUnFollow);
-    }
 
-    private List<User> getListOfUsers() {
-        List<User> userList = userRepository.findAll();
-
-        if (userList.isEmpty()) {
-            throw new NotFoundException("No se encontraron productos.");
-        }
-        return userList;
+        return new MensajeDto("Fue eliminado exitosamente el usuario");
     }
 }

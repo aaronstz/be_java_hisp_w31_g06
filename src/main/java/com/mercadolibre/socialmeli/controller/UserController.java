@@ -1,6 +1,7 @@
 package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowingListDto;
+import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/follow/{userIdToFollow}")
-    public ResponseEntity<String> follow(@PathVariable int userId, @PathVariable int userIdToFollow) {
+    public ResponseEntity<MensajeDto> follow(@PathVariable int userId, @PathVariable int userIdToFollow) {
         return new ResponseEntity<>(userService.follow(userId, userIdToFollow), HttpStatus.OK);
     }
   
@@ -41,10 +42,10 @@ public class UserController {
     }
   
     @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
-    public ResponseEntity<?> unfollowUser(@PathVariable int userId,
+    public ResponseEntity<MensajeDto> unfollowUser(@PathVariable int userId,
                                           @PathVariable int userIdToUnfollow ){
-        userService.unFollow(userId, userIdToUnfollow);
-        return new ResponseEntity<>( "Fue eliminado exitosamente el usuario",HttpStatus.OK);
+
+        return new ResponseEntity<>( userService.unFollow(userId, userIdToUnfollow), HttpStatus.OK);
     }
   
     @GetMapping("/{userId}/followers/count")
