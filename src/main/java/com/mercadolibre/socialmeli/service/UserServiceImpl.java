@@ -141,7 +141,7 @@ public class UserServiceImpl implements IUserService {
             throw new NotFoundException("Uno de los usuarios no fue encontrado");
         }
         if (!userRepository.isFollowing(userId, userIdToUnFollow)) {
-            throw new ConflictException("Ni se puede dejar de seguir a un usuario que no estás siguiendo");
+            throw new ConflictException("No se puede dejar de seguir a un usuario que no estás siguiendo");
         }
         userRepository.removeFollow(user, userToUnFollow);
 
