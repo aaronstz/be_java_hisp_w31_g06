@@ -39,7 +39,7 @@
         "category": 10,
         "price": 199.99,
         "hasPromo": false,
-        "discount": 0.25
+        "discount": 0.0
       }
     ]
   },
@@ -59,27 +59,31 @@
     ],
     "following": [
       {
+        "userId": 1,
+        "userName": "johndoe"
+      },
+      {
         "userId": 4,
         "userName": "alicewhite"
       }
     ],
     "post": [
       {
-        "userId": 1,
-        "postId": 101,
-        "date": "2025-04-15",
+        "userId": 2,
+        "postId": 102,
+        "date": "2025-04-22",
         "product": {
-          "productId": 501,
-          "productName": "Sneakers",
+          "productId": 502,
+          "productName": "Casual Shoes",
           "type": "Footwear",
-          "brand": "Nike",
-          "color": "Red",
-          "notes": "Limited edition"
+          "brand": "Converse",
+          "color": "Black",
+          "notes": "Stylish and comfortable"
         },
         "category": 10,
-        "price": 199.99,
+        "price": 40.0,
         "hasPromo": false,
-        "discount": 0.25
+        "discount": 0.0
       }
     ]
   },
@@ -91,31 +95,43 @@
       {
         "userId": 1,
         "userName": "johndoe"
+      },
+      {
+        "userId": 4,
+        "userName": "alicewhite"
       }
     ],
     "following": [
       {
+        "userId": 1,
+        "userName": "johndoe"
+      },
+      {
         "userId": 2,
         "userName": "janedoe"
+      },
+      {
+        "userId": 4,
+        "userName": "alicewhite"
       }
     ],
     "post": [
       {
-        "userId": 1,
-        "postId": 101,
-        "date": "2025-04-15",
+        "userId": 3,
+        "postId": 103,
+        "date": "2025-04-20",
         "product": {
-          "productId": 501,
-          "productName": "Sneakers",
+          "productId": 503,
+          "productName": "Basketball Shoes",
           "type": "Footwear",
-          "brand": "Nike",
-          "color": "Red",
-          "notes": "Limited edition"
+          "brand": "Puma",
+          "color": "Blue",
+          "notes": "Perfect for the court"
         },
         "category": 10,
-        "price": 199.99,
+        "price": 75.50,
         "hasPromo": false,
-        "discount": 0.25
+        "discount": 0.0
       }
     ]
   },
@@ -150,37 +166,37 @@
     "post": [
       {
         "userId": 4,
-        "postId": 102,
+        "postId": 104,
         "date": "2025-04-16",
         "product": {
-          "productId": 502,
+          "productId": 504,
           "productName": "Running Shoes",
           "type": "Footwear",
           "brand": "Adidas",
           "color": "Blue",
-          "notes": ""
+          "notes": "Lightweight and breathable"
         },
         "category": 10,
         "price": 129.99,
         "hasPromo": false,
-        "discount": 0.25
+        "discount": 0.0
       },
       {
         "userId": 4,
-        "postId": 103,
+        "postId": 105,
         "date": "2025-04-15",
         "product": {
-          "productId": 502,
-          "productName": "Running Shoes 2!",
+          "productId": 505,
+          "productName": "Hiking Boots",
           "type": "Footwear",
-          "brand": "Adidas",
-          "color": "Red",
-          "notes": ""
+          "brand": "Merrell",
+          "color": "Brown",
+          "notes": "Great for trails"
         },
         "category": 10,
         "price": 129.99,
         "hasPromo": false,
-        "discount": 0.25
+        "discount": 0.0
       }
     ]
   }
