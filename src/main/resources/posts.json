@@ -1,33 +1,87 @@
 [
   {
     "userId": 1,
-    "postId": 1,
-    "date": "01-01-2023",
+    "postId": 101,
+    "date": "2025-04-15",
     "product": {
-      "productId": 1,
-      "productName": "algo",
-      "type": "electrodomestico",
-      "color": "gris",
-      "notes": "vintage"
+      "productId": 501,
+      "productName": "Sneakers",
+      "type": "Footwear",
+      "brand": "Nike",
+      "color": "Red",
+      "notes": "Limited edition"
     },
-    "category": 101,
-    "price": 350.99,
-    "hasPromo": true,
-    "discount": 10
+    "category": 10,
+    "price": 199.99,
+    "hasPromo": false,
+    "discount": 0.0
   },
   {
     "userId": 2,
-    "postId": 2,
-    "date": "01-01-2023",
+    "postId": 102,
+    "date": "2025-04-22",
     "product": {
-      "productId": 2,
-      "productName": "algo sin descuento",
-      "type": "utensilio",
-      "color": "negro",
-      "notes": "raro"
+      "productId": 502,
+      "productName": "Casual Shoes",
+      "type": "Footwear",
+      "brand": "Converse",
+      "color": "Black",
+      "notes": "Stylish and comfortable"
     },
-    "category": 90,
-    "price": 200,
-    "hasPromo": false
+    "category": 10,
+    "price": 40.0,
+    "hasPromo": false,
+    "discount": 0.0
+  },
+  {
+    "userId": 3,
+    "postId": 103,
+    "date": "2025-04-20",
+    "product": {
+      "productId": 503,
+      "productName": "Basketball Shoes",
+      "type": "Footwear",
+      "brand": "Puma",
+      "color": "Blue",
+      "notes": "Perfect for the court"
+    },
+    "category": 10,
+    "price": 75.50,
+    "hasPromo": false,
+    "discount": 0.0
+  },
+  {
+    "userId": 4,
+    "postId": 104,
+    "date": "2025-04-16",
+    "product": {
+      "productId": 504,
+      "productName": "Running Shoes",
+      "type": "Footwear",
+      "brand": "Adidas",
+      "color": "Blue",
+      "notes": "Lightweight and breathable"
+    },
+    "category": 10,
+    "price": 129.99,
+    "hasPromo": false,
+    "discount": 0.0
+  },
+  {
+    "userId": 4,
+    "postId": 105,
+    "date": "2025-04-15",
+    "product": {
+      "productId": 505,
+      "productName": "Hiking Boots",
+      "type": "Footwear",
+      "brand": "Merrell",
+      "color": "Brown",
+      "notes": "Great for trails"
+    },
+    "category": 10,
+    "price": 129.99,
+    "hasPromo": false,
+    "discount": 0.0
   }
 ]
