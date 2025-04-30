@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +31,7 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IUserRepository userRepository;
 
-    final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());;
 
 
     @Override
@@ -97,13 +97,20 @@ public class ProductServiceImpl implements IProductService {
         if (followingList == null || followingList.isEmpty()) {
             throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<PostDto> allRecentPosts = followingList.stream()
-                .map(seller -> userRepository.findRecentPostsForUser(seller.getUserId()))
+                .map(s -> userRepository.findRecentPostsForUser(s.getUserId()))
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
-                .map(post -> mapper.convertValue(post, PostDto.class))
-                .collect(Collectors.toList());
+                .map(post -> {
+                    LocalDate postDate = LocalDate.parse(post.getDate(), formatter);
+                    PostDto postDto = mapper.convertValue(post, PostDto.class);
+                    postDto.setDate(postDate);
+                    return postDto;
+                })
+                .toList();
+
 
         if (allRecentPosts.isEmpty()) {
             throw new NotFoundException(

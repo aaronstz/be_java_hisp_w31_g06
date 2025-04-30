@@ -23,8 +23,7 @@ public class Post {
     @Positive(message = "El ID debe ser mayor a 0.")
     private Integer postId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    private String date;
 
     private Product product;
 

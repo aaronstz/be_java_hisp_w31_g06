@@ -23,7 +23,7 @@ public class PostDto implements Serializable{
     @Positive(message = "El ID debe ser mayor a 0.")
     private Integer postId;
 
-    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message="La fecha no puede ser futura.")
     private LocalDate date;
 

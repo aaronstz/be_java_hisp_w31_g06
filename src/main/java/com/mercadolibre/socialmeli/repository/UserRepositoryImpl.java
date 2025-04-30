@@ -2,11 +2,14 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import com.mercadolibre.socialmeli.exception.NotFoundException;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
@@ -126,10 +129,19 @@ public class UserRepositoryImpl implements IUserRepository {
         if (user == null) {
             return null;
         }
-        LocalDate currentDate = LocalDate.now();
+        return filterByDates(user);
 
-        return null;
     }
+
+    private Set<Post> filterByDates(User user) {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return user.getPost().stream()
+                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(
+                        (currentDate.minusDays(14)))).collect(Collectors.toSet());
+    }
+
 
     @Override
     public boolean addPostToUser(Post post) {
