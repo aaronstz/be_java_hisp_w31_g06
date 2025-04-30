@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.utils;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
@@ -161,4 +165,8 @@ public class Util {
                 .collect(Collectors.toSet());
     }
 
+    private  static final ObjectMapper mapper =new ObjectMapper();
+    public static List<PostDto> parsePostDtoList(String json) throws IOException {
+        return mapper.readValue(json, new TypeReference<>() {});
+    }
 }
