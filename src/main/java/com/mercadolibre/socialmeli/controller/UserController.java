@@ -4,6 +4,8 @@ import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.dto.UserDto;
 import com.mercadolibre.socialmeli.dto.UserListDto;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,19 +33,18 @@ public class UserController {
   
     @GetMapping("/{userId}/followed/list")
     public ResponseEntity<FollowingListDto> getFollowedList(@PathVariable Integer userId,
-                                                             @RequestParam(defaultValue = "name_asc")String order) {
+                                                            @RequestParam(defaultValue = "name_asc") String order) {
         return new ResponseEntity<>(userService.getFollowedList(userId, order), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/followers/list")
     public ResponseEntity<UserListDto> getFollowersList(@PathVariable Integer userId,
-                                                        @RequestParam(defaultValue = "name_asc") String order ) {
+                                                        @RequestParam(defaultValue = "name_asc") String order) {
         return new ResponseEntity<>(userService.getFollowersList(userId, order), HttpStatus.OK);
     }
   
     @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
-    public ResponseEntity<MensajeDto> unfollowUser(@PathVariable int userId,
-                                          @PathVariable int userIdToUnfollow ){
+    public ResponseEntity<MensajeDto> unfollowUser(@PathVariable int userId, @PathVariable int userIdToUnfollow) {
 
         return new ResponseEntity<>( userService.unFollow(userId, userIdToUnfollow), HttpStatus.OK);
     }
