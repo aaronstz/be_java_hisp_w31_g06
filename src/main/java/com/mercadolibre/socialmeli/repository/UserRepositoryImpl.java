@@ -13,6 +13,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -121,15 +122,13 @@ public class UserRepositoryImpl implements IUserRepository {
                 .filter(u -> u.getUserId().equals(userId))
                 .findFirst()
                 .orElse(null);
+
         if (user == null) {
             return null;
         }
+        LocalDate currentDate = LocalDate.now();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        return user.getPost().stream()
-                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(LocalDate.now().minusDays(14)))
-                .collect(Collectors.toSet());
+        return null;
     }
 
     @Override
@@ -201,5 +200,10 @@ public class UserRepositoryImpl implements IUserRepository {
         return seller.getPost().stream()
                 .filter(post -> Objects.equals(post.getCategory(), categoryId))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void clearRepository() {
+        listOfUsers.clear();
     }
 }

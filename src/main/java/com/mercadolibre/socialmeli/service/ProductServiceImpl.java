@@ -13,6 +13,7 @@ import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +46,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public PostDto createPost(PostDto postDto) {
+    public PostDto createPost(CreatePostDto postDto) {
         Post post = mapper.convertValue(postDto, Post.class);
 
         Boolean saved = productRepository.saveProduct(post.getProduct());
@@ -63,27 +64,25 @@ public class ProductServiceImpl implements IProductService {
         productRepository.savePost(post);
         post.setPostId(productRepository.findAllPosts().size() + 1);
 
-        return mapper.convertValue(post, PostDto.class);
+        PostDto createdPost = mapper.convertValue(post, PostDto.class);
+        createdPost.setDate(LocalDate.now());
+        return createdPost;
     }
 
-    private List<PostDto> orderPosts(List<PostDto> posts, String order) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+    public List<PostDto> orderPosts(List<PostDto> posts, String order) {
         if (order.equalsIgnoreCase("date_asc")) {
             return posts.stream()
-                    .sorted((p1, p2) -> LocalDate.parse(p1.getDate(), formatter).compareTo(LocalDate.parse(p2.getDate(),
-                            formatter)))
+                    .sorted((p1, p2) -> p1.getDate().compareTo(p2.getDate()))
+                    .collect(Collectors.toList());
+        } else {
+            return posts.stream()
+                    .sorted((p1, p2) -> p2.getDate().compareTo(p1.getDate()))
                     .collect(Collectors.toList());
         }
-        return posts.stream()
-                .sorted((p1, p2) -> LocalDate.parse(p2.getDate(), formatter).compareTo(LocalDate.parse(p1.getDate(),
-                        formatter)))
-                .collect(Collectors.toList());
     }
 
     @Override
     public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
-
         if (!order.equals("date_asc") && !order.equals("date_desc")) {
             throw new BadRequestException("El orden solo puede ser 'date_asc' o 'date_desc'");
         }
