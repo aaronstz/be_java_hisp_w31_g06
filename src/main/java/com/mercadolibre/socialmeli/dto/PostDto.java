@@ -13,15 +13,15 @@ import java.io.Serializable;
 @Data
 public class PostDto implements Serializable {
 
-    @NotNull(message = "El ID no puede estar vacío.")
-    @Positive(message = "El ID debe ser mayor a 0.")
+    @NotNull(message = "El ID del usuario no puede estar vacío.")
+    @Positive(message = "El ID del usuario debe ser un número mayor a 0.")
     private Integer userId;
 
-    @NotNull(message = "El ID no puede estar vacío.")
-    @Positive(message = "El ID debe ser mayor a 0.")
+    @NotNull(message = "El ID del producto no puede estar vacío.")
+    @Positive(message = "El ID del producto debe ser un número mayor a 0.")
     private Integer postId;
 
-    @PastOrPresent(message = "La fecha no puede ser futura a la fecha actual.")
+    //@PastOrPresent(message = "La fecha no puede ser futura a la fecha actual.")
     @NotNull(message = "El campo no puede estar vacío.")
     private String date;
 
