@@ -121,4 +121,81 @@ class ProductServiceTest {
         // Act & Assert
         assertThrows(NotFoundException.class, () -> service.getRecentSellerPostsForUser(userId, "date_desc"));
     }
+
+    void getSellerPostsForUserByKeywordTest() {
+        // Arrange
+        List<User> users = Util.getSomeUsers();
+        String keyword = "Smartwatch";
+
+        Set<Integer> followedUserIds = users.get(0).getFollowing().stream()
+                .map(Follow::getUserId)
+                .collect(Collectors.toSet());
+
+        List<User> followedUsers = users.stream()
+                .filter(u -> followedUserIds.contains(u.getUserId()))
+                .collect(Collectors.toList());
+
+        List<PostDto> postWithKeyword = new ArrayList<>();
+        for (User seguido : followedUsers) {
+            Set<Post> posts = new HashSet<>();
+            for (Post post : seguido.getPost()) {
+                if (post.getProduct().getProductName().contains(keyword)) {
+                    postWithKeyword
+                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                    posts.add(post);
+                }
+            }
+            Mockito.when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword)).thenReturn(posts);
+        }
+
+        FollowingPostDto expectedResponse = new FollowingPostDto(users.get(0).getUserId(), postWithKeyword);
+        Mockito.when(userRepository.findUserById(users.get(0).getUserId())).thenReturn(users.get(0));
+
+        // Act
+        FollowingPostDto response = service.getSellerPostsForUserByKeyword(users.get(0).getUserId(), keyword);
+
+        // Assert
+        assertNotNull(expectedResponse);
+        assertEquals(expectedResponse, response);
+    }
+
+    void getSellerPostsForUserByKeywordEmptyKeyword() {
+        // Arrange
+        List<User> users = Util.getSomeUsers();
+        String keyword = "";
+
+        Set<Integer> followedUserIds = users.get(0).getFollowing().stream()
+                .map(Follow::getUserId)
+                .collect(Collectors.toSet());
+
+        List<User> followedUsers = users.stream()
+                .filter(u -> followedUserIds.contains(u.getUserId()))
+                .collect(Collectors.toList());
+
+        List<PostDto> postWithKeyword = new ArrayList<>();
+        for (User seguido : followedUsers) {
+            Set<Post> posts = new HashSet<>();
+            for (Post post : seguido.getPost()) {
+                if (post.getProduct().getProductName().contains(keyword)) {
+                    postWithKeyword
+                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                    posts.add(post);
+                }
+            }
+            Mockito.when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword)).thenReturn(posts);
+        }
+
+        FollowingPostDto expectedResponse = new FollowingPostDto(users.get(0).getUserId(), postWithKeyword);
+        Mockito.when(userRepository.findUserById(users.get(0).getUserId())).thenReturn(users.get(0));
+
+        // Act
+        FollowingPostDto response = service.getSellerPostsForUserByKeyword(users.get(0).getUserId(), keyword);
+
+        // Assert
+        assertNotNull(expectedResponse);
+        assertEquals(expectedResponse, response);
+    }
+
 }

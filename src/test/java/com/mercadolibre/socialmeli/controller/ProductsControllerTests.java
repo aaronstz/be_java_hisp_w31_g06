@@ -77,4 +77,48 @@ class ProductsControllerTests {
                 assertEquals(response.getBody(), expectedResponse);
                 assertTrue(response.getStatusCode().is2xxSuccessful());
         }
+
+        @Test
+        void getSellerPostsForUserByKeywordTest() {
+                // Arrange
+                List<User> users = Util.getSomeUsers();
+                User user = users.get(0);
+                String keyword = "Laptop";
+
+                Set<Integer> followedUserIds = user.getFollowing().stream()
+                                .map(Follow::getUserId)
+                                .collect(Collectors.toSet());
+
+                List<User> followedUsers = users.stream()
+                                .filter(u -> followedUserIds.contains(u.getUserId()))
+                                .collect(Collectors.toList());
+
+                List<PostDto> filteredPostDto = new ArrayList<>();
+                for (User usuario : followedUsers) {
+                        for (Post post : usuario.getPost()) {
+                                if (post.getProduct().getProductName().contains(keyword)) {
+                                        filteredPostDto
+                                                        .add(new PostDto(post.getUserId(), post.getPostId(),
+                                                                        post.getDate(),
+                                                                        post.getProduct(),
+                                                                        post.getCategory(), post.getPrice(),
+                                                                        post.getHasPromo(), post.getDiscount()));
+                                }
+                        }
+                }
+
+                FollowingPostDto expectedResponse = new FollowingPostDto(user.getUserId(), filteredPostDto);
+
+                Mockito.when(service.getSellerPostsForUserByKeyword(user.getUserId(), keyword))
+                                .thenReturn(expectedResponse);
+
+                // Act
+                ResponseEntity<?> response = controller.getSellerPostsForUserByKeyword(user.getUserId(), keyword);
+
+                // Assert
+                verify(service, atLeast(1)).getSellerPostsForUserByKeyword(user.getUserId(), keyword);
+                assertEquals(response.getBody(), expectedResponse);
+                assertTrue(response.getStatusCode().is2xxSuccessful());
+        }
+
 }

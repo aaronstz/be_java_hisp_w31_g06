@@ -67,4 +67,49 @@ class UserRepositoryTests {
         assertEquals(expectedResponse, response);
     }
 
+    @Test
+    void findPostsByKeywordTest() {
+        // Arrange
+        List<User> users = Util.getSomeUsers();
+        users.forEach(u -> repository.addUser(u));
+        String keyword = "Laptop";
+        Set<Post> expectedResponse = users.get(0).getPost().stream()
+                .filter(p -> p.getProduct().getProductName().contains(keyword))
+                .collect(Collectors.toSet());
+
+        // Act
+        Set<Post> result = repository.findPostsByKeyword(users.get(0).getUserId(), keyword);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+    }
+
+    @Test
+    void findPostsByKeywordEmptyKeyword() {
+        List<User> users = Util.getSomeUsers();
+        users.forEach(u -> repository.addUser(u));
+        String keyword = "";
+        Set<Post> expectedResponse = users.get(0).getPost().stream()
+                .filter(p -> p.getProduct().getProductName().contains(keyword))
+                .collect(Collectors.toSet());
+
+        // Act
+        Set<Post> result = repository.findPostsByKeyword(users.get(0).getUserId(), keyword);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+    }
+
+    @Test
+    void findPostsByKeywordNulKeyword() {
+        List<User> users = Util.getSomeUsers();
+        users.forEach(u -> repository.addUser(u));
+        String keyword = null;
+
+        // Act & Assert
+        assertThrows(NullPointerException.class,
+                () -> repository.findPostsByKeyword(users.get(0).getUserId(), keyword));
+    }
 }
