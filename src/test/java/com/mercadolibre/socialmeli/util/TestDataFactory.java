@@ -19,14 +19,6 @@ import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
 public class TestDataFactory {
 
-    //public static void setUserRepositoryForTest(UserRepositoryImpl userRepository) {
-    //    userRepository.clearRepository();
-    //}
-
-   // public static void setProductRepositoryForTest(ProductRepositoryImpl productRepository) {
-     //   productRepository.clearRepository();
-    //}
-
     public static User createUserWithFollowers() {
         List<Post> posts = createSixPosts();
 
