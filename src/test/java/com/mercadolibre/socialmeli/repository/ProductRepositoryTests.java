@@ -3,6 +3,7 @@ package com.mercadolibre.socialmeli.repository;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ public class ProductRepositoryTests {
 
     private ProductRepositoryImpl repository;
 
+    @SneakyThrows
     @BeforeEach
     void setUp() {
+        repository = new ProductRepositoryImpl();
         TestDataFactory.createSixPosts().forEach(repository::savePost);
         TestDataFactory.createSixProducts().forEach(repository::saveProduct);
     }

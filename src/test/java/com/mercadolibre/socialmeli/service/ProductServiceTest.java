@@ -35,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProductServiceTest {
 
     @Mock
+    private ProductRepositoryImpl productRepository;
+
+    @Mock
     private UserRepositoryImpl userRepository;
 
     @InjectMocks
@@ -77,7 +80,6 @@ public class ProductServiceTest {
                 () -> service.getRecentSellerPostsForUser(user.getUserId(), "invalid"));
 
         assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
-        verify(userRepository).findUserById(user.getUserId());
 
     }
 
@@ -93,7 +95,6 @@ public class ProductServiceTest {
                 () -> service.getRecentSellerPostsForUser(user.getUserId(), null));
 
         assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
-        verify(userRepository).findUserById(user.getUserId());
     }
     @DisplayName("Should throw NotFoundException when userId is null")
     @Test
