@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class ProductRepositoryTests {
 
-    @Autowired
     private ProductRepositoryImpl repository;
 
     @BeforeEach
@@ -84,7 +83,7 @@ public class ProductRepositoryTests {
     @Test
     void saveProduct_WhenProductExists_ShouldReturnFalse() {
         // Arrange
-        Product product = TestDataFactory.createSixProducts().get(0); // Already saved in @BeforeEach
+        Product product = TestDataFactory.createSixProducts().get(0);
 
         // Act
         boolean saved = repository.saveProduct(product);
