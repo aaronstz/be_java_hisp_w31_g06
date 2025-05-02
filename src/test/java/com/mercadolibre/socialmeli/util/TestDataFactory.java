@@ -1,6 +1,7 @@
 package com.mercadolibre.socialmeli.util;
 
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -10,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
@@ -18,6 +22,13 @@ import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
 public class TestDataFactory {
+
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static List<PostDto> parsePostDtoList(String json) throws IOException {
+        return mapper.readValue(json, new TypeReference<>() {});
+    }
 
     public static User createUserWithFollowers() {
         List<Post> posts = createSixPosts();
