@@ -144,5 +144,12 @@ public class TestDataFactory {
         return List.of(mainUser, follower1, follower2, following1, following2);
     }
 
+    public static User getUserFromId(int userId) {
+        List<Post> posts = createSixPosts();
+        return new User(100, "Mariano Lopez", 2, new HashSet<Follow>(), new HashSet<Follow>(),
+                Set.of(posts.get(0), posts.get(1)));
+    }
+
+
 
 }
