@@ -2,15 +2,13 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
-import com.mercadolibre.socialmeli.utils.Util;
+import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,13 +22,12 @@ public class ProductRepositoryTests {
 
     @BeforeEach
     void setUp() {
-        Util.setProductRepositoryForTest(repository);
-        Util.createSixPosts().forEach(repository::savePost);
-        Util.createSixProducts().forEach(repository::saveProduct);
+        TestDataFactory.createSixPosts().forEach(repository::savePost);
+        TestDataFactory.createSixProducts().forEach(repository::saveProduct);
     }
 
     @Test
-    void getAllPromos_ReturnsOnlyValidPromos() {
+    void getAllPromos_shouldReturnValidPromos_WhenPostHavePromotions() {
         // Act
         List<Post> result = repository.getAllPromos();
 
@@ -86,7 +83,7 @@ public class ProductRepositoryTests {
     @Test
     void saveProduct_WhenProductExists_ShouldReturnFalse() {
         // Arrange
-        Product product = Util.createSixProducts().get(0); // Already saved in @BeforeEach
+        Product product = TestDataFactory.createSixProducts().get(0); // Already saved in @BeforeEach
 
         // Act
         boolean saved = repository.saveProduct(product);

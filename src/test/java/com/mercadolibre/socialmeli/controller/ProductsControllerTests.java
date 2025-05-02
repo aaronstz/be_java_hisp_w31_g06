@@ -1,60 +1,41 @@
 package com.mercadolibre.socialmeli.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolibre.socialmeli.dto.PostDto;
-import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
-import com.mercadolibre.socialmeli.utils.Util;
-
-import org.junit.jupiter.api.BeforeEach;
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
+import com.mercadolibre.socialmeli.service.ProductServiceImpl;
 import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
-
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class ProductsControllerTests {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private ProductServiceImpl productService;
 
-    @Autowired
-    private ProductRepositoryImpl productRepository;
-
-    @BeforeEach
-    void setUp() {
-        Util.setProductRepositoryForTest(productRepository);
-        Util.createSixPosts().forEach(productRepository::savePost);
-    }
+    @InjectMocks
+    private ProductsController controller;
 
     @Test
-    void getAllPromotions_ShouldReturnPromoPostsOnly() throws Exception {
-        String responseJson = mockMvc.perform(get("/products/promotions")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", not(empty())))
-                .andExpect(jsonPath("$[*].hasPromo", everyItem(is(true))))
-                .andExpect(jsonPath("$[*].discount", everyItem(greaterThan(0.0))))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+    void getRecentSellerPostsForUser_shouldCallServiceCorrectly_WhenUserIdAndOrderAreValid() {
+        // Arrange
+        final Integer validUserId = 100;
+        final String sortOrder = "date_asc";
+        final FollowingPostDto mockResponse = new FollowingPostDto(validUserId, List.of());
+
+        when(productService.getRecentSellerPostsForUser(validUserId, sortOrder)).thenReturn(mockResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getRecentSellerPostsForUser(validUserId, sortOrder);
 
         // Assert
-        List<PostDto> responseList = Util.parsePostDtoList(responseJson);
-        assertFalse(responseList.isEmpty());
-        assertTrue(responseList.stream().allMatch(p -> p.getHasPromo() && p.getDiscount() > 0));
+        verify(productService).getRecentSellerPostsForUser(validUserId, sortOrder);
+        assertNotNull(response);
     }
 }

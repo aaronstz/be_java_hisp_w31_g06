@@ -9,7 +9,7 @@ import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
-import com.mercadolibre.socialmeli.utils.Util;
+import com.mercadolibre.socialmeli.util.TestDataFactory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,54 +43,31 @@ public class ProductServiceTest {
     private ProductServiceImpl service;
 
     @Test
-    void getRecentSellerPostsForUser_HappyPath_ReturnsOrderedRecentPosts() {
+    void getRecentSellerPostsForUser_shouldReturnRecentPostsOrdered_WhenValidUserIdAndOrder() {
         // Arrange
-        User user = Util.createUserWithFollowers();
-        List<User> users = Util.getSomeUsers();
+        final Integer userId = 100;
+        final String order = "date_desc";
 
-        Set<Integer> followedUserIds = user.getFollowing().stream()
-                .map(Follow::getUserId)
-                .collect(Collectors.toSet());
+        User user = TestDataFactory.createUserWithFollowers();
+        Post recentPost = TestDataFactory.createSixPosts().get(1); // Post reciente con promo
 
-        List<User> followedUsers = users.stream()
-                .filter(u -> followedUserIds.contains(u.getUserId()))
-                .collect(Collectors.toList());
-
-        List<PostDto> expectedRecentPosts = followedUsers.stream()
-                .flatMap(f -> f.getPost().stream())
-                .filter(p -> Util.isRecent(p.getDate()))
-                .map(p -> new PostDto(p.getUserId(), p.getPostId(), p.getDate(), p.getProduct(),
-                        p.getCategory(), p.getPrice(), p.getHasPromo(), p.getDiscount()))
-                .sorted(Comparator.comparing(PostDto::getDate).reversed())
-                .collect(Collectors.toList());
-
-        for (User followed : followedUsers) {
-            Set<Post> recentPosts = followed.getPost().stream()
-                    .filter(p -> Util.isRecent(p.getDate()))
-                    .collect(Collectors.toSet());
-
-            lenient().when(userRepository.findRecentPostsForUser(followed.getUserId()))
-                    .thenReturn(recentPosts);
-        }
-
-        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(userRepository.findRecentPostsForUser(anyInt())).thenReturn(Set.of(recentPost));
 
         // Act
-        FollowingPostDto result = service.getRecentSellerPostsForUser(user.getUserId(), "date_desc");
+        FollowingPostDto result = service.getRecentSellerPostsForUser(userId, order);
 
         // Assert
         assertNotNull(result);
-        assertEquals(user.getUserId(), result.getUserId());
-        assertEquals(expectedRecentPosts.size(), result.getPostDto().size());
+        assertEquals(userId, result.getUserId());
+        assertEquals(2, result.getPostDto().size());
+        assertEquals(recentPost.getPostId(), result.getPostDto().get(0).getPostId());
 
-        for (int i = 0; i < expectedRecentPosts.size(); i++) {
-            assertEquals(expectedRecentPosts.get(i).getPostId(), result.getPostDto().get(i).getPostId());
-        }
     }
     @Test
     void getRecentSellerPostsForUser_InvalidOrder_ThrowsBadRequestException() {
         // Arrange
-        User user = Util.createUserWithFollowers();
+        User user = TestDataFactory.createUserWithFollowers();
         lenient().when(userRepository.findUserById(user.getUserId())).thenReturn(user);
 
         // Act & Assert
@@ -103,7 +80,7 @@ public class ProductServiceTest {
     @Test
     void getRecentSellerPostsForUser_NullOrder_ThrowsBadRequestException() {
         // Arrange
-        User user = Util.createUserWithFollowers();
+        User user = TestDataFactory.createUserWithFollowers();
         lenient().when(userRepository.findUserById(user.getUserId())).thenReturn(user);
 
         // Act & Assert

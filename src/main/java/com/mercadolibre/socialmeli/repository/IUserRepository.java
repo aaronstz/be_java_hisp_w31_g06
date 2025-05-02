@@ -21,6 +21,5 @@ public interface IUserRepository {
     boolean addPostToUser(Post post);
     Set<Post> findPostsByKeyword(Integer userId, String keyword);
     Set<Post> findPostsByFollowedUsersAndCategory(Integer userId, Integer categoryId);
-    void clearRepository();
-    void addUser(User user);
+
 }
