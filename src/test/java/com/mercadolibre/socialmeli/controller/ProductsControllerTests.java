@@ -2,6 +2,7 @@ package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.service.ProductServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,7 @@ public class ProductsControllerTests {
     @InjectMocks
     private ProductsController controller;
 
+    @DisplayName("Should call service correctly when given valid userId and order")
     @Test
     void getRecentSellerPostsForUser_shouldCallServiceCorrectly_WhenUserIdAndOrderAreValid() {
         // Arrange

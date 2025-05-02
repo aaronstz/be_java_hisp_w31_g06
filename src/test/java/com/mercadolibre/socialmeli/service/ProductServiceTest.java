@@ -11,6 +11,7 @@ import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -42,6 +43,7 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductServiceImpl service;
 
+    @DisplayName("Should return recent seller posts ordered when given valid userId and order")
     @Test
     void getRecentSellerPostsForUser_shouldReturnRecentPostsOrdered_WhenValidUserIdAndOrder() {
         // Arrange
@@ -64,6 +66,7 @@ public class ProductServiceTest {
         assertEquals(recentPost.getPostId(), result.getPostDto().get(0).getPostId());
 
     }
+    @DisplayName("Should throw BadRequestException when order is invalid")
     @Test
     void getRecentSellerPostsForUser_InvalidOrder_ThrowsBadRequestException() {
         // Arrange
@@ -77,6 +80,7 @@ public class ProductServiceTest {
         assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
     }
 
+    @DisplayName("Should throw BadRequestException when order is null")
     @Test
     void getRecentSellerPostsForUser_NullOrder_ThrowsBadRequestException() {
         // Arrange
@@ -89,7 +93,7 @@ public class ProductServiceTest {
 
         assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
     }
-
+    @DisplayName("Should throw NotFoundException when userId is null")
     @Test
     void getRecentSellerPostsForUser_NullUserId_ThrowsNotFoundException() {
         // Arrange

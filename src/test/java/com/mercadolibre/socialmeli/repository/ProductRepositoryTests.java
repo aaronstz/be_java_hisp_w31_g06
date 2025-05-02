@@ -4,6 +4,7 @@ import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,7 +26,7 @@ public class ProductRepositoryTests {
         TestDataFactory.createSixPosts().forEach(repository::savePost);
         TestDataFactory.createSixProducts().forEach(repository::saveProduct);
     }
-
+    @DisplayName("Should return only posts with valid promotions when promotions exist")
     @Test
     void getAllPromos_shouldReturnValidPromos_WhenPostHavePromotions() {
         // Act
@@ -38,7 +39,7 @@ public class ProductRepositoryTests {
                 p -> Boolean.TRUE.equals(p.getHasPromo()) && p.getDiscount() != null && p.getDiscount() > 0
         ));
     }
-
+    @DisplayName("Should return seller's promotional posts when promotions exist for given user")
     @Test
     void findPromosBySeller_ReturnsOnlySellerPromos() {
         // Arrange
@@ -53,7 +54,7 @@ public class ProductRepositoryTests {
                 p -> p.getUserId().equals(userId) && Boolean.TRUE.equals(p.getHasPromo()) && p.getDiscount() > 0
         ));
     }
-
+    @DisplayName("Should return empty list when seller has no promotional posts")
     @Test
     void findPromosBySeller_NoPromos_ReturnsEmptyList() {
         // Arrange
@@ -66,7 +67,7 @@ public class ProductRepositoryTests {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
-
+    @DisplayName("Should save a new product and return true when product doesn't exist")
     @Test
     void saveProduct_WhenNewProduct_ShouldReturnTrue() {
         // Arrange
@@ -79,7 +80,7 @@ public class ProductRepositoryTests {
         assertTrue(saved);
         assertTrue(repository.findAllProducts().contains(product));
     }
-
+    @DisplayName("Should return false when trying to save an already existing product")
     @Test
     void saveProduct_WhenProductExists_ShouldReturnFalse() {
         // Arrange

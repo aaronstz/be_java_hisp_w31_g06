@@ -4,6 +4,7 @@ import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,7 +36,7 @@ class BeJavaHispW31G06ApplicationTests {
 	void setUp() {
 		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
 	}
-
+	@DisplayName("Should return only promotional posts when calling /products/promotions successfully")
 	@Test
 	void getAllPromotions_ShouldReturnOnlyPromoPosts_WhenCalledSuccessfully() throws Exception {
 		String responseJson = mockMvc.perform(get("/products/promotions")
