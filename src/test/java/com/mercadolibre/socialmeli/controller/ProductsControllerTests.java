@@ -44,6 +44,7 @@ public class ProductsControllerTests {
         String responseJson = mockMvc.perform(get("/products/promotions")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", not(empty())))
                 .andExpect(jsonPath("$[*].hasPromo", everyItem(is(true))))
                 .andExpect(jsonPath("$[*].discount", everyItem(greaterThan(0.0))))
@@ -51,8 +52,8 @@ public class ProductsControllerTests {
                 .getResponse()
                 .getContentAsString();
 
+        // Assert
         List<PostDto> responseList = Util.parsePostDtoList(responseJson);
-
         assertFalse(responseList.isEmpty());
         assertTrue(responseList.stream().allMatch(p -> p.getHasPromo() && p.getDiscount() > 0));
     }
