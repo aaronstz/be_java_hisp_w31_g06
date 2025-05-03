@@ -7,7 +7,6 @@ import com.mercadolibre.socialmeli.entity.Product;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
-import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -67,11 +66,12 @@ public class ProductRepositoryImpl implements IProductRepository {
                 .collect(Collectors.toList());
     }
 
+
+
     private void loadDataBase() throws IOException {
         File productsFile;
         File postsFile;
         ObjectMapper mapper = new ObjectMapper();
-
         List<Product> productList;
         List<Post> postLists;
 
@@ -84,11 +84,5 @@ public class ProductRepositoryImpl implements IProductRepository {
 
         listOfProducts = productList;
         listOfPosts = postLists;
-    }
-
-    @Override
-    public void clearRepository() {
-        listOfProducts.clear();
-        listOfPosts.clear();
     }
 }
