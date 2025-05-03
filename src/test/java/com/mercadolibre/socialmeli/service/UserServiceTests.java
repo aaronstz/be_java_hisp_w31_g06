@@ -26,6 +26,7 @@ public class UserServiceTests {
     @InjectMocks
     private UserServiceImpl service;
 
+
     @Test
     @DisplayName("getFollowersCount .should return the number of followers of the user when the input data is valid")
     void getFollowersCount_shouldReturnCorrectFollowerCount_whenInputIsValid() {
@@ -47,6 +48,5 @@ public class UserServiceTests {
         verify(repository).findFollowersCount(userId);
 
     }
-
 
 }

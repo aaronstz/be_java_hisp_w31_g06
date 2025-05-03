@@ -21,8 +21,12 @@ import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
+
 public class TestDataFactory {
 
+    //public static void setUserRepositoryForTest(UserRepositoryImpl userRepository) {
+    //    userRepository.clearRepository();
+    //}
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -30,6 +34,9 @@ public class TestDataFactory {
         return mapper.readValue(json, new TypeReference<>() {});
     }
 
+    // public static void setProductRepositoryForTest(ProductRepositoryImpl productRepository) {
+    //   productRepository.clearRepository();
+    //}
 
     public static User createUserWithFollowers() {
         List<Post> posts = createSixPosts();
@@ -147,12 +154,23 @@ public class TestDataFactory {
 
         return List.of(mainUser, follower1, follower2, following1, following2);
     }
-public static class FakeProductRepositoryImpl extends ProductRepositoryImpl{
-        public FakeProductRepositoryImpl() throws IOException {
-            super();
-            findAllProducts().clear();
-            findAllPosts().clear();
-        }
-}
+
+    public static User getUserFromId(int userId) {
+        List<Post> posts = createSixPosts();
+        return new User(100, "Mariano Lopez", 2, new HashSet<Follow>(), new HashSet<Follow>(),
+                Set.of(posts.get(0), posts.get(1)));
+    }
+
+    public static class FakeProductRepositoryImpl extends ProductRepositoryImpl{
+            public FakeProductRepositoryImpl() throws IOException {
+                super();
+                findAllProducts().clear();
+                findAllPosts().clear();
+            }
+    }
 
 }
+
+
+
+
