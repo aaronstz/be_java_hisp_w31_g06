@@ -1,8 +1,8 @@
 package com.mercadolibre.socialmeli.service;
 
 import com.mercadolibre.socialmeli.dto.PostDto;
-import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +28,7 @@ public class ProductServiceTest {
     private ProductServiceImpl service;
 
     @Test
+    @DisplayName("Should sort posts in ascendant order")
     void orderPosts_dateAsc_shouldSortCorrectly() {
         LocalDate date1 = LocalDate.of(2023, 10, 25);
         LocalDate date2 = LocalDate.of(2023, 10, 26);
@@ -48,6 +49,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should sort posts in descendant order")
     void orderPosts_dateDesc_shouldSortCorrectly() {
         LocalDate date1 = LocalDate.of(2023, 10, 25);
         LocalDate date2 = LocalDate.of(2023, 10, 26);
@@ -68,6 +70,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should return empty list if there are no posts")
     void orderPosts_emptyList_shouldReturnEmptyList() {
         List<PostDto> posts = List.of();
         List<PostDto> sortedPosts = service.orderPosts(posts, "date_asc");
@@ -75,6 +78,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should maintain order if dates are equal")
     void orderPosts_sameDates_shouldMaintainOrder() {
         LocalDate date1 = LocalDate.of(2023, 10, 25);
         LocalDate date2 = LocalDate.of(2023, 10, 25);

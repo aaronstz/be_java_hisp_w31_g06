@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Follow;
@@ -31,7 +32,9 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IUserRepository userRepository;
 
-    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());;
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    ;;
 
 
     @Override
