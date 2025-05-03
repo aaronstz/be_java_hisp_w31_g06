@@ -43,6 +43,8 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductServiceImpl service;
 
+
+
     @DisplayName("Should return recent seller posts ordered when given valid userId and order")
     @Test
     void getRecentSellerPostsForUser_shouldReturnRecentPostsOrdered_WhenValidUserIdAndOrder() {
@@ -109,4 +111,5 @@ public class ProductServiceTest {
         assertEquals("Usuario no encontrado con ID: null", exception.getMessage());
 
     }
+
 }

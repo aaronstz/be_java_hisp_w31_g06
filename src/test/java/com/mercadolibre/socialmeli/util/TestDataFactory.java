@@ -13,6 +13,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
@@ -24,7 +26,9 @@ import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 public class TestDataFactory {
 
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
 
     public static List<PostDto> parsePostDtoList(String json) throws IOException {
         return mapper.readValue(json, new TypeReference<>() {});

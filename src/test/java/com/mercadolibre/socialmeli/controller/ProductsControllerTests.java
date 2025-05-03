@@ -23,6 +23,24 @@ public class ProductsControllerTests {
     @InjectMocks
     private ProductsController controller;
 
+
+    @DisplayName("Should call service to get seller posts by category when valid inputs are provided")
+    @Test
+    void getSellerPostsByCategory_shouldCallServiceCorrectly_WhenUserIdAndCategoryValid() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 1;
+        FollowingPostDto mockResponse = new FollowingPostDto(userId, List.of());
+
+        when(productService.getSellerPostsForUserByCategory(userId, categoryId)).thenReturn(mockResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getSellerPostsByCategory(userId, categoryId);
+
+        // Assert
+        verify(productService).getSellerPostsForUserByCategory(userId, categoryId);
+        assertNotNull(response);
+    }
     @DisplayName("Should call service correctly when given valid userId and order")
     @Test
     void getRecentSellerPostsForUser_shouldCallServiceCorrectly_WhenUserIdAndOrderAreValid() {
