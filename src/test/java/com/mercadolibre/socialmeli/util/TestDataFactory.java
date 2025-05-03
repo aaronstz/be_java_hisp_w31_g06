@@ -1,6 +1,7 @@
 package com.mercadolibre.socialmeli.util;
 
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -10,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
@@ -17,11 +21,18 @@ import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
+
 public class TestDataFactory {
 
     //public static void setUserRepositoryForTest(UserRepositoryImpl userRepository) {
     //    userRepository.clearRepository();
     //}
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static List<PostDto> parsePostDtoList(String json) throws IOException {
+        return mapper.readValue(json, new TypeReference<>() {});
+    }
 
     // public static void setProductRepositoryForTest(ProductRepositoryImpl productRepository) {
     //   productRepository.clearRepository();
@@ -150,6 +161,16 @@ public class TestDataFactory {
                 Set.of(posts.get(0), posts.get(1)));
     }
 
-
+    public static class FakeProductRepositoryImpl extends ProductRepositoryImpl{
+            public FakeProductRepositoryImpl() throws IOException {
+                super();
+                findAllProducts().clear();
+                findAllPosts().clear();
+            }
+    }
 
 }
+
+
+
+

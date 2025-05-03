@@ -31,6 +31,8 @@ public class UserRepositoryImpl implements IUserRepository {
         return listOfUsers;
     }
 
+
+
     @Override
     public void saveFollow(Integer userId, Integer userIdToFollow) {
         User userToFollow = listOfUsers.stream()
@@ -202,4 +204,5 @@ public class UserRepositoryImpl implements IUserRepository {
                 .filter(post -> Objects.equals(post.getCategory(), categoryId))
                 .collect(Collectors.toSet());
     }
+
 }

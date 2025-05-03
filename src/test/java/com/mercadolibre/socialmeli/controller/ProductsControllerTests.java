@@ -1,7 +1,10 @@
 package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.PostDto;
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.service.ProductServiceImpl;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,13 +19,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.http.ResponseEntity;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class ProductsControllerTests {
 
     @Mock
-    private ProductServiceImpl service;
+    private ProductServiceImpl productService;
 
     @InjectMocks
     private ProductsController controller;
@@ -42,7 +49,7 @@ public class ProductsControllerTests {
 
         FollowingPostDto dto = new FollowingPostDto(userId, List.of(post1, post2));
 
-        when(service.getRecentSellerPostsForUser(userId, order)).thenReturn(dto);
+        when(productService.getRecentSellerPostsForUser(userId, order)).thenReturn(dto);
 
         // Act
         ResponseEntity<?> response = controller.getRecentSellerPostsForUser(userId, order);
@@ -55,7 +62,7 @@ public class ProductsControllerTests {
         assertEquals(List.of("2023-01-01", "2023-02-01"),
                 body.getPostDto().stream().map(PostDto::getDate).toList());
 
-        verify(service).getRecentSellerPostsForUser(userId, order);
+        verify(productService).getRecentSellerPostsForUser(userId, order);
     }
     @Test
     @DisplayName("Debería devolver los posts ordenados de forma descendente por fecha")
@@ -72,7 +79,7 @@ public class ProductsControllerTests {
 
         FollowingPostDto dto = new FollowingPostDto(userId, List.of(post1, post2));
 
-        when(service.getRecentSellerPostsForUser(userId, order)).thenReturn(dto);
+        when(productService.getRecentSellerPostsForUser(userId, order)).thenReturn(dto);
 
         // Act
         ResponseEntity<?> response = controller.getRecentSellerPostsForUser(userId, order);
@@ -85,8 +92,27 @@ public class ProductsControllerTests {
         assertEquals(List.of("2023-02-01", "2023-01-01"),
                 body.getPostDto().stream().map(PostDto::getDate).toList());
 
-        verify(service).getRecentSellerPostsForUser(userId, order);
+        verify(productService).getRecentSellerPostsForUser(userId, order);
     }
 
 
+
+
+    @DisplayName("Should call service correctly when given valid userId and order")
+    @Test
+    void getRecentSellerPostsForUser_shouldCallServiceCorrectly_WhenUserIdAndOrderAreValid() {
+        // Arrange
+        final Integer validUserId = 100;
+        final String sortOrder = "date_asc";
+        final FollowingPostDto mockResponse = new FollowingPostDto(validUserId, List.of());
+
+        when(productService.getRecentSellerPostsForUser(validUserId, sortOrder)).thenReturn(mockResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getRecentSellerPostsForUser(validUserId, sortOrder);
+
+        // Assert
+        verify(productService).getRecentSellerPostsForUser(validUserId, sortOrder);
+        assertNotNull(response);
+    }
 }

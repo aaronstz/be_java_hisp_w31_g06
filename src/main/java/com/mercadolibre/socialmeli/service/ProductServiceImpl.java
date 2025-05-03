@@ -84,7 +84,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
 
-        if (!order.equals("date_asc") && !order.equals("date_desc")) {
+        if (order == null || (!order.equals("date_asc") && !order.equals("date_desc"))) {
             throw new BadRequestException("El orden solo puede ser 'date_asc' o 'date_desc'");
         }
 

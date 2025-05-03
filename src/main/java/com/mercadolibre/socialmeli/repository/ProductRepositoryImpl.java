@@ -7,8 +7,6 @@ import com.mercadolibre.socialmeli.entity.Product;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
-import java.util.List;
-import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -67,6 +65,8 @@ public class ProductRepositoryImpl implements IProductRepository {
                 .filter(p -> p.getHasPromo() && p.getDiscount() != null)
                 .collect(Collectors.toList());
     }
+
+
 
     private void loadDataBase() throws IOException {
         File productsFile;
