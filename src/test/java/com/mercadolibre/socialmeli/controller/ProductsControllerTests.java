@@ -35,7 +35,7 @@ public class ProductsControllerTests {
     private ProductsController controller;
 
     @Test
-    @DisplayName("Debería devolver los posts ordenados de forma ascendente por fecha")
+    @DisplayName("Should return the posts sorted in ascending order by date.")
     void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_WhenOrderIsDateAsc() {
         // Arrange
         Integer userId = 100;
@@ -65,7 +65,7 @@ public class ProductsControllerTests {
         verify(productService).getRecentSellerPostsForUser(userId, order);
     }
     @Test
-    @DisplayName("Debería devolver los posts ordenados de forma descendente por fecha")
+    @DisplayName("Should return the posts sorted in descending order by date.")
     void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_WhenOrderIsDateDesc() {
         // Arrange
         Integer userId = 100;

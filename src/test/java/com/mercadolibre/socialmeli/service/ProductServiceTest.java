@@ -61,7 +61,7 @@ public class ProductServiceTest {
     private ProductServiceImpl service;
 
     @Test
-    @DisplayName("getRecentSellerPostsForUser debería devolver una lista de productos de manera ascendente cuando el orden ingresado es ascendente")
+    @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in ascending order by date.")
     void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_whenOrderIsAscending(){
         // Arrange
         String order = "date_asc";
@@ -104,7 +104,7 @@ public class ProductServiceTest {
 
 
     @Test
-    @DisplayName("getRecentSellerPostsForUser debería devolver una lista de productos de manera descendente cuando el orden ingresado es descendente")
+    @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in descending order by date.")
     void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending(){
         // Arrange
         String order = "date_desc";

@@ -80,7 +80,7 @@ class BeJavaHispW31G06ApplicationTests {
 	}
 
 
-	@DisplayName("getRecentSellerPostsForUser debería devolver posts en orden ascendente cuando el parámetro 'order' es 'date_asc'")
+	@DisplayName("getRecentSellerPostsForUser Should return the posts sorted in ascending order by date.")
 	@Test
 	void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_whenOrderIsAscending() throws Exception {
 		Integer userId = 1;
@@ -110,7 +110,7 @@ class BeJavaHispW31G06ApplicationTests {
 	}
 
 
-	@DisplayName("getRecentSellerPostsForUser debería devolver posts en orden descendente cuando el parámetro 'order' es 'date_desc'")
+	@DisplayName("getRecentSellerPostsForUser Should return the posts sorted in descending order by date.")
 	@Test
 	void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending() throws Exception {
 		Integer userId = 1;
