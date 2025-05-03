@@ -3,6 +3,7 @@ package com.mercadolibre.socialmeli;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
+import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
@@ -27,6 +28,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,6 +48,24 @@ class BeJavaHispW31G06ApplicationTests {
 	void setUp() {
 		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
 	}
+
+	@Test
+	void testFollow() throws Exception {
+		int userId1 = 1;
+		int userId2 = 2;
+
+		String expected = "{\"message\": \"El usuario 1 siguió al usuario 2\"}";
+
+		MensajeDto response = new ObjectMapper().readValue(expected, MensajeDto.class);
+
+		this.mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userId1, userId2))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message").value(response.getMessage()))
+				.andReturn();
+	}
+
 	@DisplayName("Should return only promotional posts when calling /products/promotions successfully")
 	@Test
 	void getAllPromotions_ShouldReturnOnlyPromoPosts_WhenCalledSuccessfully() throws Exception {
@@ -85,6 +105,7 @@ class BeJavaHispW31G06ApplicationTests {
 
 		assertTrue(responseDto.getFollowersCount() >= 0);
 		Assertions.assertEquals(2, responseDto.getFollowersCount());
+	}
 
 	@DisplayName("getRecentSellerPostsForUser Should return the posts sorted in ascending order by date.")
 	@Test
@@ -112,7 +133,7 @@ class BeJavaHispW31G06ApplicationTests {
 		List<LocalDate> fechasOrdenadas = new ArrayList<>(fechas);
 		fechasOrdenadas.sort(Comparator.naturalOrder());
 
-		assertEquals(fechasOrdenadas, fechas);
+		Assertions.assertEquals(fechasOrdenadas, fechas);
 	}
 
 
@@ -141,7 +162,7 @@ class BeJavaHispW31G06ApplicationTests {
 		List<LocalDate> fechasOrdenadas = new ArrayList<>(fechas);
 		fechasOrdenadas.sort(Comparator.reverseOrder());
 
-		assertEquals(fechasOrdenadas, fechas);
+		Assertions.assertEquals(fechasOrdenadas, fechas);
 
 	}
 

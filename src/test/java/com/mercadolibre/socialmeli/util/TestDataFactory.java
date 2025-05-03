@@ -157,7 +157,7 @@ public class TestDataFactory {
 
     public static User getUserFromId(int userId) {
         List<Post> posts = createSixPosts();
-        return new User(100, "Mariano Lopez", 2, new HashSet<Follow>(), new HashSet<Follow>(),
+        return new User(userId, "Mariano Lopez", 2, new HashSet<>(), new HashSet<>(),
                 Set.of(posts.get(0), posts.get(1)));
     }
 
