@@ -1,7 +1,9 @@
 package com.mercadolibre.socialmeli;
 
 import com.mercadolibre.socialmeli.dto.PostDto;
+import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
+import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,10 +34,14 @@ class BeJavaHispW31G06ApplicationTests {
 	@Autowired
 	private ProductRepositoryImpl productRepository;
 
+	@Autowired
+	private UserRepositoryImpl userRepository;
+
 	@BeforeEach
 	void setUp() {
 		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
 	}
+
 	@DisplayName("Should return only promotional posts when calling /products/promotions successfully")
 	@Test
 	void getAllPromotions_ShouldReturnOnlyPromoPosts_WhenCalledSuccessfully() throws Exception {

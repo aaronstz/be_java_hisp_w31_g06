@@ -105,7 +105,6 @@ public class TestDataFactory {
         posts.add(new Post(201, 4, "2023-10-13", products.get(3), 1, 200.0, false, 0.0));
         posts.add(new Post(300, 5, "2025-04-29", products.get(4), 3, 300.0, true, 10.0));
         posts.add(new Post(301, 6, "2023-10-15", products.get(5), 2, 60.0, false, 0.0));
-
         return posts;
     }
 
@@ -157,6 +156,16 @@ public static class FakeProductRepositoryImpl extends ProductRepositoryImpl{
             findAllProducts().clear();
             findAllPosts().clear();
         }
+
 }
+    public static class FakeUserRepositoryImpl extends UserRepositoryImpl {
+        public FakeUserRepositoryImpl() throws IOException {
+            super();
+            findAll().clear();
+        }
+        public void preloadUsers(List<User> users) {
+            findAll().addAll(users);
+        }
+    }
 
 }
