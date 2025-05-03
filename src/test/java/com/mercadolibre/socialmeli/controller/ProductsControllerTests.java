@@ -1,19 +1,43 @@
 package com.mercadolibre.socialmeli.controller;
 
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.service.ProductServiceImpl;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class ProductsControllerTests {
 
     @Mock
-    private ProductServiceImpl service;
+    private ProductServiceImpl productService;
 
     @InjectMocks
     private ProductsController controller;
+
+    @DisplayName("Should call service correctly when given valid userId and order")
+    @Test
+    void getRecentSellerPostsForUser_shouldCallServiceCorrectly_WhenUserIdAndOrderAreValid() {
+        // Arrange
+        final Integer validUserId = 100;
+        final String sortOrder = "date_asc";
+        final FollowingPostDto mockResponse = new FollowingPostDto(validUserId, List.of());
+
+        when(productService.getRecentSellerPostsForUser(validUserId, sortOrder)).thenReturn(mockResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getRecentSellerPostsForUser(validUserId, sortOrder);
+
+        // Assert
+        verify(productService).getRecentSellerPostsForUser(validUserId, sortOrder);
+        assertNotNull(response);
+    }
 }
