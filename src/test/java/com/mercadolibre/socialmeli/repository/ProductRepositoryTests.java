@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,10 +23,9 @@ public class ProductRepositoryTests {
 
     private ProductRepositoryImpl repository;
 
-    @SneakyThrows
     @BeforeEach
-    void setUp() {
-        repository = new ProductRepositoryImpl();
+    void setUp() throws IOException {
+        repository = new TestDataFactory.FakeProductRepositoryImpl();
         TestDataFactory.createSixPosts().forEach(repository::savePost);
         TestDataFactory.createSixProducts().forEach(repository::saveProduct);
     }

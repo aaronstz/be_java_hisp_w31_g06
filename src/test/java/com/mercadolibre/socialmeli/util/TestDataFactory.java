@@ -147,6 +147,12 @@ public class TestDataFactory {
 
         return List.of(mainUser, follower1, follower2, following1, following2);
     }
-
+public static class FakeProductRepositoryImpl extends ProductRepositoryImpl{
+        public FakeProductRepositoryImpl() throws IOException {
+            super();
+            findAllProducts().clear();
+            findAllPosts().clear();
+        }
+}
 
 }
