@@ -35,15 +35,9 @@ public class UserRepositoryImpl implements IUserRepository {
 
     @Override
     public void saveFollow(Integer userId, Integer userIdToFollow) {
-        User userToFollow = listOfUsers.stream()
-                .filter(utf -> utf.getUserId().equals(userIdToFollow))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("No se encontró el usuario a seguir"));
+        User userToFollow = this.findUserById(userId);
 
-        User user = listOfUsers.stream()
-                .filter(ul -> ul.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("No se encontró al seguidor"));
+        User user = this.findUserById(userIdToFollow);
 
         userToFollow.setFollowersCount(userToFollow.getFollowersCount() + 1);
 
@@ -114,7 +108,7 @@ public class UserRepositoryImpl implements IUserRepository {
         return listOfUsers.stream()
                 .filter(u -> u.getUserId().equals(userId))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("No se encontró el usuario a seguir"));
     }
 
     @Override
