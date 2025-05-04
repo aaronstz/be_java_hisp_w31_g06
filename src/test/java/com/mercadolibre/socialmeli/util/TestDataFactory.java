@@ -23,17 +23,25 @@ import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
+
 public class TestDataFactory {
 
+    //public static void setUserRepositoryForTest(UserRepositoryImpl userRepository) {
+    //    userRepository.clearRepository();
+    //}
 
     private static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
 
     public static List<PostDto> parsePostDtoList(String json) throws IOException {
-        return mapper.readValue(json, new TypeReference<>() {});
+        return mapper.readValue(json, new TypeReference<>() {
+        });
     }
 
+    // public static void setProductRepositoryForTest(ProductRepositoryImpl productRepository) {
+    //   productRepository.clearRepository();
+    //}
 
     public static User createUserWithFollowers() {
         List<Post> posts = createSixPosts();
@@ -150,22 +158,34 @@ public class TestDataFactory {
 
         return List.of(mainUser, follower1, follower2, following1, following2);
     }
-public static class FakeProductRepositoryImpl extends ProductRepositoryImpl{
-        public FakeProductRepositoryImpl() throws IOException {
-            super();
-            findAllProducts().clear();
-            findAllPosts().clear();
-        }
 
-}
+
     public static class FakeUserRepositoryImpl extends UserRepositoryImpl {
         public FakeUserRepositoryImpl() throws IOException {
             super();
             findAll().clear();
         }
+
         public void preloadUsers(List<User> users) {
             findAll().addAll(users);
+        }}
+
+        public static User getUserFromId(int userId) {
+            List<Post> posts = createSixPosts();
+            return new User(userId, "Mariano Lopez", 2, new HashSet<>(), new HashSet<>(),
+                    Set.of(posts.get(0), posts.get(1)));
+        }
+
+        public static class FakeProductRepositoryImpl extends ProductRepositoryImpl {
+            public FakeProductRepositoryImpl() throws IOException {
+                super();
+                findAllProducts().clear();
+                findAllPosts().clear();
+            }
         }
     }
 
-}
+
+
+
+
