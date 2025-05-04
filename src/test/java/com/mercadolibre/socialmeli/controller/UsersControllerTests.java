@@ -1,8 +1,11 @@
 package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
+import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.service.UserServiceImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -74,7 +80,57 @@ public class UsersControllerTests {
         assertNotNull(response);
     }
 
+    @Test
+    void testGetFollowedListAsc() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> followSet = TestDataFactory.getFollowList();
+        FollowingListDto expected = new FollowingListDto(user.getUserId(), user.getUserName(), followSet);
+        String order = "name_asc";
 
+        when(service.getFollowedList(user.getUserId(), order)).thenReturn(expected);
 
+        // Act
+        ResponseEntity<FollowingListDto> response = controller.getFollowedList(user.getUserId(), order);
 
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(expected, response.getBody());
+        verify(service).getFollowedList(user.getUserId(), order);
+    }
+
+    @Test
+    void testGetFollowedListDesc() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> followSet = TestDataFactory.getFollowList();
+        FollowingListDto expected = new FollowingListDto(user.getUserId(), user.getUserName(), followSet);
+        String order = "name_desc";
+
+        when(service.getFollowedList(user.getUserId(), order)).thenReturn(expected);
+
+        // Act
+        ResponseEntity<FollowingListDto> response = controller.getFollowedList(user.getUserId(), order);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(expected, response.getBody());
+        verify(service).getFollowedList(user.getUserId(), order);
+    }
+
+    @Test
+    void testGetFollowedListNotFound() {
+        // Arrange
+        Integer userId = 999; // ID de usuario que no tiene datos
+        String order = "name_asc";
+
+        when(service.getFollowedList(userId, order)).thenThrow(new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId));
+
+        // Act & Assert
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
+            controller.getFollowedList(userId, order);
+        });
+
+        assertEquals("No se encontraron seguidos para el usuario con ID: " + userId, thrown.getMessage());
+    }
 }

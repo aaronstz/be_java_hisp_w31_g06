@@ -166,5 +166,25 @@ class BeJavaHispW31G06ApplicationTests {
 
 	}
 
+	@Test
+	void testGetFollowedListSuccess() throws Exception {
+		int userId = 1; // El ID del usuario para el cual estás probando
+		String order = "name_asc";
 
+		// Realiza la llamada GET al controlador
+		mockMvc.perform(get("/users/{userId}/followed/list", userId)
+						.param("order", order)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.followed").isArray());
+	}
+
+	@Test
+	void testGetFollowedListNotFound() throws Exception {
+		int userId = 999;
+
+		mockMvc.perform(get("/users/{userId}/followed/list", userId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+	}
 }

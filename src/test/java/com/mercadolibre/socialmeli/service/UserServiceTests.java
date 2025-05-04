@@ -1,8 +1,13 @@
 package com.mercadolibre.socialmeli.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.FollowDto;
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
+import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
@@ -16,8 +21,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -130,4 +135,106 @@ public class UserServiceTests {
 
     }
 
+    @Test
+    void testGetFollowedListAlphabeticalAscOrder() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> follows = TestDataFactory.getFollowList();
+
+        List<Follow> followsList = new ArrayList<>(follows.stream()
+                .map(f -> {
+                    Follow follow = new Follow();
+                    follow.setUserId(f.getUserId());
+                    follow.setUserName(f.getUserName());
+                    return follow;
+                })
+                .toList());
+
+        followsList.sort(Comparator.comparing(Follow::getUserName));
+
+        // Act
+        when(repository.findFollowingList(user.getUserId())).thenReturn(follows);
+        when(repository.findUserById(user.getUserId())).thenReturn(user);
+
+        FollowingListDto expectedFollowingListDto = new FollowingListDto();
+        expectedFollowingListDto.setUserId(user.getUserId());
+        expectedFollowingListDto.setUserName(repository.findUserById(user.getUserId()).getUserName());
+        expectedFollowingListDto.setFollowed(new LinkedHashSet<>(followsList));
+
+        FollowingListDto response = service.getFollowedList(user.getUserId(), "name_asc");
+
+        // Assert
+        verify(repository).findFollowingList(user.getUserId());
+        verify(repository).findUserById(user.getUserId());
+        Assertions.assertEquals(expectedFollowingListDto, response);
+    }
+
+    @Test
+    void testGetFollowedListAlphabeticalDescOrder() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> follows = TestDataFactory.getFollowList();
+
+        List<Follow> followsList = new ArrayList<>(follows.stream()
+                .map(f -> {
+                    Follow follow = new Follow();
+                    follow.setUserId(f.getUserId());
+                    follow.setUserName(f.getUserName());
+                    return follow;
+                })
+                .toList());
+
+        followsList.sort(Comparator.comparing(Follow::getUserName).reversed());
+
+        // Act
+        when(repository.findFollowingList(user.getUserId())).thenReturn(follows);
+        when(repository.findUserById(user.getUserId())).thenReturn(user);
+
+        FollowingListDto expectedFollowingListDto = new FollowingListDto();
+        expectedFollowingListDto.setUserId(user.getUserId());
+        expectedFollowingListDto.setUserName(repository.findUserById(user.getUserId()).getUserName());
+        expectedFollowingListDto.setFollowed(new LinkedHashSet<>(followsList));
+
+        FollowingListDto response = service.getFollowedList(user.getUserId(), "name_desc");
+
+        // Assert
+        verify(repository).findFollowingList(user.getUserId());
+        Assertions.assertEquals(expectedFollowingListDto, response);
+    }
+
+    @Test
+    void testGetFollowedListAlphabeticalAscOrderNotFoundFail(){
+        // Arrange
+        int userId = 999;
+        String order = "name_asc";
+
+        String expect = "No se encontraron seguidos para el usuario con ID: " + userId;
+
+        when(repository.findFollowingList(userId)).thenReturn(null);
+        // Act
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () ->
+                service.getFollowedList(userId, order));
+
+        // Assert
+        verify(repository).findFollowingList(userId);
+        Assertions.assertEquals(expect, thrown.getMessage());
+    }
+
+    @Test
+    void testGetFollowedListAlphabeticalAscOrderConflictFail() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> follows = TestDataFactory.getFollowList();
+
+        String expected = "Parámetro 'order' inválido. Valores permitidos: name_asc, name_desc";
+
+        // Act
+        when(repository.findFollowingList(user.getUserId())).thenReturn(follows);
+
+        BadRequestException thrown = Assertions.assertThrows(BadRequestException.class,
+                () -> service.getFollowedList(user.getUserId(), ""));
+
+        // Assert
+        Assertions.assertEquals(expected, thrown.getMessage());
+    }
 }
