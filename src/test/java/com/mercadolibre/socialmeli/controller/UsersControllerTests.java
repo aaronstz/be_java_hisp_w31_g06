@@ -1,9 +1,11 @@
 package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
+import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.service.UserServiceImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +29,24 @@ public class UsersControllerTests {
 
     @InjectMocks
     private UserController controller;
+
+    @Test
+    void testFollow() {
+        int userId = 1;
+        int userIdToFollow = 2;
+        MensajeDto expected = new MensajeDto("El usuario " + userId + " siguió al usuario " + userIdToFollow);
+
+        when(service.follow(userId, userIdToFollow)).thenReturn(expected);
+
+        // Act
+        ResponseEntity<?> response = controller.follow(userId, userIdToFollow);
+        MensajeDto body = (MensajeDto) response.getBody();
+
+        // Assert
+        verify(service).follow(userId, userIdToFollow);
+        Assertions.assertEquals(expected, body);
+        Assertions.assertNotNull(response);
+    }
 
     @Test
     @DisplayName("getFollowersCount .should return the number of followers of the user when the input data is valid")
