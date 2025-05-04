@@ -5,11 +5,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -183,7 +179,49 @@ public class TestDataFactory {
                 findAllPosts().clear();
             }
         }
+    // For Category
+
+    public static void preloadUserFollowingSellerWithPost(UserRepositoryImpl userRepository, ProductRepositoryImpl productRepository, Integer buyerId, Integer sellerId, Integer categoryId) {
+        Product testProduct = new Product(
+                99, "Producto Test", "Electronics",
+                "Marca Test", "Negro", "Descripción Test"
+        );
+        productRepository.saveProduct(testProduct);
+
+        Post testPost = new Post(
+                sellerId,
+                999,
+                LocalDate.now().toString(),
+                testProduct,
+                categoryId,
+                1500.0,
+                true,
+                10.0
+        );
+        productRepository.savePost(testPost);
+
+        User seller = new User(
+                sellerId,
+                "Seller User",
+                0,
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashSet<>(Set.of(testPost))
+        );
+        userRepository.findAll().add(seller);
+
+        User buyer = new User(
+                buyerId,
+                "Test Buyer",
+                2,
+                new HashSet<>(),
+                new HashSet<>(Set.of(new Follow(sellerId, "Seller User"))),
+                new HashSet<>()
+        );
+        userRepository.findAll().add(buyer);
     }
+    }
+
 
 
 

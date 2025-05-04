@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
+import com.mercadolibre.socialmeli.entity.Product;
+import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
@@ -17,13 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.greaterThan;
@@ -51,7 +53,9 @@ class BeJavaHispW31G06ApplicationTests {
 
 	@BeforeEach
 	void setUp() {
+
 		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
+
 	}
 
 
@@ -171,6 +175,39 @@ class BeJavaHispW31G06ApplicationTests {
 		Assertions.assertEquals(fechasOrdenadas, fechas);
 
 	}
+	@DisplayName("Should return posts when category exists")
+	@Test
+	void getSellerPostsByCategory_ShouldReturnPosts_WhenCategoryExists() throws Exception {
+		Integer userId = 100;
+		Integer sellerId = 200;
+		Integer filterCategory= 1;
 
+		TestDataFactory.preloadUserFollowingSellerWithPost(userRepository,productRepository,userId,sellerId,filterCategory);
+		mockMvc.perform(get("/products/followed/{userId}/filterByCategory", userId)
+						.param("filterCategory", filterCategory.toString())
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.postDto").isArray())
+				.andExpect(jsonPath("$.postDto.length()", greaterThan(0)))
+				.andExpect(jsonPath("$.postDto[*].category", everyItem(equalTo(filterCategory))));
+	}
+	@DisplayName("Should return 404 when no posts are found for given category")
+	@Test
+	void getSellerPostsByCategory_ShouldReturnNotFound_WhenNoPostsExist() throws Exception {
+		// Arrange
+		Integer userId = 100;
+		Integer nonExistentCategory = 999;
+
+		// Act & Assert
+		mockMvc.perform(get("/products/followed/{userId}/filterByCategory", userId)
+						.param("filterCategory", nonExistentCategory.toString())
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message").value("No se encontraron publicaciones para la categoría proporcionada."));
+	}
 
 }
