@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -134,6 +135,60 @@ public class UserServiceTests {
     }
 
     @Test
+    void testUnfollow() {
+        // Arrange
+        User user1 = new User(1, "Mariano Lopez", 0, new HashSet<>(),
+                new HashSet<>(), null);
+        User user2 = new User(2, "Fernando Perez", 1, new HashSet<>(),
+                new HashSet<>(), null);
+
+        MensajeDto expected = new MensajeDto("El usuario " + user1.getUserId() + " a dejado de seguir al usuario " +
+                user2.getUserId());
+
+        // Act
+        when(repository.findUserById(user1.getUserId())).thenReturn(user1);
+        when(repository.findUserById(user2.getUserId())).thenReturn(user2);
+        when(repository.isFollowing(user1.getUserId(), user2.getUserId())).thenReturn(true);
+
+        MensajeDto response = service.unFollow(user1.getUserId(), user2.getUserId());
+
+        // Assert
+        verify(repository).findUserById(user1.getUserId());
+        verify(repository).findUserById(user2.getUserId());
+        Assertions.assertEquals(expected, response);
+    }
+
+    @Test
+    @DisplayName("This test ensures that a `ConflictException` is thrown when a user attempts to unfollow themselves")
+    void testCannotUnFollowHimself() {
+        // Arrange
+        int user1 = 1;
+        String expected = "Un usuario no puede dejar de seguirse.";
+
+        // Act
+        ConflictException thrown = Assertions.assertThrows(ConflictException.class,
+                () -> service.unFollow(user1, user1));
+
+        // Assert
+        Assertions.assertEquals(expected, thrown.getMessage());
+    }
+
+    @Test
+    @DisplayName("This test ensures that a `NotFoundException` is thrown when a user is not found or does not exist")
+    void testUnFollowUserIsNull() {
+        // Arrange
+        int userId = 999;
+        int userId2 = 2;
+        String expected = "Uno de los usuarios no fue encontrado";
+
+        // Act
+        when(repository.findUserById(userId)).thenReturn(null);
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class,
+                () -> service.unFollow(userId, userId2));
+
+        // Assert
+        verify(repository).findUserById(userId);
+      
     @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
     void testGetFollowedListAcsOrder_shouldReturnFollowedListInAscNameOrder_whenInputIsValid() {
         // Arrange
@@ -236,10 +291,36 @@ public class UserServiceTests {
                 () -> service.getFollowedList(user.getUserId(), ""));
 
         // Assert
+
         Assertions.assertEquals(expected, thrown.getMessage());
     }
 
     @Test
+    @DisplayName("This test ensures that a `ConflictException` is thrown when trying to unfollow a user that is not " +
+            "being followed")
+    void testUnfollowUserNotFollowing() {
+        // Arrange
+        User user1 = new User(1, "Mariano Lopez", 0, new HashSet<>(),
+                new HashSet<>(), null);
+        User user2 = new User(2, "Fernando Perez", 1, new HashSet<>(),
+                new HashSet<>(), null);
+
+        String expected = "No se puede dejar de seguir a un usuario que no estás siguiendo";
+
+        // Act
+        when(repository.findUserById(user1.getUserId())).thenReturn(user1);
+        when(repository.findUserById(user2.getUserId())).thenReturn(user2);
+        when(repository.isFollowing(user1.getUserId(), user2.getUserId())).thenReturn(false);
+
+        ConflictException thrown = Assertions.assertThrows(ConflictException.class,
+                () -> service.unFollow(user1.getUserId(), user2.getUserId()));
+
+        // Assert
+        verify(repository).findUserById(user1.getUserId());
+        verify(repository).findUserById(user2.getUserId());
+        Assertions.assertEquals(expected, thrown.getMessage());
+    }
+
     @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
     void testGetFollowersListAcsOrder_shouldReturnFollowersInAscNameOrder_whenInputIsValid() {
         // Arrange
@@ -344,5 +425,6 @@ public class UserServiceTests {
         // Assert
         Assertions.assertEquals(expected, thrown.getMessage());
     }
+
 
 }

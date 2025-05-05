@@ -31,8 +31,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -71,6 +70,42 @@ class BeJavaHispW31G06ApplicationTests {
 		this.mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userId1, userId2))
 				.andDo(print())
 				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message").value(response.getMessage()))
+				.andReturn();
+	}
+
+	@Test
+	@DisplayName("testUnFollow return a confirmation message when a user unfollows another")
+	void testUnFollow_shouldReturnMessage_whenUserUnfollowsAnother() throws Exception {
+		int userId1 = 3;
+		int userId2 = 2;
+
+		String expected = "{\"message\": \"El usuario 3 a dejado de seguir al usuario 2\"}";
+
+		MensajeDto response = new ObjectMapper().readValue(expected, MensajeDto.class);
+
+		this.mockMvc.perform(put("/users/{userId}/unfollow/{userIdToUnfollow}", userId1, userId2))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message").value(response.getMessage()))
+				.andReturn();
+	}
+
+	@Test
+	@DisplayName("Should return a Conflict Exception when user tries to unfollow themselves")
+	void testUnFollow_shouldReturnConflictException_whenUserTriesToUnfollowThemselves() throws Exception {
+		int userId1 = 3;
+		int userId2 = 3;
+
+		String expected = "{\"message\": \"Un usuario no puede dejar de seguirse.\"}";
+
+		MensajeDto response = new ObjectMapper().readValue(expected, MensajeDto.class);
+
+		this.mockMvc.perform(put("/users/{userId}/unfollow/{userIdToUnfollow}", userId1, userId2))
+				.andDo(print())
+				.andExpect(status().isConflict())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.message").value(response.getMessage()))
 				.andReturn();
