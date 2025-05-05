@@ -185,7 +185,7 @@ class BeJavaHispW31G06ApplicationTests {
 	@DisplayName("getRecentSellerPostsForUser Should return the posts sorted in descending order by date.")
 	@Test
 	void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending() throws Exception {
-		Integer userId = 1;
+		Integer userId = 3;
 		MvcResult result = mockMvc.perform(get("/products/followed/{userId}/list", userId)
 						.param("order", "date_desc"))
 				.andDo(print())
