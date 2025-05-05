@@ -1,13 +1,10 @@
 package com.mercadolibre.socialmeli.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.entity.Post;
+import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.util.TestDataFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.User;
-import com.mercadolibre.socialmeli.util.TestDataFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -62,6 +63,29 @@ class UserRepositoryTests {
         // Assert
         assertNotNull(response);
         assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    @DisplayName("This test confirms when a user did an unfollow to a user")
+    void testRemoveFollow_shouldRemoveFollowFromUser_whenInputsCorrect() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        User userToUnfollow = TestDataFactory.getUserFromId(200);
+        Follow follower = new Follow(100, "Mariano Lopez");
+        Follow unfollow = new Follow(200, "Guillermo Lopez");
+
+        userToUnfollow.getFollower().add(follower);
+
+        int userFollowersCount = userToUnfollow.getFollowersCount();
+
+        // Act
+        repository.removeFollow(user, userToUnfollow);
+
+        // Assertions
+        Assertions.assertFalse(userToUnfollow.getFollower().contains(follower));
+        Assertions.assertEquals(userFollowersCount - 1, userToUnfollow.getFollowersCount());
+        Assertions.assertFalse(user.getFollowing().contains(unfollow));
+
     }
 
 }

@@ -55,6 +55,62 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductServiceImpl service;
 
+    @DisplayName("Should return posts filtered by category when valid userId and category are provided")
+    @Test
+    void getSellerPostsForUserByCategory_shouldReturnPosts_WhenUserIdAndCategoryValid() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 1;
+
+        User user = TestDataFactory.createUserWithFollowers();
+        Post matchingPost = TestDataFactory.createSixPosts().get(0);
+
+        when(userRepository.findPostsByFollowedUsersAndCategory(userId, categoryId)).thenReturn(Set.of(matchingPost));
+
+        // Act
+        FollowingPostDto result = service.getSellerPostsForUserByCategory(userId, categoryId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals(1, result.getPostDto().size());
+        assertEquals(categoryId, result.getPostDto().get(0).getCategory());
+
+        verify(userRepository).findPostsByFollowedUsersAndCategory(userId, categoryId);
+    }
+
+    @DisplayName("Should throw BadRequestException when category is invalid (zero)")
+    @Test
+    void getSellerPostsForUserByCategory_shouldThrowBadRequest_WhenCategoryIsZero() {
+        // Arrange
+        Integer userId = 100;
+
+        // Act & Assert
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> service.getSellerPostsForUserByCategory(userId, 0));
+
+        assertEquals("Debe proporcionar una categoría válida.", exception.getMessage());
+    }
+
+    @DisplayName("Should throw NotFoundException when no posts found for category")
+    @Test
+    void getSellerPostsForUserByCategory_shouldThrowNotFound_WhenNoPostsFound() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 99;
+
+        User user = TestDataFactory.createUserWithFollowers();
+        when(userRepository.findPostsByFollowedUsersAndCategory(userId, categoryId)).thenReturn(Set.of());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> service.getSellerPostsForUserByCategory(userId, categoryId));
+
+        assertEquals("No se encontraron publicaciones para la categoría proporcionada.", exception.getMessage());
+
+        verify(userRepository).findPostsByFollowedUsersAndCategory(userId, categoryId);
+    }
+
     @Test
     @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in ascending order by date.")
     void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_whenOrderIsAscending() {

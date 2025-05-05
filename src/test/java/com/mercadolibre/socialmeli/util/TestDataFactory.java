@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
@@ -27,7 +25,9 @@ public class TestDataFactory {
         // userRepository.clearRepository();
         // }
 
-        private static final ObjectMapper mapper = new ObjectMapper();
+        private static final ObjectMapper mapper = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
 
         public static List<PostDto> parsePostDtoList(String json) throws IOException {
                 return mapper.readValue(json, new TypeReference<>() {
@@ -111,7 +111,6 @@ public class TestDataFactory {
                 posts.add(new Post(201, 4, "2023-10-13", products.get(3), 1, 200.0, false, 0.0));
                 posts.add(new Post(300, 5, "2025-04-29", products.get(4), 3, 300.0, true, 10.0));
                 posts.add(new Post(301, 6, "2023-10-15", products.get(5), 2, 60.0, false, 0.0));
-
                 return posts;
         }
 
@@ -158,6 +157,17 @@ public class TestDataFactory {
                 return List.of(mainUser, follower1, follower2, following1, following2);
         }
 
+        public static class FakeUserRepositoryImpl extends UserRepositoryImpl {
+                public FakeUserRepositoryImpl() throws IOException {
+                        super();
+                        findAll().clear();
+                }
+
+                public void preloadUsers(List<User> users) {
+                        findAll().addAll(users);
+                }
+        }
+
         public static User getUserFromId(int userId) {
                 List<Post> posts = createSixPosts();
                 return new User(userId, "Mariano Lopez", 2, new HashSet<>(), new HashSet<>(),
@@ -171,12 +181,52 @@ public class TestDataFactory {
                         findAllPosts().clear();
                 }
         }
+        // For Category
 
-        public static class FakeUserRepositoryImpl extends UserRepositoryImpl {
-                public FakeUserRepositoryImpl() throws IOException {
-                        super();
-                        findAll().clear();
-                }
+        public static void preloadUserFollowingSellerWithPost(UserRepositoryImpl userRepository,
+                        ProductRepositoryImpl productRepository, Integer buyerId, Integer sellerId,
+                        Integer categoryId) {
+                Product testProduct = new Product(
+                                99, "Producto Test", "Electronics",
+                                "Marca Test", "Negro", "Descripción Test");
+                productRepository.saveProduct(testProduct);
+
+                Post testPost = new Post(
+                                sellerId,
+                                999,
+                                LocalDate.now().toString(),
+                                testProduct,
+                                categoryId,
+                                1500.0,
+                                true,
+                                10.0);
+                productRepository.savePost(testPost);
+
+                User seller = new User(
+                                sellerId,
+                                "Seller User",
+                                0,
+                                new HashSet<>(),
+                                new HashSet<>(),
+                                new HashSet<>(Set.of(testPost)));
+                userRepository.findAll().add(seller);
+
+                User buyer = new User(
+                                buyerId,
+                                "Test Buyer",
+                                2,
+                                new HashSet<>(),
+                                new HashSet<>(Set.of(new Follow(sellerId, "Seller User"))),
+                                new HashSet<>());
+                userRepository.findAll().add(buyer);
         }
 
+        public static Set<Follow> getFollowList() {
+                Follow follower1 = new Follow(100, "Tralalero Tralala");
+                Follow follower2 = new Follow(200, "Armando Casas");
+                Follow follower3 = new Follow(300, "Esteban Quito");
+                Follow follower4 = new Follow(400, "Jacky Sieras");
+
+                return new HashSet<>(Arrays.asList(follower1, follower2, follower3, follower4));
+        }
 }

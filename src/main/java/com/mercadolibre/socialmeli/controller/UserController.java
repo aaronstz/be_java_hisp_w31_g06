@@ -45,7 +45,6 @@ public class UserController {
   
     @PutMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public ResponseEntity<MensajeDto> unfollowUser(@PathVariable int userId, @PathVariable int userIdToUnfollow) {
-
         return new ResponseEntity<>( userService.unFollow(userId, userIdToUnfollow), HttpStatus.OK);
     }
   
