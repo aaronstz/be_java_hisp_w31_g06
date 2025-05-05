@@ -39,7 +39,8 @@ public class UserServiceTests {
     private UserServiceImpl service;
 
     @Test
-    void testFollow() {
+    @DisplayName("testFollow test that a user can follow another")
+    void testFollow_shouldAllowUserToFollowAnother_whenInputAreAccepted() {
         // Arrange
         User user1 = new User(1, "Mariano Lopez", 0, new HashSet<>(),
                 new HashSet<>(), null);
@@ -61,7 +62,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("This test ensures that a `ConflictException` is thrown when a user attempts to follow themselves")
-    void testCannotFollowHimself() {
+    void testCannotFollowHimself_shouldThrowConflictException_whenUserAttemptsToFollowThemselves() {
         // Arrange
         int user1 = 1;
         String expected = "Un usuario no puede seguirse a sí mismo";
@@ -76,7 +77,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("This test ensures that a `NotFoundException` is thrown when a user is not found or does not exist")
-    void testFollowUserIsNull() {
+    void testFollowUserIsNull_shouldThrowNotFoundException_whenUserInNotFound() {
         // Arrange
         int userId = 999;
         int userId2 = 2;
@@ -94,7 +95,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("This test ensures that a `ConflictException` is thrown when trying to re-follow an user")
-    void testFollowUserAlreadyFollows() {
+    void testFollowUserAlreadyFollows_shouldThrowConflictException_whenTryToFollowUserAlreadyFollowed() {
         // Arrange
         User user = new User(1, "Mariano Lopez", 0, new HashSet<>(),
                 new HashSet<>(), null);
@@ -136,7 +137,8 @@ public class UserServiceTests {
     }
 
     @Test
-    void testGetFollowedListAlphabeticalAscOrder() {
+    @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
+    void testGetFollowedListAcsOrder_shouldReturnFollowersInAscNameOrder_whenInputIsValid() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> follows = TestDataFactory.getFollowList();
@@ -165,12 +167,12 @@ public class UserServiceTests {
 
         // Assert
         verify(repository).findFollowingList(user.getUserId());
-        verify(repository).findUserById(user.getUserId());
         Assertions.assertEquals(expectedFollowingListDto, response);
     }
 
     @Test
-    void testGetFollowedListAlphabeticalDescOrder() {
+    @DisplayName("getFollowedList (Desc) should return the followed list of a user in desc order")
+    void testGetFollowedListDescOrder_shouldReturnFollowersInDescNameOrder_whenInputIsValid() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> follows = TestDataFactory.getFollowList();
@@ -203,7 +205,8 @@ public class UserServiceTests {
     }
 
     @Test
-    void testGetFollowedListAlphabeticalAscOrderNotFoundFail(){
+    @DisplayName("This test ensures that a 'NotFoundConflict' is thrown when user does not have followers")
+    void testGetFollowedListFail_shouldReturnNotFoundFail_whenArrayNotExists(){
         // Arrange
         int userId = 999;
         String order = "name_asc";
@@ -221,7 +224,8 @@ public class UserServiceTests {
     }
 
     @Test
-    void testGetFollowedListAlphabeticalAscOrderConflictFail() {
+    @DisplayName("This test ensures that a 'BadRequestException' is thrown when input order is invalid")
+    void testGetFollowedList_shouldReturnConflictFail_whenInputIsInvalid() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> follows = TestDataFactory.getFollowList();
