@@ -220,9 +220,20 @@ public class TestDataFactory {
         );
         userRepository.findAll().add(buyer);
     }
+
+
+
+
+    public static Set<Follow> getFollowList() {
+        Follow follower1 = new Follow(100, "Tralalero Tralala");
+        Follow follower2 = new Follow(200, "Armando Casas");
+        Follow follower3 = new Follow(300, "Esteban Quito");
+        Follow follower4 = new Follow(400, "Jacky Sieras");
+
+        return new HashSet<>(Arrays.asList(follower1, follower2, follower3, follower4));
     }
 
-
+}
 
 
 
