@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,12 +35,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -115,9 +110,10 @@ public class ProductServiceTest {
 
         verify(userRepository).findPostsByFollowedUsersAndCategory(userId, categoryId);
     }
+
     @Test
     @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in ascending order by date.")
-    void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_whenOrderIsAscending(){
+    void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_whenOrderIsAscending() {
         // Arrange
         String order = "date_asc";
         User userExpected = TestDataFactory.createUserWithFollowers();
@@ -157,10 +153,9 @@ public class ProductServiceTest {
         verify(userRepository).findRecentPostsForUser(301);
     }
 
-
     @Test
     @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in descending order by date.")
-    void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending(){
+    void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending() {
         // Arrange
         String order = "date_desc";
         User userExpected = TestDataFactory.createUserWithFollowers();
@@ -200,7 +195,6 @@ public class ProductServiceTest {
         verify(userRepository).findRecentPostsForUser(301);
     }
 
-
     @DisplayName("Should return recent seller posts ordered when given valid userId and order")
     @Test
     void getRecentSellerPostsForUser_shouldReturnRecentPostsOrdered_WhenValidUserIdAndOrder() {
@@ -226,6 +220,7 @@ public class ProductServiceTest {
         verify(userRepository).findUserById(userId);
         verify(userRepository, atLeastOnce()).findRecentPostsForUser(anyInt());
     }
+
     @DisplayName("Should throw BadRequestException when order is invalid")
     @Test
     void getRecentSellerPostsForUser_InvalidOrder_ThrowsBadRequestException() {
@@ -254,6 +249,7 @@ public class ProductServiceTest {
 
         assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
     }
+
     @DisplayName("Should throw NotFoundException when userId is null")
     @Test
     void getRecentSellerPostsForUser_NullUserId_ThrowsNotFoundException() {
@@ -268,4 +264,52 @@ public class ProductServiceTest {
 
     }
 
+    @DisplayName("Given a valid user, should return posts from followed sellers during the last two weeks")
+    @Test
+    void getRecentSellerPostsForUser_ShouldReturnSellerPostsFromLastTwoWeeks_WhenGivenValidUser() {
+        List<User> users = TestDataFactory.getSomeUsers();
+        User user = users.get(0);
+
+        Set<Integer> followedUserIds = user.getFollowing().stream()
+                .map(Follow::getUserId)
+                .collect(Collectors.toSet());
+
+        List<User> followedUsers = users.stream()
+                .filter(u -> followedUserIds.contains(u.getUserId()))
+                .toList();
+
+        List<PostDto> recentPostDtos = new ArrayList<>();
+        for (User seguido : followedUsers) {
+            for (Post post : seguido.getPost()) {
+                if (TestDataFactory.isRecent(post.getDate())) {
+                    recentPostDtos
+                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                }
+            }
+        }
+
+        Collections.sort(recentPostDtos, (p1, p2) -> {
+            LocalDate date1 = LocalDate.parse(p1.getDate(), DateTimeFormatter.ISO_LOCAL_DATE);
+            LocalDate date2 = LocalDate.parse(p2.getDate(), DateTimeFormatter.ISO_LOCAL_DATE);
+            return date2.compareTo(date1);
+        });
+
+        FollowingPostDto expectedResponse = new FollowingPostDto(user.getUserId(), recentPostDtos);
+
+        for (User followedUser : followedUsers) {
+            when(userRepository.findRecentPostsForUser(followedUser.getUserId()))
+                    .thenReturn(followedUser.getPost().stream()
+                            .filter(p -> TestDataFactory.isRecent(p.getDate()))
+                            .collect(Collectors.toSet()));
+        }
+        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act
+        FollowingPostDto result = service.getRecentSellerPostsForUser(user.getUserId(), "date_desc");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+    }
 }
