@@ -11,17 +11,23 @@ import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.IUserRepository;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 
-    @Autowired
-    private IUserRepository userRepository;
+
+    private final IUserRepository userRepository;
 
     @Override
     public List<UserDto> getAll() {
