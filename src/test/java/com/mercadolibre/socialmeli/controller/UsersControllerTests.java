@@ -176,7 +176,7 @@ public class UsersControllerTests {
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(expected, response.getBody());
-        verify(service).getFollowedList(user.getUserId(), order);
+        verify(service).getFollowersList(user.getUserId(), order);
     }
 
     @Test
@@ -223,4 +223,6 @@ public class UsersControllerTests {
 
         assertEquals(expected, thrown.getMessage());
     }
+
+
 }

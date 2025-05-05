@@ -188,7 +188,7 @@ public class UserServiceTests {
 
         // Assert
         verify(repository).findUserById(userId);
-      
+    }
     @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
     void testGetFollowedListAcsOrder_shouldReturnFollowedListInAscNameOrder_whenInputIsValid() {
         // Arrange

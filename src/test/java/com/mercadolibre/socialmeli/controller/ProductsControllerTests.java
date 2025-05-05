@@ -34,6 +34,24 @@ public class ProductsControllerTests {
     @InjectMocks
     private ProductsController controller;
 
+
+    @DisplayName("Should call service to get seller posts by category when valid inputs are provided")
+    @Test
+    void getSellerPostsByCategory_shouldCallServiceCorrectly_WhenUserIdAndCategoryValid() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 1;
+        FollowingPostDto mockResponse = new FollowingPostDto(userId, List.of());
+
+        when(productService.getSellerPostsForUserByCategory(userId, categoryId)).thenReturn(mockResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getSellerPostsByCategory(userId, categoryId);
+
+        // Assert
+        verify(productService).getSellerPostsForUserByCategory(userId, categoryId);
+        assertNotNull(response);
+    }
     @Test
     @DisplayName("Should return the posts sorted in ascending order by date.")
     void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_WhenOrderIsDateAsc() {
@@ -94,7 +112,6 @@ public class ProductsControllerTests {
 
         verify(productService).getRecentSellerPostsForUser(userId, order);
     }
-
 
 
 
