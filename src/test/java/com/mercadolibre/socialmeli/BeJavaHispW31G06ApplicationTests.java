@@ -23,12 +23,10 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -290,7 +288,7 @@ class BeJavaHispW31G06ApplicationTests {
 		// Arrange
 		Integer userId = 100;
 		Integer sellerId = 200;
-		String keyword = "test";
+		String keyword = "Test";
 		TestDataFactory.preloadUserFollowingSellerWithPost(userRepository, productRepository, userId, sellerId, 1);
 
 		// Act & Assert
@@ -319,10 +317,8 @@ class BeJavaHispW31G06ApplicationTests {
 				.andDo(print())
 				.andExpect(status().isNotFound())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.message", equalTo(
-						"No se encontraron publicaciones que contengan la palabra clave "
-								+ nonExistentKeyword
-								+ " para los seguidos del usuario con ID: "
-								+ userId)));
+				.andExpect(
+						jsonPath("$.message", equalTo("No se encontraron publicaciones que contengan la palabra clave '"
+								+ nonExistentKeyword + "' para los seguidos del usuario con ID: " + userId)));
 	}
 }
