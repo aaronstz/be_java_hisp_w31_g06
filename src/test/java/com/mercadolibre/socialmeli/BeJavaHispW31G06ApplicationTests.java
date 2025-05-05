@@ -5,10 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
-import com.mercadolibre.socialmeli.entity.Follow;
-import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.Product;
-import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
@@ -20,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -30,12 +25,10 @@ import java.util.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,12 +44,7 @@ class BeJavaHispW31G06ApplicationTests {
 	private UserRepositoryImpl userRepository;
 
 	@BeforeEach
-	void setUp() {
-
-		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
-
-	}
-
+	void setUp() { TestDataFactory.createSixPosts().forEach(productRepository::savePost); }
 
 	@Test
 	void testFollow() throws Exception {

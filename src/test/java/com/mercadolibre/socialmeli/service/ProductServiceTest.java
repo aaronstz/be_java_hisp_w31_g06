@@ -4,11 +4,7 @@ import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
-import com.mercadolibre.socialmeli.dto.FollowingPostDto;
-import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
-import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
@@ -16,11 +12,7 @@ import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
-import com.mercadolibre.socialmeli.util.TestDataFactory;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
@@ -35,19 +27,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.time.LocalDate;
+
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
-
-    @Mock
-    private ProductRepositoryImpl productRepository;
 
     @Mock
     private UserRepositoryImpl userRepository;

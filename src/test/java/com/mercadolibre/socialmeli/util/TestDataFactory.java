@@ -20,11 +20,6 @@ import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
 public class TestDataFactory {
 
-        // public static void setUserRepositoryForTest(UserRepositoryImpl
-        // userRepository) {
-        // userRepository.clearRepository();
-        // }
-
         private static final ObjectMapper mapper = new ObjectMapper()
                         .registerModule(new JavaTimeModule())
                         .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
@@ -33,11 +28,6 @@ public class TestDataFactory {
                 return mapper.readValue(json, new TypeReference<>() {
                 });
         }
-
-        // public static void setProductRepositoryForTest(ProductRepositoryImpl
-        // productRepository) {
-        // productRepository.clearRepository();
-        // }
 
         public static User createUserWithFollowers() {
                 List<Post> posts = createSixPosts();
@@ -181,7 +171,6 @@ public class TestDataFactory {
                         findAllPosts().clear();
                 }
         }
-        // For Category
 
         public static void preloadUserFollowingSellerWithPost(UserRepositoryImpl userRepository,
                         ProductRepositoryImpl productRepository, Integer buyerId, Integer sellerId,
