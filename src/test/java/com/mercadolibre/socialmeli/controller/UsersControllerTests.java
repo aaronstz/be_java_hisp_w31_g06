@@ -56,6 +56,25 @@ public class UsersControllerTests {
     }
 
     @Test
+    @DisplayName("Should return a success confirmation message when a user unfollows another")
+    void testUnfollow_shouldReturnConfirmationMessage_whenInputsCorrect() {
+        int userId = 1;
+        int userIdToUnFollow = 2;
+        MensajeDto expected = new MensajeDto("El usuario " + userId + " a dejado de seguir al usuario " + userIdToUnFollow);
+
+        when(service.unFollow(userId, userIdToUnFollow)).thenReturn(expected);
+
+        // Act
+        ResponseEntity<?> response = controller.unfollowUser(userId, userIdToUnFollow);
+        MensajeDto body = (MensajeDto) response.getBody();
+
+        // Assert
+        verify(service).unFollow(userId, userIdToUnFollow);
+        Assertions.assertEquals(expected, body);
+        Assertions.assertNotNull(response);
+    }
+
+    @Test
     @DisplayName("getFollowersCount .should return the number of followers of the user when the input data is valid")
     void getFollowersCount_shouldReturnCorrectFollowerCount_whenInputIsValid() {
         // Arrange
