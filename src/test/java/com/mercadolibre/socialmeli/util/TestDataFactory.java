@@ -20,11 +20,6 @@ import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 
 public class TestDataFactory {
 
-        // public static void setUserRepositoryForTest(UserRepositoryImpl
-        // userRepository) {
-        // userRepository.clearRepository();
-        // }
-
         private static final ObjectMapper mapper = new ObjectMapper()
                         .registerModule(new JavaTimeModule())
                         .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
@@ -33,11 +28,6 @@ public class TestDataFactory {
                 return mapper.readValue(json, new TypeReference<>() {
                 });
         }
-
-        // public static void setProductRepositoryForTest(ProductRepositoryImpl
-        // productRepository) {
-        // productRepository.clearRepository();
-        // }
 
         public static User createUserWithFollowers() {
                 List<Post> posts = createSixPosts();
@@ -228,5 +218,17 @@ public class TestDataFactory {
                 Follow follower4 = new Follow(400, "Jacky Sieras");
 
                 return new HashSet<>(Arrays.asList(follower1, follower2, follower3, follower4));
+        }
+
+        public static User createUserWithoutFollowersOrFollowing() {
+                List<Post> posts = createSixPosts();
+
+                User mainUser = new User(100, "Mariano Lopez", 2, new HashSet<Follow>(), new HashSet<Follow>(),
+                                Set.of(posts.get(0), posts.get(1)));
+
+                mainUser.setFollower(new HashSet<>());
+                mainUser.setFollowing(new HashSet<>());
+
+                return mainUser;
         }
 }

@@ -140,4 +140,22 @@ public class ProductsControllerTests {
         verify(productService).getRecentSellerPostsForUser(validUserId, sortOrder);
         assertNotNull(response);
     }
+
+    @DisplayName("Should call service to get seller posts filtered by that keyword when valid inputs are provided")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldInvokeServiceAndReturnFilteredPosts_WhenUserIdAndKeywordAreValid() {
+        // Arrange
+        Integer userId = 100;
+        String keyword = "shoes";
+        FollowingPostDto expectedResponse = new FollowingPostDto(userId, List.of());
+
+        when(productService.getSellerPostsForUserByKeyword(userId, keyword)).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getSellerPostsForUserByKeyword(userId, keyword);
+
+        // Assert
+        verify(productService, atLeast(1)).getSellerPostsForUserByKeyword(userId, keyword);
+        assertNotNull(response);
+    }
 }

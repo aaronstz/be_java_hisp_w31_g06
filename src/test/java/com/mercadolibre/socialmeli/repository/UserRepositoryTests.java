@@ -14,9 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -86,6 +88,49 @@ class UserRepositoryTests {
         Assertions.assertEquals(userFollowersCount - 1, userToUnfollow.getFollowersCount());
         Assertions.assertFalse(user.getFollowing().contains(unfollow));
 
+    }
+
+    @DisplayName("Given a valid user ID and keyword, should return the user's posts that contain the keyword")
+    @Test
+    void findPostsByKeyword_ShouldReturnUserPostsContainingKeyword_WhenUserIdAndKeywordAreValid() {
+        // Arrange
+        User user = repository.findAll().get(0);
+        String keyword = "Laptop";
+        Set<Post> expectedResponse = user.getPost().stream()
+                .filter(p -> p.getProduct().getProductName().contains(keyword)).collect(Collectors.toSet());
+
+        // Act
+        Set<Post> result = repository.findPostsByKeyword(user.getUserId(), keyword);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+    }
+
+    @DisplayName("Given a valid user and a non-existent keyword, should return an empty set of posts")
+    @Test
+    void findPostsByKeyword_ShouldReturnEmptySet_WhenKeywordDoesNotExist() {
+        // Arrange
+        User user = repository.findAll().get(0);
+        String keyword = "palabra clave inexistente!!!";
+        Set<Post> expectedResponse = new HashSet<>();
+
+        // Act
+        Set<Post> result = repository.findPostsByKeyword(user.getUserId(), keyword);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+    }
+
+    @DisplayName("Given a valid user and null keyword, should throw NullPointerException")
+    @Test
+    void findPostsByKeyword_ShouldThrowNullPointerException_WhenKeywordIsNull() {
+        // Arrange
+        Integer userId = 100;
+
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> repository.findPostsByKeyword(userId, null));
     }
 
 }
