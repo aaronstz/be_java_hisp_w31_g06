@@ -81,7 +81,8 @@ public class UsersControllerTests {
     }
 
     @Test
-    void testGetFollowedListAsc() {
+    @DisplayName("Should return the followed list sorted by name in ascending order")
+    void testGetFollowedList_shouldReturnFollowedListAscOrder_whenInputsAreCorrect() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> followSet = TestDataFactory.getFollowList();
@@ -100,7 +101,8 @@ public class UsersControllerTests {
     }
 
     @Test
-    void testGetFollowedListDesc() {
+    @DisplayName("Should return the followed list sorted by name in descending order")
+    void testGetFollowedList_shouldReturnFollowedListDescOrder_whenInputsAreCorrect() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> followSet = TestDataFactory.getFollowList();
@@ -119,12 +121,14 @@ public class UsersControllerTests {
     }
 
     @Test
-    void testGetFollowedListNotFound() {
+    @DisplayName("Should throw NotFound exception when user has an empty followed list")
+    void testGetFollowedList_shouldThrowNotFoundException_whenUserHasEmptyList() {
         // Arrange
-        Integer userId = 999; // ID de usuario que no tiene datos
+        Integer userId = 999;
         String order = "name_asc";
 
-        when(service.getFollowedList(userId, order)).thenThrow(new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId));
+        when(service.getFollowedList(userId, order)).thenThrow(
+                new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId));
 
         // Act & Assert
         NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
