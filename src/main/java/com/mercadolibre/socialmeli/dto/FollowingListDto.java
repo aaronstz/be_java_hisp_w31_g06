@@ -4,11 +4,15 @@ import com.mercadolibre.socialmeli.entity.Follow;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FollowingListDto {
 
     @NotNull(message = "El ID no puede estar vacío.")
