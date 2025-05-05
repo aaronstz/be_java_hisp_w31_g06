@@ -84,7 +84,7 @@ class BeJavaHispW31G06ApplicationTests {
 	}
 
 	@Test
-	@DisplayName("testUnFollow return a confirmation message when a user unfollows another")
+	@DisplayName("Should return a Conflict Exception when user tries to unfollow themselves")
 	void testUnFollow_shouldReturnConflictException_whenUserTriesToUnfollowThemselves() throws Exception {
 		int userId1 = 3;
 		int userId2 = 3;

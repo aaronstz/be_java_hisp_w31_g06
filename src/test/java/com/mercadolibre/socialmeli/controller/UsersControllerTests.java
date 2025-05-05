@@ -49,7 +49,8 @@ public class UsersControllerTests {
     }
 
     @Test
-    void testUnfollow() {
+    @DisplayName("Should return a success confirmation message when a user unfollows another")
+    void testUnfollow_shouldReturnConfirmationMessage_whenInputsCorrect() {
         int userId = 1;
         int userIdToUnFollow = 2;
         MensajeDto expected = new MensajeDto("El usuario " + userId + " a dejado de seguir al usuario " + userIdToUnFollow);

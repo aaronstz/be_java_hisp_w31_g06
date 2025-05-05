@@ -5,6 +5,7 @@ import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,7 +25,8 @@ public class UserRepositoryTests {
     }
 
     @Test
-    void testRemoveFollow() {
+    @DisplayName("This test confirms when a user did an unfollow to a user")
+    void testRemoveFollow_shouldRemoveFollowFromUser_whenInputsCorrect() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         User userToUnfollow = TestDataFactory.getUserFromId(200);
