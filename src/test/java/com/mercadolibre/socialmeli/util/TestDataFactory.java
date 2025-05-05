@@ -218,4 +218,16 @@ public class TestDataFactory {
 
                 return new HashSet<>(Arrays.asList(follower1, follower2, follower3, follower4));
         }
+
+        public static User createUserWithoutFollowersOrFollowing() {
+                List<Post> posts = createSixPosts();
+
+                User mainUser = new User(100, "Mariano Lopez", 2, new HashSet<Follow>(), new HashSet<Follow>(),
+                                Set.of(posts.get(0), posts.get(1)));
+
+                mainUser.setFollower(new HashSet<>());
+                mainUser.setFollowing(new HashSet<>());
+
+                return mainUser;
+        }
 }

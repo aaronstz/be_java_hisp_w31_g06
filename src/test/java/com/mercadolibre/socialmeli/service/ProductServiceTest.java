@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -298,5 +299,78 @@ public class ProductServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(expectedResponse, result);
+    }
+
+    @DisplayName("Given a valid user and keyword, should return seller posts from followed sellers in the last two weeks that contain the keyword")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldReturnSellerPostsFromFollowedSellersInLastTwoWeeksContainingKeyword_WhenGivenValidUserAndKeyword() {
+        // Arrange
+        List<User> users = TestDataFactory.getSomeUsers();
+        String keyword = "Smartwatch";
+
+        Set<Integer> followedUserIds = users.get(0).getFollowing().stream().map(Follow::getUserId)
+                .collect(Collectors.toSet());
+
+        List<User> followedUsers = users.stream().filter(u -> followedUserIds.contains(u.getUserId())).toList();
+
+        List<PostDto> postWithKeyword = new ArrayList<>();
+        for (User seguido : followedUsers) {
+            Set<Post> posts = new HashSet<>();
+            for (Post post : seguido.getPost()) {
+                if (post.getProduct().getProductName().contains(keyword)) {
+                    postWithKeyword
+                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                    posts.add(post);
+                }
+            }
+            when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword)).thenReturn(posts);
+        }
+
+        FollowingPostDto expectedResponse = new FollowingPostDto(users.get(0).getUserId(), postWithKeyword);
+        when(userRepository.findUserById(users.get(0).getUserId())).thenReturn(users.get(0));
+
+        // Act
+        FollowingPostDto response = service.getSellerPostsForUserByKeyword(users.get(0).getUserId(), keyword);
+
+        // Assert
+        assertNotNull(expectedResponse);
+        assertEquals(expectedResponse, response);
+    }
+
+    @DisplayName("Given a valid user and a non-existent keyword, should throw NotFoundException when retrieving seller posts")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldThrowNotFoundException_WhenKeywordDoesNotExist() {
+        // Arrange
+        List<User> users = TestDataFactory.getSomeUsers();
+        User user = users.get(0);
+        String keyword = "Palabra clave inexistente!!!";
+
+        Set<Integer> followedUserIds = user.getFollowing().stream().map(Follow::getUserId).collect(Collectors.toSet());
+        List<User> followedUsers = users.stream().filter(u -> followedUserIds.contains(u.getUserId())).toList();
+
+        followedUsers.stream().forEach(seguido -> when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword))
+                .thenReturn(new HashSet<>()));
+
+        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> service.getSellerPostsForUserByKeyword(user.getUserId(), keyword));
+    }
+
+    @DisplayName("Given a valid user with no followed sellers and a valid keyword, should throw NotFoundException when retrieving seller posts")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldThrowNotFoundException_WhenUserDoesNotFollowAnySeller() {
+        // Arrange
+        List<User> users = new ArrayList<>(TestDataFactory.getSomeUsers());
+        User user = TestDataFactory.createUserWithoutFollowersOrFollowing();
+        users.add(user);
+        String keyword = "Smartwatch";
+
+        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        assertThrows(NotFoundException.class,
+                () -> service.getSellerPostsForUserByKeyword(user.getUserId(), keyword));
     }
 }
