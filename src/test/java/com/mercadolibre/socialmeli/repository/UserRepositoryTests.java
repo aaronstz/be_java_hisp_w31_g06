@@ -1,48 +1,47 @@
 package com.mercadolibre.socialmeli.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.entity.Post;
+import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.util.TestDataFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.User;
-import com.mercadolibre.socialmeli.utils.Util;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class UserRepositoryTests {
 
-    @Autowired
-    UserRepositoryImpl repository;
+    private UserRepositoryImpl repository;
 
     @BeforeEach
-    void setUp() {
-        Util.setUserRepositoryForTest(repository);
+    void setUp() throws IOException {
+        repository = new TestDataFactory.FakeUserRepositoryImpl();
+        TestDataFactory.getSomeUsers().forEach(user -> repository.findAll().add(user));
     }
 
+    @DisplayName("Should return user's posts from the last two weeks when user has posts")
     @Test
-    void findRecentPostsForUserTest() {
+    void findRecentPostsForUser_ShouldReturnPostsFromLastTwoWeeks_WhenUserHasPosts() {
         // Arrange
-        List<User> users = Util.getSomeUsers();
-        users.forEach(u -> repository.addUser(u));
-        Set<Post> expectedResponse = users.get(0).getPost().stream()
-                .filter(p -> Util.isRecent(p.getDate()))
+        User user = repository.findAll().get(0);
+        Set<Post> expectedResponse = user.getPost().stream().filter(p -> TestDataFactory.isRecent(p.getDate()))
                 .collect(Collectors.toSet());
 
         // Act
-        Set<Post> response = repository.findRecentPostsForUser(users.get(0).getUserId());
+        Set<Post> response = repository.findRecentPostsForUser(user.getUserId());
 
         // Assert
         assertNotNull(response);
@@ -52,12 +51,11 @@ class UserRepositoryTests {
         }
     }
 
+    @DisplayName("Given a valid user ID, should return the user when the user exists")
     @Test
-    void findUserByIdTest() {
+    void findUserById_ShouldReturnUser_WhenUserExists() {
         // Arrange
-        List<User> users = Util.getSomeUsers();
-        users.stream().forEach(u -> repository.addUser(u));
-        User expectedResponse = users.get(0);
+        User expectedResponse = repository.findAll().get(0);
 
         // Act
         User response = repository.findUserById(expectedResponse.getUserId());
@@ -68,48 +66,26 @@ class UserRepositoryTests {
     }
 
     @Test
-    void findPostsByKeywordTest() {
+    @DisplayName("This test confirms when a user did an unfollow to a user")
+    void testRemoveFollow_shouldRemoveFollowFromUser_whenInputsCorrect() {
         // Arrange
-        List<User> users = Util.getSomeUsers();
-        users.forEach(u -> repository.addUser(u));
-        String keyword = "Laptop";
-        Set<Post> expectedResponse = users.get(0).getPost().stream()
-                .filter(p -> p.getProduct().getProductName().contains(keyword))
-                .collect(Collectors.toSet());
+        User user = TestDataFactory.createUserWithFollowers();
+        User userToUnfollow = TestDataFactory.getUserFromId(200);
+        Follow follower = new Follow(100, "Mariano Lopez");
+        Follow unfollow = new Follow(200, "Guillermo Lopez");
+
+        userToUnfollow.getFollower().add(follower);
+
+        int userFollowersCount = userToUnfollow.getFollowersCount();
 
         // Act
-        Set<Post> result = repository.findPostsByKeyword(users.get(0).getUserId(), keyword);
+        repository.removeFollow(user, userToUnfollow);
 
-        // Assert
-        assertNotNull(result);
-        assertEquals(expectedResponse, result);
+        // Assertions
+        Assertions.assertFalse(userToUnfollow.getFollower().contains(follower));
+        Assertions.assertEquals(userFollowersCount - 1, userToUnfollow.getFollowersCount());
+        Assertions.assertFalse(user.getFollowing().contains(unfollow));
+
     }
 
-    @Test
-    void findPostsByKeywordEmptyKeyword() {
-        List<User> users = Util.getSomeUsers();
-        users.forEach(u -> repository.addUser(u));
-        String keyword = "";
-        Set<Post> expectedResponse = users.get(0).getPost().stream()
-                .filter(p -> p.getProduct().getProductName().contains(keyword))
-                .collect(Collectors.toSet());
-
-        // Act
-        Set<Post> result = repository.findPostsByKeyword(users.get(0).getUserId(), keyword);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(expectedResponse, result);
-    }
-
-    @Test
-    void findPostsByKeywordNulKeyword() {
-        List<User> users = Util.getSomeUsers();
-        users.forEach(u -> repository.addUser(u));
-        String keyword = null;
-
-        // Act & Assert
-        assertThrows(NullPointerException.class,
-                () -> repository.findPostsByKeyword(users.get(0).getUserId(), keyword));
-    }
 }

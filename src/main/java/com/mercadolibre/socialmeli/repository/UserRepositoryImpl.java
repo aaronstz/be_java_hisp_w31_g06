@@ -31,10 +31,7 @@ public class UserRepositoryImpl implements IUserRepository {
         return listOfUsers;
     }
 
-    @Override
-    public void addUser(User user) {
-        listOfUsers.add(user);
-    }
+
 
     @Override
     public void saveFollow(Integer userId, Integer userIdToFollow) {
@@ -208,8 +205,4 @@ public class UserRepositoryImpl implements IUserRepository {
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public void clearRepository() {
-        listOfUsers.clear();
-    }
 }

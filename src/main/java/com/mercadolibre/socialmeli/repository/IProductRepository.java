@@ -12,5 +12,4 @@ public interface IProductRepository {
     Boolean saveProduct(Product product);
     List<Post> getAllPromos();
     List<Post> findPromosBySeller(Integer userId);
-    void clearRepository();
 }

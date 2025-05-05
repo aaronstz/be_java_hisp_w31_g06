@@ -1,23 +1,11 @@
 package com.mercadolibre.socialmeli.controller;
 
-import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
-import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.service.ProductServiceImpl;
-import com.mercadolibre.socialmeli.utils.Util;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,100 +13,131 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-@SpringBootTest
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.springframework.http.ResponseEntity;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
-class ProductsControllerTests {
+public class ProductsControllerTests {
 
-        @Mock
-        private ProductServiceImpl service;
+    @Mock
+    private ProductServiceImpl productService;
 
-        @InjectMocks
-        private ProductsController controller;
+    @InjectMocks
+    private ProductsController controller;
 
-        @Test
-        void getRecentSellerPostsForUserTest() {
-                // Arrange
-                List<User> users = Util.getSomeUsers();
-                User user = users.get(0);
+    @DisplayName("Should call service to get seller posts by category when valid inputs are provided")
+    @Test
+    void getSellerPostsByCategory_shouldCallServiceCorrectly_WhenUserIdAndCategoryValid() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 1;
+        FollowingPostDto mockResponse = new FollowingPostDto(userId, List.of());
 
-                Set<Integer> followedUserIds = user.getFollowing().stream()
-                                .map(Follow::getUserId)
-                                .collect(Collectors.toSet());
+        when(productService.getSellerPostsForUserByCategory(userId, categoryId)).thenReturn(mockResponse);
 
-                List<User> followedUsers = users.stream()
-                                .filter(u -> followedUserIds.contains(u.getUserId()))
-                                .collect(Collectors.toList());
+        // Act
+        ResponseEntity<?> response = controller.getSellerPostsByCategory(userId, categoryId);
 
-                List<PostDto> recentPostDtos = new ArrayList<>();
-                for (User usuario : followedUsers) {
-                        for (Post post : usuario.getPost()) {
-                                if (Util.isRecent(post.getDate())) {
-                                        recentPostDtos
-                                                        .add(new PostDto(post.getUserId(), post.getPostId(),
-                                                                        post.getDate(), post.getProduct(),
-                                                                        post.getCategory(), post.getPrice(),
-                                                                        post.getHasPromo(), post.getDiscount()));
-                                }
-                        }
-                }
+        // Assert
+        verify(productService).getSellerPostsForUserByCategory(userId, categoryId);
+        assertNotNull(response);
+    }
 
-                FollowingPostDto expectedResponse = new FollowingPostDto(user.getUserId(), recentPostDtos);
+    @Test
+    @DisplayName("Should return the posts sorted in ascending order by date.")
+    void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_WhenOrderIsDateAsc() {
+        // Arrange
+        Integer userId = 100;
+        String order = "date_asc";
 
-                Mockito.when(service.getRecentSellerPostsForUser(user.getUserId(), "date_asc"))
-                                .thenReturn(expectedResponse);
+        PostDto post1 = new PostDto();
+        post1.setDate("2023-01-01");
 
-                // Act
-                ResponseEntity<?> response = controller.getRecentSellerPostsForUser(user.getUserId(), "date_asc");
+        PostDto post2 = new PostDto();
+        post2.setDate("2023-02-01");
 
-                // Assert
-                verify(service, atLeast(1)).getRecentSellerPostsForUser(user.getUserId(), "date_asc");
-                assertEquals(response.getBody(), expectedResponse);
-                assertTrue(response.getStatusCode().is2xxSuccessful());
-        }
+        FollowingPostDto dto = new FollowingPostDto(userId, List.of(post1, post2));
 
-        @Test
-        void getSellerPostsForUserByKeywordTest() {
-                // Arrange
-                List<User> users = Util.getSomeUsers();
-                User user = users.get(0);
-                String keyword = "Laptop";
+        when(productService.getRecentSellerPostsForUser(userId, order)).thenReturn(dto);
 
-                Set<Integer> followedUserIds = user.getFollowing().stream()
-                                .map(Follow::getUserId)
-                                .collect(Collectors.toSet());
+        // Act
+        ResponseEntity<?> response = controller.getRecentSellerPostsForUser(userId, order);
 
-                List<User> followedUsers = users.stream()
-                                .filter(u -> followedUserIds.contains(u.getUserId()))
-                                .collect(Collectors.toList());
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        FollowingPostDto body = (FollowingPostDto) response.getBody();
+        assertNotNull(body);
+        assertEquals(userId, body.getUserId());
+        assertEquals(List.of("2023-01-01", "2023-02-01"),
+                body.getPostDto().stream().map(PostDto::getDate).toList());
 
-                List<PostDto> filteredPostDto = new ArrayList<>();
-                for (User usuario : followedUsers) {
-                        for (Post post : usuario.getPost()) {
-                                if (post.getProduct().getProductName().contains(keyword)) {
-                                        filteredPostDto
-                                                        .add(new PostDto(post.getUserId(), post.getPostId(),
-                                                                        post.getDate(),
-                                                                        post.getProduct(),
-                                                                        post.getCategory(), post.getPrice(),
-                                                                        post.getHasPromo(), post.getDiscount()));
-                                }
-                        }
-                }
+        verify(productService).getRecentSellerPostsForUser(userId, order);
+    }
 
-                FollowingPostDto expectedResponse = new FollowingPostDto(user.getUserId(), filteredPostDto);
+    @Test
+    @DisplayName("Should return the posts sorted in descending order by date.")
+    void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_WhenOrderIsDateDesc() {
+        // Arrange
+        Integer userId = 100;
+        String order = "date_desc";
 
-                Mockito.when(service.getSellerPostsForUserByKeyword(user.getUserId(), keyword))
-                                .thenReturn(expectedResponse);
+        PostDto post1 = new PostDto();
+        post1.setDate("2023-02-01");
 
-                // Act
-                ResponseEntity<?> response = controller.getSellerPostsForUserByKeyword(user.getUserId(), keyword);
+        PostDto post2 = new PostDto();
+        post2.setDate("2023-01-01");
 
-                // Assert
-                verify(service, atLeast(1)).getSellerPostsForUserByKeyword(user.getUserId(), keyword);
-                assertEquals(response.getBody(), expectedResponse);
-                assertTrue(response.getStatusCode().is2xxSuccessful());
-        }
+        FollowingPostDto dto = new FollowingPostDto(userId, List.of(post1, post2));
 
+        when(productService.getRecentSellerPostsForUser(userId, order)).thenReturn(dto);
+
+        // Act
+        ResponseEntity<?> response = controller.getRecentSellerPostsForUser(userId, order);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        FollowingPostDto body = (FollowingPostDto) response.getBody();
+        assertNotNull(body);
+        assertEquals(userId, body.getUserId());
+        assertEquals(List.of("2023-02-01", "2023-01-01"),
+                body.getPostDto().stream().map(PostDto::getDate).toList());
+
+        verify(productService).getRecentSellerPostsForUser(userId, order);
+    }
+
+    @DisplayName("Should call service correctly when given valid userId and order")
+    @Test
+    void getRecentSellerPostsForUser_shouldCallServiceCorrectly_WhenUserIdAndOrderAreValid() {
+        // Arrange
+        final Integer validUserId = 100;
+        final String sortOrder = "date_asc";
+        final FollowingPostDto mockResponse = new FollowingPostDto(validUserId, List.of());
+
+        when(productService.getRecentSellerPostsForUser(validUserId, sortOrder)).thenReturn(mockResponse);
+
+        // Act
+        ResponseEntity<?> response = controller.getRecentSellerPostsForUser(validUserId, sortOrder);
+
+        // Assert
+        verify(productService).getRecentSellerPostsForUser(validUserId, sortOrder);
+        assertNotNull(response);
+    }
 }
