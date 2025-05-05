@@ -1,8 +1,12 @@
 package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
+import com.mercadolibre.socialmeli.dto.FollowingListDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
+import com.mercadolibre.socialmeli.dto.UserListDto;
+import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.service.UserServiceImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +17,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -93,7 +100,127 @@ public class UsersControllerTests {
         assertNotNull(response);
     }
 
+    @Test
+    @DisplayName("Should return the followed list sorted by name in ascending order")
+    void testGetFollowedList_shouldReturnFollowedListAscOrder_whenInputsAreCorrect() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> followSet = TestDataFactory.getFollowList();
+        FollowingListDto expected = new FollowingListDto(user.getUserId(), user.getUserName(), followSet);
+        String order = "name_asc";
 
+        when(service.getFollowedList(user.getUserId(), order)).thenReturn(expected);
 
+        // Act
+        ResponseEntity<FollowingListDto> response = controller.getFollowedList(user.getUserId(), order);
 
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(expected, response.getBody());
+        verify(service).getFollowedList(user.getUserId(), order);
+    }
+
+    @Test
+    @DisplayName("Should return the followed list sorted by name in descending order")
+    void testGetFollowedList_shouldReturnFollowedListDescOrder_whenInputsAreCorrect() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> followSet = TestDataFactory.getFollowList();
+        FollowingListDto expected = new FollowingListDto(user.getUserId(), user.getUserName(), followSet);
+        String order = "name_desc";
+
+        when(service.getFollowedList(user.getUserId(), order)).thenReturn(expected);
+
+        // Act
+        ResponseEntity<FollowingListDto> response = controller.getFollowedList(user.getUserId(), order);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(expected, response.getBody());
+        verify(service).getFollowedList(user.getUserId(), order);
+    }
+
+    @Test
+    @DisplayName("Should throw NotFound exception when user has an empty followed list")
+    void testGetFollowedList_shouldThrowNotFoundException_whenUserHasEmptyList() {
+        // Arrange
+        Integer userId = 999;
+        String order = "name_asc";
+
+        when(service.getFollowedList(userId, order)).thenThrow(
+                new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId));
+
+        // Act & Assert
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
+            controller.getFollowedList(userId, order);
+        });
+
+        assertEquals("No se encontraron seguidos para el usuario con ID: " + userId, thrown.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return the followers list sorted by name in ascending order")
+    void testGetFollowersList_shouldReturnFollowersListAscOrder_whenInputsAreCorrect() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> followSet = TestDataFactory.getFollowList();
+
+        UserListDto expected = new UserListDto(user.getUserId(), user.getUserName(), followSet);
+        String order = "name_asc";
+
+        when(service.getFollowersList(user.getUserId(), order)).thenReturn(expected);
+
+        // Act
+        ResponseEntity<UserListDto> response = controller.getFollowersList(user.getUserId(), order);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(expected, response.getBody());
+        verify(service).getFollowedList(user.getUserId(), order);
+    }
+
+    @Test
+    @DisplayName("Should return the followers list sorted by name in descending order")
+    void testGetFollowersList_shouldReturnFollowersListDescOrder_whenInputsAreCorrect() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+
+        Set<Follow> followSet = TestDataFactory.getFollowList();
+        List<Follow> followList = new ArrayList<>(followSet);
+        Collections.reverse(followList);
+        Set<Follow> reversedFollowSet = new LinkedHashSet<>(followList);
+
+        UserListDto expected = new UserListDto(user.getUserId(), user.getUserName(), reversedFollowSet);
+        String order = "name_desc";
+
+        when(service.getFollowersList(user.getUserId(), order)).thenReturn(expected);
+
+        // Act
+        ResponseEntity<UserListDto> response = controller.getFollowersList(user.getUserId(), order);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(expected, response.getBody());
+        verify(service).getFollowersList(user.getUserId(), order);
+    }
+
+    @Test
+    @DisplayName("Should throw NotFound exception when user has an empty followed list")
+    void testGetFollowersList_shouldThrowNotFoundException_whenUserHasEmptyList() {
+        // Arrange
+        Integer userId = 999;
+        String order = "name_asc";
+
+        String expected = "No se encontraron seguidores para el usuario con ID: " + userId;
+
+        when(service.getFollowersList(userId, order)).thenThrow(
+                new NotFoundException("No se encontraron seguidores para el usuario con ID: " + userId));
+
+        // Act & Assert
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
+            controller.getFollowersList(userId, order);
+        });
+
+        assertEquals(expected, thrown.getMessage());
+    }
 }
