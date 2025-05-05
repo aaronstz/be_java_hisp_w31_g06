@@ -3,17 +3,16 @@ package com.mercadolibre.socialmeli.repository;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,12 +22,47 @@ public class ProductRepositoryTests {
 
     private ProductRepositoryImpl repository;
 
+    private UserRepositoryImpl userRepository;
     @BeforeEach
     void setUp() throws IOException {
         repository = new TestDataFactory.FakeProductRepositoryImpl();
         TestDataFactory.createSixPosts().forEach(repository::savePost);
         TestDataFactory.createSixProducts().forEach(repository::saveProduct);
+        userRepository = new TestDataFactory.FakeUserRepositoryImpl();
+userRepository.findAll().addAll(TestDataFactory.getSomeUsers());
     }
+
+    @DisplayName("Should return posts filtered by category when valid userId and category are provided")
+    @Test
+    void findPostsByFollowedUsersAndCategory_shouldReturnPosts_WhenUserIdAndCategoryValid() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 1;
+
+        // Act
+        Set<Post> result = userRepository.findPostsByFollowedUsersAndCategory(userId, categoryId);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.stream().allMatch(post -> post.getCategory().equals(categoryId)));
+    }
+
+    @DisplayName("Should return empty set when no posts match the given category")
+    @Test
+    void findPostsByFollowedUsersAndCategory_shouldReturnEmpty_WhenNoPostsMatchCategory() {
+        // Arrange
+        Integer userId = 100;
+        Integer nonExistentCategory = 99;
+
+        // Act
+        Set<Post> result = userRepository.findPostsByFollowedUsersAndCategory(userId, nonExistentCategory);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+
     @DisplayName("Should return only posts with valid promotions when promotions exist")
     @Test
     void getAllPromos_shouldReturnValidPromos_WhenPostHavePromotions() {

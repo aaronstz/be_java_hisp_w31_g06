@@ -1,19 +1,35 @@
 package com.mercadolibre.socialmeli.service;
 
+import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
+import com.mercadolibre.socialmeli.entity.Post;
+import com.mercadolibre.socialmeli.entity.User;
+import com.mercadolibre.socialmeli.entity.Follow;
+import com.mercadolibre.socialmeli.exception.BadRequestException;
+import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
+import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
+import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,80 +38,335 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProductServiceTest {
 
     @Mock
-    private ProductRepositoryImpl repository;
+    private UserRepositoryImpl userRepository;
 
     @InjectMocks
     private ProductServiceImpl service;
 
+    @DisplayName("Should return posts filtered by category when valid userId and category are provided")
     @Test
-    @DisplayName("Should sort posts in ascendant order")
-    void orderPosts_dateAsc_shouldSortCorrectly() {
-        LocalDate date1 = LocalDate.of(2023, 10, 25);
-        LocalDate date2 = LocalDate.of(2023, 10, 26);
-        LocalDate date3 = LocalDate.of(2023, 10, 24);
+    void getSellerPostsForUserByCategory_shouldReturnPosts_WhenUserIdAndCategoryValid() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 1;
 
-        PostDto post1 = new PostDto();
-        post1.setDate(date1);
-        PostDto post2 = new PostDto();
-        post2.setDate(date2);
-        PostDto post3 = new PostDto();
-        post3.setDate(date3);
+        User user = TestDataFactory.createUserWithFollowers();
+        Post matchingPost = TestDataFactory.createSixPosts().get(0);
 
-        List<PostDto> sortedPosts = service.orderPosts(List.of(post1, post2, post3), "date_asc");
+        when(userRepository.findPostsByFollowedUsersAndCategory(userId, categoryId)).thenReturn(Set.of(matchingPost));
 
-        assertEquals(date3, sortedPosts.get(0).getDate());
-        assertEquals(date1, sortedPosts.get(1).getDate());
-        assertEquals(date2, sortedPosts.get(2).getDate());
+        // Act
+        FollowingPostDto result = service.getSellerPostsForUserByCategory(userId, categoryId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals(1, result.getPostDto().size());
+        assertEquals(categoryId, result.getPostDto().get(0).getCategory());
+
+        verify(userRepository).findPostsByFollowedUsersAndCategory(userId, categoryId);
+    }
+
+    @DisplayName("Should throw BadRequestException when category is invalid (zero)")
+    @Test
+    void getSellerPostsForUserByCategory_shouldThrowBadRequest_WhenCategoryIsZero() {
+        // Arrange
+        Integer userId = 100;
+
+        // Act & Assert
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> service.getSellerPostsForUserByCategory(userId, 0));
+
+        assertEquals("Debe proporcionar una categoría válida.", exception.getMessage());
+    }
+
+    @DisplayName("Should throw NotFoundException when no posts found for category")
+    @Test
+    void getSellerPostsForUserByCategory_shouldThrowNotFound_WhenNoPostsFound() {
+        // Arrange
+        Integer userId = 100;
+        Integer categoryId = 99;
+
+        User user = TestDataFactory.createUserWithFollowers();
+        when(userRepository.findPostsByFollowedUsersAndCategory(userId, categoryId)).thenReturn(Set.of());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> service.getSellerPostsForUserByCategory(userId, categoryId));
+
+        assertEquals("No se encontraron publicaciones para la categoría proporcionada.", exception.getMessage());
+
+        verify(userRepository).findPostsByFollowedUsersAndCategory(userId, categoryId);
     }
 
     @Test
-    @DisplayName("Should sort posts in descendant order")
-    void orderPosts_dateDesc_shouldSortCorrectly() {
-        LocalDate date1 = LocalDate.of(2023, 10, 25);
-        LocalDate date2 = LocalDate.of(2023, 10, 26);
-        LocalDate date3 = LocalDate.of(2023, 10, 24);
+    @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in ascending order by date.")
+    void getRecentSellerPostsForUser_shouldReturnPostsInAscendingOrder_whenOrderIsAscending() {
+        // Arrange
+        String order = "date_asc";
+        User userExpected = TestDataFactory.createUserWithFollowers();
+        Set<Post> recentPosts = userExpected.getPost();
+        List<Post> recentPostsList = new ArrayList<>(recentPosts);
 
-        PostDto post1 = new PostDto();
-        post1.setDate(date1);
-        PostDto post2 = new PostDto();
-        post2.setDate(date2);
-        PostDto post3 = new PostDto();
-        post3.setDate(date3);
+        Integer userId = userExpected.getUserId();
 
-        List<PostDto> sortedPosts = service.orderPosts(List.of(post1, post2, post3), "date_desc");
+        Set<Post> postsForUser300 = new LinkedHashSet<>();
+        postsForUser300.add(recentPostsList.get(0));
 
-        assertEquals(date2, sortedPosts.get(0).getDate());
-        assertEquals(date1, sortedPosts.get(1).getDate());
-        assertEquals(date3, sortedPosts.get(2).getDate());
+        Set<Post> postsForUser301 = new LinkedHashSet<>();
+        postsForUser301.add(recentPostsList.get(1));
+        when(userRepository.findUserById(userId)).thenReturn(userExpected);
+        when(userRepository.findRecentPostsForUser(300)).thenReturn(postsForUser300);
+        when(userRepository.findRecentPostsForUser(301)).thenReturn(postsForUser301);
+
+        // Act
+        FollowingPostDto followingPostDto = service.getRecentSellerPostsForUser(userId, order);
+        // Assert
+        List<LocalDate> fechasExpected = recentPosts.stream()
+                .map(Post::getDate)
+                .sorted()
+                .toList();
+
+        List<LocalDate> fechas = followingPostDto.getPostDto().stream()
+                .map(PostDto::getDate)
+                .toList();
+
+        assertFalse(fechas.isEmpty());
+        assertEquals(fechasExpected.size(), fechas.size());
+        assertEquals(fechasExpected, fechas);
+        verify(userRepository).findUserById(userExpected.getUserId());
+        verify(userRepository).findRecentPostsForUser(300);
+        verify(userRepository).findRecentPostsForUser(301);
     }
 
     @Test
-    @DisplayName("Should return empty list if there are no posts")
-    void orderPosts_emptyList_shouldReturnEmptyList() {
-        List<PostDto> posts = List.of();
-        List<PostDto> sortedPosts = service.orderPosts(posts, "date_asc");
-        assertEquals(0, sortedPosts.size());
+    @DisplayName("getRecentSellerPostsForUser Should return the posts sorted in descending order by date.")
+    void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending() {
+        // Arrange
+        String order = "date_desc";
+        User userExpected = TestDataFactory.createUserWithFollowers();
+        Set<Post> recentPosts = userExpected.getPost();
+        List<Post> recentPostsList = new ArrayList<>(recentPosts);
+
+        Integer userId = userExpected.getUserId();
+
+        Set<Post> postsForUser300 = new LinkedHashSet<>();
+        postsForUser300.add(recentPostsList.get(0));
+
+        Set<Post> postsForUser301 = new LinkedHashSet<>();
+        postsForUser301.add(recentPostsList.get(1));
+        when(userRepository.findUserById(userId)).thenReturn(userExpected);
+        when(userRepository.findRecentPostsForUser(300)).thenReturn(postsForUser300);
+        when(userRepository.findRecentPostsForUser(301)).thenReturn(postsForUser301);
+
+        // Act
+        FollowingPostDto followingPostDto = service.getRecentSellerPostsForUser(userId, order);
+        // Assert
+        List<LocalDate> fechasExpected = recentPosts.stream()
+                .map(Post::getDate)
+                .sorted(Comparator.reverseOrder())
+                .toList();
+
+        List<LocalDate> fechas = followingPostDto.getPostDto().stream()
+                .map(PostDto::getDate)
+                .toList();
+
+        assertFalse(fechas.isEmpty());
+        assertEquals(fechasExpected.size(), fechas.size());
+        assertEquals(fechasExpected, fechas);
+        verify(userRepository).findUserById(userExpected.getUserId());
+        verify(userRepository).findRecentPostsForUser(300);
+        verify(userRepository).findRecentPostsForUser(301);
     }
 
+    @DisplayName("Should return recent seller posts ordered when given valid userId and order")
     @Test
-    @DisplayName("Should maintain order if dates are equal")
-    void orderPosts_sameDates_shouldMaintainOrder() {
-        LocalDate date1 = LocalDate.of(2023, 10, 25);
-        LocalDate date2 = LocalDate.of(2023, 10, 25);
-        LocalDate date3 = LocalDate.of(2023, 10, 25);
+    void getRecentSellerPostsForUser_shouldReturnRecentPostsOrdered_WhenValidUserIdAndOrder() {
+        // Arrange
+        final Integer userId = 100;
+        final String order = "date_desc";
 
-        PostDto post1 = new PostDto();
-        post1.setDate(date1);
-        PostDto post2 = new PostDto();
-        post2.setDate(date2);
-        PostDto post3 = new PostDto();
-        post3.setDate(date3);
+        User user = TestDataFactory.createUserWithFollowers();
+        Post recentPost = TestDataFactory.createSixPosts().get(1); // Post reciente con promo
 
-        List<PostDto> posts = Arrays.asList(post1, post2, post3);
-        List<PostDto> sortedPosts = service.orderPosts(posts, "date_asc");
+        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(userRepository.findRecentPostsForUser(anyInt())).thenReturn(Set.of(recentPost));
 
-        assertEquals(date1, sortedPosts.get(0).getDate());
-        assertEquals(date2, sortedPosts.get(1).getDate());
-        assertEquals(date3, sortedPosts.get(2).getDate());
+        // Act
+        FollowingPostDto result = service.getRecentSellerPostsForUser(userId, order);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals(2, result.getPostDto().size());
+        assertEquals(recentPost.getPostId(), result.getPostDto().get(0).getPostId());
+
+        verify(userRepository).findUserById(userId);
+        verify(userRepository, atLeastOnce()).findRecentPostsForUser(anyInt());
+    }
+
+    @DisplayName("Should throw BadRequestException when order is invalid")
+    @Test
+    void getRecentSellerPostsForUser_InvalidOrder_ThrowsBadRequestException() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        lenient().when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> service.getRecentSellerPostsForUser(user.getUserId(), "invalid"));
+
+        assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
+
+    }
+
+    @DisplayName("Should throw BadRequestException when order is null")
+    @Test
+    void getRecentSellerPostsForUser_NullOrder_ThrowsBadRequestException() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        lenient().when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> service.getRecentSellerPostsForUser(user.getUserId(), null));
+
+        assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
+    }
+
+    @DisplayName("Should throw NotFoundException when userId is null")
+    @Test
+    void getRecentSellerPostsForUser_NullUserId_ThrowsNotFoundException() {
+        // Arrange
+        Integer userId = null;
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> service.getRecentSellerPostsForUser(userId, "date_desc"));
+
+        assertEquals("Usuario no encontrado con ID: null", exception.getMessage());
+
+    }
+
+    @DisplayName("Given a valid user, should return posts from followed sellers during the last two weeks")
+    @Test
+    void getRecentSellerPostsForUser_ShouldReturnSellerPostsFromLastTwoWeeks_WhenGivenValidUser() {
+        List<User> users = TestDataFactory.getSomeUsers();
+        User user = users.get(0);
+
+        Set<Integer> followedUserIds = user.getFollowing().stream()
+                .map(Follow::getUserId)
+                .collect(Collectors.toSet());
+
+        List<User> followedUsers = users.stream()
+                .filter(u -> followedUserIds.contains(u.getUserId()))
+                .toList();
+
+        List<PostDto> recentPostDtos = new ArrayList<>();
+        for (User seguido : followedUsers) {
+            for (Post post : seguido.getPost()) {
+                if (TestDataFactory.isRecent(post.getDate())) {
+                    recentPostDtos
+                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                }
+            }
+        }
+
+        Collections.sort(recentPostDtos, (p1, p2) -> {
+            LocalDate date1 = p1.getDate();
+            LocalDate date2 = p2.getDate();
+            return date2.compareTo(date1);
+        });
+
+        FollowingPostDto expectedResponse = new FollowingPostDto(user.getUserId(), recentPostDtos);
+
+        for (User followedUser : followedUsers) {
+            when(userRepository.findRecentPostsForUser(followedUser.getUserId()))
+                    .thenReturn(followedUser.getPost().stream()
+                            .filter(p -> TestDataFactory.isRecent(p.getDate()))
+                            .collect(Collectors.toSet()));
+        }
+        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act
+        FollowingPostDto result = service.getRecentSellerPostsForUser(user.getUserId(), "date_desc");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+    }
+
+    @DisplayName("Given a valid user and keyword, should return seller posts from followed sellers in the last two weeks that contain the keyword")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldReturnSellerPostsFromFollowedSellersInLastTwoWeeksContainingKeyword_WhenGivenValidUserAndKeyword() {
+        // Arrange
+        List<User> users = TestDataFactory.getSomeUsers();
+        String keyword = "Smartwatch";
+
+        Set<Integer> followedUserIds = users.get(0).getFollowing().stream().map(Follow::getUserId)
+                .collect(Collectors.toSet());
+
+        List<User> followedUsers = users.stream().filter(u -> followedUserIds.contains(u.getUserId())).toList();
+
+        List<PostDto> postWithKeyword = new ArrayList<>();
+        for (User seguido : followedUsers) {
+            Set<Post> posts = new HashSet<>();
+            for (Post post : seguido.getPost()) {
+                if (post.getProduct().getProductName().contains(keyword)) {
+                    postWithKeyword
+                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                    posts.add(post);
+                }
+            }
+            when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword)).thenReturn(posts);
+        }
+
+        FollowingPostDto expectedResponse = new FollowingPostDto(users.get(0).getUserId(), postWithKeyword);
+        when(userRepository.findUserById(users.get(0).getUserId())).thenReturn(users.get(0));
+
+        // Act
+        FollowingPostDto response = service.getSellerPostsForUserByKeyword(users.get(0).getUserId(), keyword);
+
+        // Assert
+        assertNotNull(expectedResponse);
+        assertEquals(expectedResponse, response);
+    }
+
+    @DisplayName("Given a valid user and a non-existent keyword, should throw NotFoundException when retrieving seller posts")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldThrowNotFoundException_WhenKeywordDoesNotExist() {
+        // Arrange
+        List<User> users = TestDataFactory.getSomeUsers();
+        User user = users.get(0);
+        String keyword = "Palabra clave inexistente!!!";
+
+        Set<Integer> followedUserIds = user.getFollowing().stream().map(Follow::getUserId).collect(Collectors.toSet());
+        List<User> followedUsers = users.stream().filter(u -> followedUserIds.contains(u.getUserId())).toList();
+
+        followedUsers.stream().forEach(seguido -> when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword))
+                .thenReturn(new HashSet<>()));
+
+        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> service.getSellerPostsForUserByKeyword(user.getUserId(), keyword));
+    }
+
+    @DisplayName("Given a valid user with no followed sellers and a valid keyword, should throw NotFoundException when retrieving seller posts")
+    @Test
+    void getSellerPostsForUserByKeyword_ShouldThrowNotFoundException_WhenUserDoesNotFollowAnySeller() {
+        // Arrange
+        List<User> users = new ArrayList<>(TestDataFactory.getSomeUsers());
+        User user = TestDataFactory.createUserWithoutFollowersOrFollowing();
+        users.add(user);
+        String keyword = "Smartwatch";
+
+        when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        assertThrows(NotFoundException.class,
+                () -> service.getSellerPostsForUserByKeyword(user.getUserId(), keyword));
     }
 }

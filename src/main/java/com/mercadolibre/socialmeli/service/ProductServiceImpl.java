@@ -107,7 +107,7 @@ public class ProductServiceImpl implements IProductService {
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
                 .map(post -> {
-                    LocalDate postDate = LocalDate.parse(post.getDate(), formatter);
+                    LocalDate postDate = post.getDate();
                     PostDto postDto = mapper.convertValue(post, PostDto.class);
                     postDto.setDate(postDate);
                     return postDto;

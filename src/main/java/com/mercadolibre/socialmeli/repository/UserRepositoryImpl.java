@@ -138,7 +138,7 @@ public class UserRepositoryImpl implements IUserRepository {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         return user.getPost().stream()
-                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(
+                .filter(p -> p.getDate().isAfter(
                         (currentDate.minusDays(14)))).collect(Collectors.toSet());
     }
 

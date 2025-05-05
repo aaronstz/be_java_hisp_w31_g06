@@ -23,7 +23,7 @@ public class Post {
     @Positive(message = "El ID debe ser mayor a 0.")
     private Integer postId;
 
-    private String date;
+    private LocalDate date;
 
     private Product product;
 
