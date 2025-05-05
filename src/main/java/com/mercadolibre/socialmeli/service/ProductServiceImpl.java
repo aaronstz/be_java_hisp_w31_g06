@@ -12,9 +12,6 @@ import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
 import com.mercadolibre.socialmeli.exception.ConflictException;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +24,11 @@ import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
 
 @Service
-@RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
-
-    private final IProductRepository productRepository;
-
-    private final IUserRepository userRepository;
+    @Autowired
+    private IProductRepository productRepository;
+    @Autowired
+    private IUserRepository userRepository;
 
     final ObjectMapper mapper = new ObjectMapper();
 
