@@ -1,15 +1,18 @@
 package com.mercadolibre.socialmeli.service;
 
-import com.mercadolibre.socialmeli.dto.FollowingPostDto;
-import com.mercadolibre.socialmeli.dto.PostDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Post;
+import com.mercadolibre.socialmeli.entity.Product;
 import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
+import com.mercadolibre.socialmeli.exception.ConflictException;
 import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,11 +20,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,7 +32,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,8 +42,55 @@ public class ProductServiceTest {
     @Mock
     private UserRepositoryImpl userRepository;
 
+    @Mock
+    private ProductRepositoryImpl productRepository;
+
     @InjectMocks
     private ProductServiceImpl service;
+
+    @Mock
+    private ObjectMapper mapper;
+
+    private CreatePostDto createPostDto;
+    private Post post;
+    private PostDto postDto;
+    private Product product;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        user = new User();
+        user.setUserId(1);
+        product = new Product();
+        product.setProductId(12345);
+
+        createPostDto = new CreatePostDto();
+        createPostDto.setUserId(user.getUserId());
+        createPostDto.setProduct(product);
+        createPostDto.setCategory(2);
+        createPostDto.setPrice(1000.0);
+        createPostDto.setHasPromo(false);
+        createPostDto.setDiscount(5.0);
+
+        post = new Post();
+        post.setUserId(user.getUserId());
+        post.setProduct(product);
+        post.setCategory(2);
+        post.setPrice(1000.0);
+        post.setHasPromo(false);
+        post.setDiscount(5.0);
+
+        postDto = new PostDto();
+        postDto.setUserId(user.getUserId());
+        postDto.setPostId(99);
+        postDto.setProduct(product);
+        postDto.setCategory(2);
+        postDto.setPrice(1000.0);
+        postDto.setHasPromo(false);
+        postDto.setDiscount(5.0);
+    }
 
     @DisplayName("Should return posts filtered by category when valid userId and category are provided")
     @Test
@@ -124,6 +173,7 @@ public class ProductServiceTest {
         // Assert
         List<LocalDate> fechasExpected = recentPosts.stream()
                 .map(Post::getDate)
+                .map(LocalDate::parse)
                 .sorted()
                 .toList();
 
@@ -164,6 +214,7 @@ public class ProductServiceTest {
         // Assert
         List<LocalDate> fechasExpected = recentPosts.stream()
                 .map(Post::getDate)
+                .map(LocalDate::parse)
                 .sorted(Comparator.reverseOrder())
                 .toList();
 
@@ -222,14 +273,29 @@ public class ProductServiceTest {
 
     @DisplayName("Should throw BadRequestException when order is null")
     @Test
-    void getRecentSellerPostsForUser_NullOrder_ThrowsBadRequestException() {
+    void getRecentSellerPostsForUser_NullOrder_ThrowsNotFoundException() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         lenient().when(userRepository.findUserById(user.getUserId())).thenReturn(user);
 
         // Act & Assert
-        BadRequestException exception = assertThrows(BadRequestException.class,
+        NotFoundException exception = assertThrows(NotFoundException.class,
                 () -> service.getRecentSellerPostsForUser(user.getUserId(), null));
+
+        assertEquals("El orden no puede estar vacío", exception.getMessage());
+    }
+
+    @DisplayName("Should throw BadRequestException when order is null")
+    @Test
+    void getRecentSellerPostsForUser_BadOrder_ThrowsBadRequestException() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        String badOrder = "bad order";
+        lenient().when(userRepository.findUserById(user.getUserId())).thenReturn(user);
+
+        // Act & Assert
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> service.getRecentSellerPostsForUser(user.getUserId(), badOrder));
 
         assertEquals("El orden solo puede ser 'date_asc' o 'date_desc'", exception.getMessage());
     }
@@ -265,10 +331,11 @@ public class ProductServiceTest {
         List<PostDto> recentPostDtos = new ArrayList<>();
         for (User seguido : followedUsers) {
             for (Post post : seguido.getPost()) {
-                if (TestDataFactory.isRecent(post.getDate())) {
+                if (TestDataFactory.isRecent(LocalDate.parse(post.getDate()))) {
                     recentPostDtos
-                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
-                                    post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
+                            .add(new PostDto(post.getUserId(), post.getPostId(), LocalDate.parse(post.getDate()),
+                                    post.getProduct(), post.getCategory(), post.getPrice(), post.getHasPromo(),
+                                    post.getDiscount()));
                 }
             }
         }
@@ -284,7 +351,7 @@ public class ProductServiceTest {
         for (User followedUser : followedUsers) {
             when(userRepository.findRecentPostsForUser(followedUser.getUserId()))
                     .thenReturn(followedUser.getPost().stream()
-                            .filter(p -> TestDataFactory.isRecent(p.getDate()))
+                            .filter(p -> TestDataFactory.isRecent(LocalDate.parse(p.getDate())))
                             .collect(Collectors.toSet()));
         }
         when(userRepository.findUserById(user.getUserId())).thenReturn(user);
@@ -315,7 +382,7 @@ public class ProductServiceTest {
             for (Post post : seguido.getPost()) {
                 if (post.getProduct().getProductName().contains(keyword)) {
                     postWithKeyword
-                            .add(new PostDto(post.getUserId(), post.getPostId(), post.getDate(), post.getProduct(),
+                            .add(new PostDto(post.getUserId(), post.getPostId(), LocalDate.parse(post.getDate()), post.getProduct(),
                                     post.getCategory(), post.getPrice(), post.getHasPromo(), post.getDiscount()));
                     posts.add(post);
                 }
@@ -369,4 +436,151 @@ public class ProductServiceTest {
         assertThrows(NotFoundException.class,
                 () -> service.getSellerPostsForUserByKeyword(user.getUserId(), keyword));
     }
+
+    @Test
+    void getRecentSellerPostsForUser_shouldReturn_NotFoundException() {
+        Integer badId = 2391;
+        String order = "date_desc";
+
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> service.getRecentSellerPostsForUser(badId, order));
+
+        assertEquals("Usuario no encontrado con ID: " + badId, ex.getMessage());
+    }
+
+    @Test
+    void testGetPromoPostCount_UserNotFound() {
+        Integer userId = 1;
+        when(userRepository.findUserById(userId)).thenReturn(null);
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.getPromoPostCount(userId);
+        });
+        assertEquals("No se encontró un usuario con ID: 1", exception.getMessage());
+    }
+
+    @Test
+    void testGetPromoPostCount_NoPosts() {
+        Integer userId = 1;
+        User user = new User();
+        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(userRepository.findRecentPostsForUser(userId)).thenReturn(Collections.emptySet());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.getPromoPostCount(userId);
+        });
+        assertEquals("No se encontraron publicaciones para el usuario con ID 1", exception.getMessage());
+    }
+
+    @Test
+    void testGetPromoPostCount_WithPromoPosts() {
+        Integer userId = 1;
+        User user = new User();
+        user.setUserName("User1");
+        Set<Post> posts = new HashSet<>();
+        Post post1 = new Post();
+        post1.setHasPromo(true);
+        posts.add(post1);
+
+        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(userRepository.findRecentPostsForUser(userId)).thenReturn(posts);
+
+        PromoPostCountDto result = service.getPromoPostCount(userId);
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals("User1", result.getUserName());
+        assertEquals(1, result.getPromoProductsCount());
+    }
+
+    @Test
+    void testGetPromosBySeller_UserNotFound() {
+        Integer userId = 1;
+        when(userRepository.findUserById(userId)).thenReturn(null);
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.getPromosBySeller(userId);
+        });
+        assertEquals("No se encontró el usuario con id 1", exception.getMessage());
+    }
+
+    @Test
+    void testGetPromosBySeller_NoPromos() {
+        Integer userId = 1;
+        User user = new User();
+        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(productRepository.findPromosBySeller(userId)).thenReturn(Collections.emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.getPromosBySeller(userId);
+        });
+        assertEquals("No se encontraron promociones del vendedor con id 1", exception.getMessage());
+    }
+
+    @Test
+    void testGetPromosBySeller_WithPromos() {
+        Integer userId = 1;
+        User user = new User();
+        user.setUserName("Seller1");
+
+        Post promoPost = new Post();
+        List<Post> promoPosts = new ArrayList<>();
+        promoPosts.add(promoPost);
+
+        when(userRepository.findUserById(userId)).thenReturn(user);
+        when(productRepository.findPromosBySeller(userId)).thenReturn(promoPosts);
+
+        PromoPostDto result = service.getPromosBySeller(userId);
+
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals("Seller1", result.getUserName());
+        assertEquals(1, result.getPosts().size());
+    }
+
+    @Test
+    void testGetAll_NoProducts() {
+        when(productRepository.findAllProducts()).thenReturn(Collections.emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.getAll();
+        });
+        assertEquals("No se encontraron productos.", exception.getMessage());
+    }
+
+    @Test
+    void testCreatePost_Success() {
+        when(productRepository.saveProduct(post.getProduct())).thenReturn(true);
+        when(userRepository.addPostToUser(any(Post.class))).thenReturn(true);
+        doNothing().when(productRepository).savePost(post);
+        when(productRepository.findAllPosts()).thenReturn(Collections.singletonList(post));
+
+        PostDto result = service.createPost(createPostDto);
+        assertNotNull(result);
+        assertEquals(LocalDate.now(), result.getDate());
+        assertEquals(Integer.valueOf(2), result.getPostId());
+        verify(productRepository, times(1)).saveProduct(post.getProduct());
+    }
+
+    @Test
+    void testCreatePost_ProductAlreadyExists_ThrowsConflictException() {
+        when(productRepository.saveProduct(post.getProduct())).thenReturn(false);
+
+        ConflictException exception = assertThrows(ConflictException.class, () -> {
+            service.createPost(createPostDto);
+        });
+        assertEquals("Ya existe un producto con el id 12345", exception.getMessage());
+    }
+
+    @Test
+    void testCreatePost_UserNotFound_ThrowsNotFoundException() {
+        when(productRepository.saveProduct(post.getProduct())).thenReturn(true);
+        when(userRepository.addPostToUser(post)).thenReturn(false);
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            service.createPost(createPostDto);
+        });
+        assertEquals("No se encontró al usuario", exception.getMessage());
+    }
+
+
 }

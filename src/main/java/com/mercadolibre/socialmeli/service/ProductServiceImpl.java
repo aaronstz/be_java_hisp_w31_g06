@@ -86,6 +86,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
+        if (order == null) {
+            throw new NotFoundException("El orden no puede estar vacío");
+        }
         if (!order.equals("date_asc") && !order.equals("date_desc")) {
             throw new BadRequestException("El orden solo puede ser 'date_asc' o 'date_desc'");
         }
@@ -107,7 +110,7 @@ public class ProductServiceImpl implements IProductService {
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
                 .map(post -> {
-                    LocalDate postDate = post.getDate();
+                    LocalDate postDate = LocalDate.parse(post.getDate());
                     PostDto postDto = mapper.convertValue(post, PostDto.class);
                     postDto.setDate(postDate);
                     return postDto;

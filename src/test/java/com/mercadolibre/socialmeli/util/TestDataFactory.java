@@ -2,7 +2,6 @@ package com.mercadolibre.socialmeli.util;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -95,12 +94,12 @@ public class TestDataFactory {
                 List<Product> products = createSixProducts();
                 List<Post> posts = new ArrayList<Post>();
 
-                posts.add(new Post(100, 1, LocalDate.of(2023,10,10), products.get(0), 1, 1000.0, false, 0.0));
-                posts.add(new Post(100, 2, LocalDate.of(2025,4,29), products.get(1), 1, 500.0, true, 5.0));
-                posts.add(new Post(200, 3, LocalDate.of(2025,4,29), products.get(2), 2, 700.0, false, 0.0));
-                posts.add(new Post(201, 4, LocalDate.of(2023,10,13), products.get(3), 1, 200.0, false, 0.0));
-                posts.add(new Post(300, 5, LocalDate.of(2025,4,29), products.get(4), 3, 300.0, true, 10.0));
-                posts.add(new Post(301, 6, LocalDate.of(2023,10,15), products.get(5), 2, 60.0, false, 0.0));
+                posts.add(new Post(100, 1, "2023-10-10", products.get(0), 1, 1000.0, false, 0.0));
+                posts.add(new Post(100, 2, "2025-04-29", products.get(1), 1, 500.0, true, 5.0));
+                posts.add(new Post(200, 3, "2025-04-29", products.get(2), 2, 700.0, false, 0.0));
+                posts.add(new Post(201, 4, "2023-10-13", products.get(3), 1, 200.0, false, 0.0));
+                posts.add(new Post(300, 5, "2025-04-29", products.get(4), 3, 300.0, true, 10.0));
+                posts.add(new Post(301, 6, "2023-10-15", products.get(5), 2, 60.0, false, 0.0));
                 return posts;
         }
 
@@ -182,7 +181,7 @@ public class TestDataFactory {
                 Post testPost = new Post(
                                 sellerId,
                                 999,
-                                LocalDate.now(),
+                                LocalDate.now().toString(),
                                 testProduct,
                                 categoryId,
                                 1500.0,

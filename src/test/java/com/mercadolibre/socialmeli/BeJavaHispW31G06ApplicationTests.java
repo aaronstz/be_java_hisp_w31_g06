@@ -2,6 +2,7 @@ package com.mercadolibre.socialmeli;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.CreatePostDto;
 import com.mercadolibre.socialmeli.dto.FollowerCountDto;
 import com.mercadolibre.socialmeli.dto.MensajeDto;
 import com.mercadolibre.socialmeli.dto.PostDto;
@@ -25,6 +26,7 @@ import java.util.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,6 +39,8 @@ class BeJavaHispW31G06ApplicationTests {
 	@Autowired
 	private MockMvc mockMvc;
 
+	private ObjectMapper objectMapper;
+
 	@Autowired
 	private ProductRepositoryImpl productRepository;
 
@@ -44,7 +48,10 @@ class BeJavaHispW31G06ApplicationTests {
 	private UserRepositoryImpl userRepository;
 
 	@BeforeEach
-	void setUp() { TestDataFactory.createSixPosts().forEach(productRepository::savePost); }
+	void setUp() {
+		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
+		objectMapper = new ObjectMapper();
+	}
 
 	@Test
 	void testFollow() throws Exception {
@@ -277,6 +284,17 @@ class BeJavaHispW31G06ApplicationTests {
 
 		mockMvc.perform(get("/users/{userId}/followers/list", userId)
 						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@DisplayName("This test throws BadRequest exception when required fields are missing in CreatePostDto")
+	void testCreatePost_shouldReturnBadRequest_whenCreatePostDtoIsInvalid() throws Exception {
+		CreatePostDto createPostDto = new CreatePostDto();
+		createPostDto.setUserId(null);
+		mockMvc.perform(post("/post")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(createPostDto)))
 				.andExpect(status().isNotFound());
 	}
 }

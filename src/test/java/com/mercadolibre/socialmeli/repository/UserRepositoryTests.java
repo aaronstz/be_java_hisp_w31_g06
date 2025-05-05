@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,7 +40,8 @@ class UserRepositoryTests {
     void findRecentPostsForUser_ShouldReturnPostsFromLastTwoWeeks_WhenUserHasPosts() {
         // Arrange
         User user = repository.findAll().get(0);
-        Set<Post> expectedResponse = user.getPost().stream().filter(p -> TestDataFactory.isRecent(p.getDate()))
+        Set<Post> expectedResponse = user.getPost().stream().filter(p -> TestDataFactory.isRecent(LocalDate.parse(
+                p.getDate())))
                 .collect(Collectors.toSet());
 
         // Act
