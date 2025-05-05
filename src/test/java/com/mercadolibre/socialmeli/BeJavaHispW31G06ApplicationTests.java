@@ -167,7 +167,8 @@ class BeJavaHispW31G06ApplicationTests {
 	}
 
 	@Test
-	void testGetFollowedListSuccess() throws Exception {
+	@DisplayName("This test expects to return a success followed list from a user")
+	void testGetFollowedList_shouldReturnSuccess_whenCorrectInputs() throws Exception {
 		int userId = 1; // El ID del usuario para el cual estás probando
 		String order = "name_asc";
 
@@ -180,10 +181,34 @@ class BeJavaHispW31G06ApplicationTests {
 	}
 
 	@Test
-	void testGetFollowedListNotFound() throws Exception {
+	@DisplayName("This test throws NotFound exception when the UserId does not exist or is not found")
+	void testGetFollowedList_shouldThrowNotFoundException_whenUserIdIsNotFound() throws Exception {
 		int userId = 999;
 
 		mockMvc.perform(get("/users/{userId}/followed/list", userId)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@DisplayName("This test expects to return a success followers list from a user")
+	void testGetFollowersList_shouldReturnSuccess_whenInputIsCorrect() throws Exception {
+		int userId = 1;
+		String order = "name_asc";
+
+		mockMvc.perform(get("/users/{userId}/followers/list", userId)
+						.param("order", order)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.follower").isArray());
+	}
+
+	@Test
+	@DisplayName("This test throws NotFound exception when the UserId does not exist")
+	void testGetFollowersList_shouldReturnNotFoundException_whenUserIdIsNotFound() throws Exception {
+		int userId = 999;
+
+		mockMvc.perform(get("/users/{userId}/followers/list", userId)
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}

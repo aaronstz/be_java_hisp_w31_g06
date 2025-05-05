@@ -1,10 +1,7 @@
 package com.mercadolibre.socialmeli.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolibre.socialmeli.dto.FollowDto;
-import com.mercadolibre.socialmeli.dto.FollowerCountDto;
-import com.mercadolibre.socialmeli.dto.FollowingListDto;
-import com.mercadolibre.socialmeli.dto.MensajeDto;
+import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.User;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
@@ -138,7 +135,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
-    void testGetFollowedListAcsOrder_shouldReturnFollowersInAscNameOrder_whenInputIsValid() {
+    void testGetFollowedListAcsOrder_shouldReturnFollowedListInAscNameOrder_whenInputIsValid() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> follows = TestDataFactory.getFollowList();
@@ -172,7 +169,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("getFollowedList (Desc) should return the followed list of a user in desc order")
-    void testGetFollowedListDescOrder_shouldReturnFollowersInDescNameOrder_whenInputIsValid() {
+    void testGetFollowedListDescOrder_shouldReturnFollowedListInDescNameOrder_whenInputIsValid() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
         Set<Follow> follows = TestDataFactory.getFollowList();
@@ -205,7 +202,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("This test ensures that a 'NotFoundConflict' is thrown when user does not have followers")
+    @DisplayName("This test ensures that a 'NotFound' exceptions is thrown when user is not found")
     void testGetFollowedListFail_shouldReturnNotFoundFail_whenArrayNotExists(){
         // Arrange
         int userId = 999;
@@ -224,7 +221,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("This test ensures that a 'BadRequestException' is thrown when input order is invalid")
+    @DisplayName("This test ensures that a 'BadRequest' exception is thrown when input order is invalid")
     void testGetFollowedList_shouldReturnConflictFail_whenInputIsInvalid() {
         // Arrange
         User user = TestDataFactory.createUserWithFollowers();
@@ -241,4 +238,111 @@ public class UserServiceTests {
         // Assert
         Assertions.assertEquals(expected, thrown.getMessage());
     }
+
+    @Test
+    @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
+    void testGetFollowersListAcsOrder_shouldReturnFollowersInAscNameOrder_whenInputIsValid() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> follows = TestDataFactory.getFollowList();
+
+        List<Follow> followsList = new ArrayList<>(follows.stream()
+                .map(f -> {
+                    Follow follow = new Follow();
+                    follow.setUserId(f.getUserId());
+                    follow.setUserName(f.getUserName());
+                    return follow;
+                })
+                .toList());
+
+        followsList.sort(Comparator.comparing(Follow::getUserName));
+
+        // Act
+        when(repository.findFollowersList(user.getUserId())).thenReturn(follows);
+        when(repository.findUserById(user.getUserId())).thenReturn(user);
+
+        UserListDto userListDto = new UserListDto();
+        userListDto.setUserId(user.getUserId());
+        userListDto.setUserName(repository.findUserById(user.getUserId()).getUserName());
+        userListDto.setFollower(new LinkedHashSet<>(followsList));
+
+        UserListDto response = service.getFollowersList(user.getUserId(), "name_asc");
+
+        // Assert
+        verify(repository).findFollowersList(user.getUserId());
+        Assertions.assertEquals(userListDto, response);
+    }
+
+    @Test
+    @DisplayName("getFollowedList (Desc) should return the followed list of a user in asc order")
+    void testGetFollowersListDescOrder_shouldReturnFollowersInDescNameOrder_whenInputIsValid() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> follows = TestDataFactory.getFollowList();
+
+        List<Follow> followsList = new ArrayList<>(follows.stream()
+                .map(f -> {
+                    Follow follow = new Follow();
+                    follow.setUserId(f.getUserId());
+                    follow.setUserName(f.getUserName());
+                    return follow;
+                })
+                .toList());
+
+        followsList.sort(Comparator.comparing(Follow::getUserName).reversed());
+
+        // Act
+        when(repository.findFollowersList(user.getUserId())).thenReturn(follows);
+        when(repository.findUserById(user.getUserId())).thenReturn(user);
+
+        UserListDto userListDto = new UserListDto();
+        userListDto.setUserId(user.getUserId());
+        userListDto.setUserName(repository.findUserById(user.getUserId()).getUserName());
+        userListDto.setFollower(new LinkedHashSet<>(followsList));
+
+        UserListDto response = service.getFollowersList(user.getUserId(), "name_desc");
+
+        // Assert
+        verify(repository).findFollowersList(user.getUserId());
+        Assertions.assertEquals(userListDto, response);
+    }
+
+    @Test
+    @DisplayName("This test ensures that a 'NotFound' exception is thrown when user is not found")
+    void testGetFollowersListFail_shouldReturnNotFoundFail_whenArrayNotExists(){
+        // Arrange
+        int userId = 999;
+        String order = "name_asc";
+
+        String expect = "No se encontraron seguidores para el usuario con ID: " + userId;
+
+        when(repository.findFollowersList(userId)).thenReturn(null);
+        // Act
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () ->
+                service.getFollowersList(userId, order));
+
+        // Assert
+        verify(repository).findFollowersList(userId);
+        Assertions.assertEquals(expect, thrown.getMessage());
+    }
+
+    @Test
+    @DisplayName("This test ensures that a 'BadRequest' exception is thrown when input order is invalid")
+    void testGetFollowersList_shouldReturnConflictFail_whenInputIsInvalid() {
+        // Arrange
+        User user = TestDataFactory.createUserWithFollowers();
+        Set<Follow> follows = TestDataFactory.getFollowList();
+
+        String expected = "Parámetro 'order' inválido. Valores permitidos: name_asc, name_desc";
+
+        // Act
+        when(repository.findFollowersList(user.getUserId())).thenReturn(follows);
+
+        BadRequestException thrown = Assertions.assertThrows(BadRequestException.class,
+                () -> service.getFollowersList(user.getUserId(), ""));
+
+        // Assert
+        Assertions.assertEquals(expected, thrown.getMessage());
+    }
+
 }
