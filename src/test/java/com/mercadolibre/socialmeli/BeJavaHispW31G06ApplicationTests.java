@@ -44,7 +44,9 @@ class BeJavaHispW31G06ApplicationTests {
 	private UserRepositoryImpl userRepository;
 
 	@BeforeEach
-	void setUp() { TestDataFactory.createSixPosts().forEach(productRepository::savePost); }
+	void setUp() {
+		TestDataFactory.createSixPosts().forEach(productRepository::savePost);
+	}
 
 	@Test
 	void testFollow() throws Exception {
@@ -103,7 +105,7 @@ class BeJavaHispW31G06ApplicationTests {
 	@Test
 	void getAllPromotions_ShouldReturnOnlyPromoPosts_WhenCalledSuccessfully() throws Exception {
 		String responseJson = mockMvc.perform(get("/products/promotions")
-						.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$", not(empty())))
@@ -118,7 +120,6 @@ class BeJavaHispW31G06ApplicationTests {
 		assertFalse(responseList.isEmpty());
 		assertTrue(responseList.stream().allMatch(p -> p.getHasPromo() && p.getDiscount() > 0));
 	}
-
 
 	@DisplayName("getFollowersCount should return the number of followers of the user when the input data is valid")
 	@Test
@@ -146,7 +147,7 @@ class BeJavaHispW31G06ApplicationTests {
 		Integer userId = 1;
 
 		MvcResult result = mockMvc.perform(get("/products/followed/{userId}/list", userId)
-						.param("order", "date_asc"))
+				.param("order", "date_asc"))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -169,13 +170,12 @@ class BeJavaHispW31G06ApplicationTests {
 		Assertions.assertEquals(fechasOrdenadas, fechas);
 	}
 
-
 	@DisplayName("getRecentSellerPostsForUser Should return the posts sorted in descending order by date.")
 	@Test
 	void getRecentSellerPostsForUser_shouldReturnPostsInDescendingOrder_whenOrderIsDescending() throws Exception {
 		Integer userId = 3;
 		MvcResult result = mockMvc.perform(get("/products/followed/{userId}/list", userId)
-						.param("order", "date_desc"))
+				.param("order", "date_desc"))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -198,18 +198,19 @@ class BeJavaHispW31G06ApplicationTests {
 		Assertions.assertEquals(fechasOrdenadas, fechas);
 
 	}
+
 	@DisplayName("Should return posts when category exists")
 	@Test
 	void getSellerPostsByCategory_ShouldReturnPosts_WhenCategoryExists() throws Exception {
 		Integer userId = 100;
 		Integer sellerId = 200;
-		Integer filterCategory= 1;
+		Integer filterCategory = 1;
 
-
-		TestDataFactory.preloadUserFollowingSellerWithPost(userRepository,productRepository,userId,sellerId,filterCategory);
+		TestDataFactory.preloadUserFollowingSellerWithPost(userRepository, productRepository, userId, sellerId,
+				filterCategory);
 		mockMvc.perform(get("/products/followed/{userId}/filterByCategory", userId)
-						.param("filterCategory", filterCategory.toString())
-						.accept(MediaType.APPLICATION_JSON))
+				.param("filterCategory", filterCategory.toString())
+				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -217,6 +218,7 @@ class BeJavaHispW31G06ApplicationTests {
 				.andExpect(jsonPath("$.postDto.length()", greaterThan(0)))
 				.andExpect(jsonPath("$.postDto[*].category", everyItem(equalTo(filterCategory))));
 	}
+
 	@DisplayName("Should return 404 when no posts are found for given category")
 	@Test
 	void getSellerPostsByCategory_ShouldReturnNotFound_WhenNoPostsExist() throws Exception {
@@ -226,13 +228,15 @@ class BeJavaHispW31G06ApplicationTests {
 
 		// Act & Assert
 		mockMvc.perform(get("/products/followed/{userId}/filterByCategory", userId)
-						.param("filterCategory", nonExistentCategory.toString())
-						.accept(MediaType.APPLICATION_JSON))
+				.param("filterCategory", nonExistentCategory.toString())
+				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isNotFound())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.message").value("No se encontraron publicaciones para la categoría proporcionada."));
+				.andExpect(jsonPath("$.message")
+						.value("No se encontraron publicaciones para la categoría proporcionada."));
 	}
+
 	@Test
 	@DisplayName("This test expects to return a success followed list from a user")
 	void testGetFollowedList_shouldReturnSuccess_whenCorrectInputs() throws Exception {
@@ -241,8 +245,8 @@ class BeJavaHispW31G06ApplicationTests {
 
 		// Realiza la llamada GET al controlador
 		mockMvc.perform(get("/users/{userId}/followed/list", userId)
-						.param("order", order)
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("order", order)
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.followed").isArray());
 	}
@@ -253,7 +257,7 @@ class BeJavaHispW31G06ApplicationTests {
 		int userId = 999;
 
 		mockMvc.perform(get("/users/{userId}/followed/list", userId)
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 
@@ -264,8 +268,8 @@ class BeJavaHispW31G06ApplicationTests {
 		String order = "name_asc";
 
 		mockMvc.perform(get("/users/{userId}/followers/list", userId)
-						.param("order", order)
-						.contentType(MediaType.APPLICATION_JSON))
+				.param("order", order)
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.follower").isArray());
 	}
@@ -276,7 +280,49 @@ class BeJavaHispW31G06ApplicationTests {
 		int userId = 999;
 
 		mockMvc.perform(get("/users/{userId}/followers/list", userId)
-						.contentType(MediaType.APPLICATION_JSON))
+				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
+	}
+
+	@DisplayName("Given a valid user with a followed seller, when keyword exists, then it should return posts")
+	@Test
+	void getSellerPostsForUserByKeyword_ShouldReturnPosts_WhenKeywordExists() throws Exception {
+		// Arrange
+		Integer userId = 100;
+		Integer sellerId = 200;
+		String keyword = "test";
+		TestDataFactory.preloadUserFollowingSellerWithPost(userRepository, productRepository, userId, sellerId, 1);
+
+		// Act & Assert
+		mockMvc.perform(get("/products/followed/{userId}/filterByKeyword", userId)
+				.param("keyword", keyword)
+				.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.postDto").isArray())
+				.andExpect(jsonPath("$.postDto.length()", greaterThan(0)))
+				.andExpect(jsonPath("$.postDto[*].product.productName", everyItem(containsString(keyword))));
+	}
+
+	@DisplayName("Given a valid user with followed sellers, when no posts match the keyword, then should return 404 with an appropriate message")
+	@Test
+	void getSellerPostsForUserByKeyword_ShouldReturnNotFound_WhenNoPostsMatchTheKeyword() throws Exception {
+		// Arrange
+		Integer userId = 100;
+		String nonExistentKeyword = "Palabra clave inexistente!!";
+
+		// Act & Assert
+		mockMvc.perform(get("/products/followed/{userId}/filterByKeyword", userId)
+				.param("keyword", nonExistentKeyword)
+				.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message", equalTo(
+						"No se encontraron publicaciones que contengan la palabra clave "
+								+ nonExistentKeyword
+								+ " para los seguidos del usuario con ID: "
+								+ userId)));
 	}
 }
