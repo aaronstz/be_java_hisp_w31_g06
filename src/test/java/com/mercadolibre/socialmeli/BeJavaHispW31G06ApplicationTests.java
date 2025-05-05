@@ -26,7 +26,6 @@ import java.util.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -40,6 +39,7 @@ class BeJavaHispW31G06ApplicationTests {
 	private MockMvc mockMvc;
 
 	private ObjectMapper objectMapper;
+
 
 	@Autowired
 	private ProductRepositoryImpl productRepository;
@@ -285,6 +285,46 @@ class BeJavaHispW31G06ApplicationTests {
 		mockMvc.perform(get("/users/{userId}/followers/list", userId)
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
+	}
+
+	@DisplayName("Given a valid user with a followed seller, when keyword exists, then it should return posts")
+	@Test
+	void getSellerPostsForUserByKeyword_ShouldReturnPosts_WhenKeywordExists() throws Exception {
+		// Arrange
+		Integer userId = 100;
+		Integer sellerId = 200;
+		String keyword = "Test";
+		TestDataFactory.preloadUserFollowingSellerWithPost(userRepository, productRepository, userId, sellerId, 1);
+
+		// Act & Assert
+		mockMvc.perform(get("/products/followed/{userId}/filterByKeyword", userId)
+						.param("keyword", keyword)
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.postDto").isArray())
+				.andExpect(jsonPath("$.postDto.length()", greaterThan(0)))
+				.andExpect(jsonPath("$.postDto[*].product.productName", everyItem(containsString(keyword))));
+	}
+
+	@DisplayName("Given a valid user with followed sellers, when no posts match the keyword, then should return 404 with an appropriate message")
+	@Test
+	void getSellerPostsForUserByKeyword_ShouldReturnNotFound_WhenNoPostsMatchTheKeyword() throws Exception {
+		// Arrange
+		Integer userId = 100;
+		String nonExistentKeyword = "Palabra clave inexistente!!";
+
+		// Act & Assert
+		mockMvc.perform(get("/products/followed/{userId}/filterByKeyword", userId)
+						.param("keyword", nonExistentKeyword)
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(
+						jsonPath("$.message", equalTo("No se encontraron publicaciones que contengan la palabra clave '"
+								+ nonExistentKeyword + "' para los seguidos del usuario con ID: " + userId)));
 	}
 
 	@Test
