@@ -66,7 +66,8 @@ class BeJavaHispW31G06ApplicationTests {
 	}
 
 	@Test
-	void testUnFollow() throws Exception {
+	@DisplayName("testUnFollow return a confirmation message when a user unfollows another")
+	void testUnFollow_shouldReturnMessage_whenUserUnfollowsAnother() throws Exception {
 		int userId1 = 3;
 		int userId2 = 2;
 
@@ -77,6 +78,24 @@ class BeJavaHispW31G06ApplicationTests {
 		this.mockMvc.perform(put("/users/{userId}/unfollow/{userIdToUnfollow}", userId1, userId2))
 				.andDo(print())
 				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message").value(response.getMessage()))
+				.andReturn();
+	}
+
+	@Test
+	@DisplayName("testUnFollow return a confirmation message when a user unfollows another")
+	void testUnFollow_shouldReturnConflictException_whenUserTriesToUnfollowThemselves() throws Exception {
+		int userId1 = 3;
+		int userId2 = 3;
+
+		String expected = "{\"message\": \"Un usuario no puede dejar de seguirse.\"}";
+
+		MensajeDto response = new ObjectMapper().readValue(expected, MensajeDto.class);
+
+		this.mockMvc.perform(put("/users/{userId}/unfollow/{userIdToUnfollow}", userId1, userId2))
+				.andDo(print())
+				.andExpect(status().isConflict())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.message").value(response.getMessage()))
 				.andReturn();
