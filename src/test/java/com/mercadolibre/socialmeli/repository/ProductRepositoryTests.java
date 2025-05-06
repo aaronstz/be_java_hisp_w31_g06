@@ -29,7 +29,7 @@ public class ProductRepositoryTests {
         TestDataFactory.createSixPosts().forEach(repository::savePost);
         TestDataFactory.createSixProducts().forEach(repository::saveProduct);
         userRepository = new TestDataFactory.FakeUserRepositoryImpl();
-userRepository.findAll().addAll(TestDataFactory.getSomeUsers());
+        userRepository.findAll().addAll(TestDataFactory.getSomeUsers());
     }
 
     @DisplayName("Should return posts filtered by category when valid userId and category are provided")

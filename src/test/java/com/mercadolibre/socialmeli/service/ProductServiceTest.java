@@ -412,7 +412,7 @@ public class ProductServiceTest {
         Set<Integer> followedUserIds = user.getFollowing().stream().map(Follow::getUserId).collect(Collectors.toSet());
         List<User> followedUsers = users.stream().filter(u -> followedUserIds.contains(u.getUserId())).toList();
 
-        followedUsers.stream().forEach(seguido -> when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword))
+        followedUsers.forEach(seguido -> when(userRepository.findPostsByKeyword(seguido.getUserId(), keyword))
                 .thenReturn(new HashSet<>()));
 
         when(userRepository.findUserById(user.getUserId())).thenReturn(user);
@@ -438,6 +438,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when recent seller posts are not found for a user.")
     void getRecentSellerPostsForUser_shouldReturn_NotFoundException() {
         Integer badId = 2391;
         String order = "date_desc";
@@ -449,6 +450,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when the user is not found while getting promo post count.")
     void testGetPromoPostCount_UserNotFound() {
         Integer userId = 1;
         when(userRepository.findUserById(userId)).thenReturn(null);
@@ -460,6 +462,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when there are no posts for the user while getting promo post count.")
     void testGetPromoPostCount_NoPosts() {
         Integer userId = 1;
         User user = new User();
@@ -473,6 +476,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should get promo post count correctly.")
     void testGetPromoPostCount_WithPromoPosts() {
         Integer userId = 1;
         User user = new User();
@@ -493,6 +497,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when the user is not found while getting promos by seller.")
     void testGetPromosBySeller_UserNotFound() {
         Integer userId = 1;
         when(userRepository.findUserById(userId)).thenReturn(null);
@@ -504,6 +509,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when there are no promos for the seller.")
     void testGetPromosBySeller_NoPromos() {
         Integer userId = 1;
         User user = new User();
@@ -517,6 +523,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should get promos by seller correctly.")
     void testGetPromosBySeller_WithPromos() {
         Integer userId = 1;
         User user = new User();
@@ -538,6 +545,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException when no products are found while getting all.")
     void testGetAll_NoProducts() {
         when(productRepository.findAllProducts()).thenReturn(Collections.emptyList());
 
@@ -548,6 +556,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should create a post correctly.")
     void testCreatePost_Success() {
         when(productRepository.saveProduct(post.getProduct())).thenReturn(true);
         when(userRepository.addPostToUser(any(Post.class))).thenReturn(true);
@@ -562,6 +571,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw ConflictException if the product already exists while creating a post.")
     void testCreatePost_ProductAlreadyExists_ThrowsConflictException() {
         when(productRepository.saveProduct(post.getProduct())).thenReturn(false);
 
@@ -572,6 +582,7 @@ public class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw NotFoundException if the user is not found while creating a post.")
     void testCreatePost_UserNotFound_ThrowsNotFoundException() {
         when(productRepository.saveProduct(post.getProduct())).thenReturn(true);
         when(userRepository.addPostToUser(post)).thenReturn(false);
@@ -581,6 +592,7 @@ public class ProductServiceTest {
         });
         assertEquals("No se encontró al usuario", exception.getMessage());
     }
+
 
 
 }
