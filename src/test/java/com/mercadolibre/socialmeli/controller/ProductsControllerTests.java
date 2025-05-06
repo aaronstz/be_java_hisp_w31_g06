@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,10 +57,12 @@ public class ProductsControllerTests {
         String order = "date_asc";
 
         PostDto post1 = new PostDto();
-        post1.setDate("2023-01-01");
+        LocalDate date1 = LocalDate.of(2023,1,1);
+        post1.setDate(date1);
 
         PostDto post2 = new PostDto();
-        post2.setDate("2023-02-01");
+        LocalDate date2 = LocalDate.of(2023,2,1);
+        post2.setDate(date2);
 
         FollowingPostDto dto = new FollowingPostDto(userId, List.of(post1, post2));
 
@@ -73,7 +76,7 @@ public class ProductsControllerTests {
         FollowingPostDto body = (FollowingPostDto) response.getBody();
         assertNotNull(body);
         assertEquals(userId, body.getUserId());
-        assertEquals(List.of("2023-01-01", "2023-02-01"),
+        assertEquals(List.of(date1, date2),
                 body.getPostDto().stream().map(PostDto::getDate).toList());
 
         verify(productService).getRecentSellerPostsForUser(userId, order);
@@ -87,10 +90,12 @@ public class ProductsControllerTests {
         String order = "date_desc";
 
         PostDto post1 = new PostDto();
-        post1.setDate("2023-02-01");
+        LocalDate date1 = LocalDate.of(2023,2,1);
+        post1.setDate(date1);
 
         PostDto post2 = new PostDto();
-        post2.setDate("2023-01-01");
+        LocalDate date2 = LocalDate.of(2023,1,1);
+        post2.setDate(date2);
 
         FollowingPostDto dto = new FollowingPostDto(userId, List.of(post1, post2));
 
@@ -104,7 +109,7 @@ public class ProductsControllerTests {
         FollowingPostDto body = (FollowingPostDto) response.getBody();
         assertNotNull(body);
         assertEquals(userId, body.getUserId());
-        assertEquals(List.of("2023-02-01", "2023-01-01"),
+        assertEquals(List.of(date1, date2),
                 body.getPostDto().stream().map(PostDto::getDate).toList());
 
         verify(productService).getRecentSellerPostsForUser(userId, order);

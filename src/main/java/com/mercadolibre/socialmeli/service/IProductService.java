@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IProductService {
     List<ProductDto> getAll();
-    PostDto createPost(PostDto post);
+    PostDto createPost(CreatePostDto post);
     FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order);
     PromoPostCountDto getPromoPostCount(Integer userId);
     FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword);

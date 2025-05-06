@@ -66,6 +66,11 @@ public class ProductRepositoryImpl implements IProductRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void clearRepository() {
+        listOfPosts.clear();
+        listOfProducts.clear();
+    }
 
 
     private void loadDataBase() throws IOException {

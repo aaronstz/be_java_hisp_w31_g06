@@ -2,7 +2,6 @@ package com.mercadolibre.socialmeli.util;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -104,9 +103,8 @@ public class TestDataFactory {
                 return posts;
         }
 
-        public static boolean isRecent(String dateStr) {
+        public static boolean isRecent(LocalDate date) {
                 try {
-                        LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
                         LocalDate today = LocalDate.now();
                         LocalDate twoWeeksAgo = today.minusWeeks(2);
                         return !date.isBefore(twoWeeksAgo) && !date.isAfter(today);

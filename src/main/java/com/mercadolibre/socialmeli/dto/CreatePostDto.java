@@ -1,30 +1,25 @@
-package com.mercadolibre.socialmeli.entity;
+package com.mercadolibre.socialmeli.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
+import com.mercadolibre.socialmeli.entity.Product;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Data
-public class Post {
+public class CreatePostDto {
+
     @NotNull(message = "El ID no puede estar vacío.")
     @Positive(message = "El ID debe ser mayor a 0.")
     private Integer userId;
 
-    @NotNull(message = "El ID no puede estar vacío.")
-    @Positive(message = "El ID debe ser mayor a 0.")
-    private Integer postId;
+    private LocalDate date;
 
-    private String date;
-
+    @NotNull(message = "El producto no puede estar vacío.")
     private Product product;
 
     @NotNull(message = "El campo no puede estar vacío.")

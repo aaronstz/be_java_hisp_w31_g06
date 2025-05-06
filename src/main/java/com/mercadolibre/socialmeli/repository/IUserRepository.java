@@ -22,4 +22,5 @@ public interface IUserRepository {
     Set<Post> findPostsByKeyword(Integer userId, String keyword);
     Set<Post> findPostsByFollowedUsersAndCategory(Integer userId, Integer categoryId);
 
+    void clearRepository();
 }

@@ -1,9 +1,6 @@
 package com.mercadolibre.socialmeli.controller;
 
-import com.mercadolibre.socialmeli.dto.FollowingPostDto;
-import com.mercadolibre.socialmeli.dto.PostDto;
-import com.mercadolibre.socialmeli.dto.ProductDto;
-import com.mercadolibre.socialmeli.dto.PromoPostDto;
+import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.service.IProductService;
 
 import jakarta.validation.Valid;
@@ -31,18 +28,18 @@ public class ProductsController {
     }
 
     @GetMapping("/followed/{userId}/list")
-    public ResponseEntity<?> getRecentSellerPostsForUser(@PathVariable  Integer userId,
+    public ResponseEntity<FollowingPostDto> getRecentSellerPostsForUser(@PathVariable  Integer userId,
                                                          @RequestParam(defaultValue = "date_desc") String order) {
         return new ResponseEntity<>(productService.getRecentSellerPostsForUser(userId, order), HttpStatus.OK);
     }
 
     @PostMapping("/post")
-    public ResponseEntity<PostDto> createPost(@RequestBody @Valid PostDto post) {
+    public ResponseEntity<PostDto> createPost(@RequestBody @Valid CreatePostDto post) {
         return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
 
     @PostMapping("/promo-post")
-    public ResponseEntity<PostDto> createPostWithDiscount(@RequestBody @Valid PostDto post) {
+    public ResponseEntity<PostDto> createPostWithDiscount(@RequestBody @Valid CreatePostDto post) {
         return new ResponseEntity<>(productService.createPost(post), HttpStatus.OK);
     }
 

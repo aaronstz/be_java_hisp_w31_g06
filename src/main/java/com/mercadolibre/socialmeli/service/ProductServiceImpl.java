@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.exception.BadRequestException;
@@ -30,7 +32,9 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IUserRepository userRepository;
 
-    final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    ;;
 
 
     @Override
@@ -45,7 +49,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public PostDto createPost(PostDto postDto) {
+    public PostDto createPost(CreatePostDto postDto) {
         Post post = mapper.convertValue(postDto, Post.class);
 
         Boolean saved = productRepository.saveProduct(post.getProduct());
@@ -63,28 +67,29 @@ public class ProductServiceImpl implements IProductService {
         productRepository.savePost(post);
         post.setPostId(productRepository.findAllPosts().size() + 1);
 
-        return mapper.convertValue(post, PostDto.class);
+        PostDto createdPost = mapper.convertValue(post, PostDto.class);
+        createdPost.setDate(LocalDate.now());
+        return createdPost;
     }
 
-    private List<PostDto> orderPosts(List<PostDto> posts, String order) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+    public List<PostDto> orderPosts(List<PostDto> posts, String order) {
         if (order.equalsIgnoreCase("date_asc")) {
             return posts.stream()
-                    .sorted((p1, p2) -> LocalDate.parse(p1.getDate(), formatter).compareTo(LocalDate.parse(p2.getDate(),
-                            formatter)))
+                    .sorted((p1, p2) -> p1.getDate().compareTo(p2.getDate()))
+                    .collect(Collectors.toList());
+        } else {
+            return posts.stream()
+                    .sorted((p1, p2) -> p2.getDate().compareTo(p1.getDate()))
                     .collect(Collectors.toList());
         }
-        return posts.stream()
-                .sorted((p1, p2) -> LocalDate.parse(p2.getDate(), formatter).compareTo(LocalDate.parse(p1.getDate(),
-                        formatter)))
-                .collect(Collectors.toList());
     }
 
     @Override
     public FollowingPostDto getRecentSellerPostsForUser(Integer userId, String order) {
-
-        if (order == null || (!order.equals("date_asc") && !order.equals("date_desc"))) {
+        if (order == null) {
+            throw new NotFoundException("El orden no puede estar vacío");
+        }
+        if (!order.equals("date_asc") && !order.equals("date_desc")) {
             throw new BadRequestException("El orden solo puede ser 'date_asc' o 'date_desc'");
         }
 
@@ -98,13 +103,20 @@ public class ProductServiceImpl implements IProductService {
         if (followingList == null || followingList.isEmpty()) {
             throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<PostDto> allRecentPosts = followingList.stream()
-                .map(seller -> userRepository.findRecentPostsForUser(seller.getUserId()))
+                .map(s -> userRepository.findRecentPostsForUser(s.getUserId()))
                 .filter(Objects::nonNull)
                 .flatMap(Set::stream)
-                .map(post -> mapper.convertValue(post, PostDto.class))
-                .collect(Collectors.toList());
+                .map(post -> {
+                    LocalDate postDate = LocalDate.parse(post.getDate());
+                    PostDto postDto = mapper.convertValue(post, PostDto.class);
+                    postDto.setDate(postDate);
+                    return postDto;
+                })
+                .toList();
+
 
         if (allRecentPosts.isEmpty()) {
             throw new NotFoundException(

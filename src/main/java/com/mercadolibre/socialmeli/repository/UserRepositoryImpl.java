@@ -2,17 +2,21 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import com.mercadolibre.socialmeli.exception.NotFoundException;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,8 +34,6 @@ public class UserRepositoryImpl implements IUserRepository {
     public List<User> findAll() {
         return listOfUsers;
     }
-
-
 
     @Override
     public void saveFollow(Integer userId, Integer userIdToFollow) {
@@ -123,16 +125,23 @@ public class UserRepositoryImpl implements IUserRepository {
                 .filter(u -> u.getUserId().equals(userId))
                 .findFirst()
                 .orElse(null);
+
         if (user == null) {
             return null;
         }
+        return filterByDates(user);
 
+    }
+
+    private Set<Post> filterByDates(User user) {
+        LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         return user.getPost().stream()
-                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(LocalDate.now().minusDays(14)))
-                .collect(Collectors.toSet());
+                .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(
+                        (currentDate.minusDays(14)))).collect(Collectors.toSet());
     }
+
 
     @Override
     public boolean addPostToUser(Post post) {
@@ -205,4 +214,8 @@ public class UserRepositoryImpl implements IUserRepository {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public void clearRepository() {
+        listOfUsers.clear();
+    }
 }
