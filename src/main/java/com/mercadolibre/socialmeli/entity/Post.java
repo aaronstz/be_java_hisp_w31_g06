@@ -1,19 +1,12 @@
 package com.mercadolibre.socialmeli.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Date;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Getter @Setter
 public class Post {
     @NotNull(message = "El ID no puede estar vacío.")
     @Positive(message = "El ID debe ser mayor a 0.")

@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -186,6 +186,8 @@ public class UserServiceTests {
         // Assert
         verify(repository).findUserById(userId);
     }
+
+    @Test
     @DisplayName("getFollowedList (Asc) should return the followed list of a user in asc order")
     void testGetFollowedListAcsOrder_shouldReturnFollowedListInAscNameOrder_whenInputIsValid() {
         // Arrange
@@ -217,6 +219,21 @@ public class UserServiceTests {
         // Assert
         verify(repository).findFollowingList(user.getUserId());
         Assertions.assertEquals(expectedFollowingListDto, response);
+    }
+
+    @Test
+    void testFindFollowingList_shouldReturnNull_whenUserHasEmptyFollowingList() {
+        // Arrange
+        User user = new User(99, "Bombardiro Crocodilo", 0, null, new HashSet<>(), null);
+        String expected = "No se encontraron seguidos para el usuario con ID: " + user.getUserId();
+
+        // Act
+        when(repository.findFollowingList(user.getUserId())).thenReturn(new HashSet<>());
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> service.getFollowedList(user.getUserId(), "name_asc"));
+
+        // Assert
+        Assertions.assertEquals(expected, thrown.getMessage());
+        verify(repository).findFollowingList(user.getUserId());
     }
 
     @Test
@@ -422,6 +439,4 @@ public class UserServiceTests {
         // Assert
         Assertions.assertEquals(expected, thrown.getMessage());
     }
-
-
 }
