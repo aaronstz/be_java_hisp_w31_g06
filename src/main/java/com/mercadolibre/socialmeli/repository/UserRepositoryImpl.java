@@ -2,21 +2,17 @@ package com.mercadolibre.socialmeli.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolibre.socialmeli.dto.PostDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.User;
 
 import com.mercadolibre.socialmeli.exception.NotFoundException;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,11 +79,8 @@ public class UserRepositoryImpl implements IUserRepository {
         if (user == null) {
             return null;
         }
-        Set<Follow> foundFollowers = user.getFollower();
-        if (foundFollowers.isEmpty()) {
-            return null;
-        }
-        return foundFollowers;
+
+        return user.getFollower();
     }
 
     @Override
@@ -96,11 +89,8 @@ public class UserRepositoryImpl implements IUserRepository {
         if (foundUser == null) {
             return null;
         }
-        Set<Follow> foundFollowing = foundUser.getFollowing();
-        if (foundFollowing.isEmpty()) {
-            return null;
-        }
-        return foundFollowing;
+
+        return foundUser.getFollowing();
     }
 
     @Override
@@ -130,7 +120,6 @@ public class UserRepositoryImpl implements IUserRepository {
             return null;
         }
         return filterByDates(user);
-
     }
 
     private Set<Post> filterByDates(User user) {
@@ -141,7 +130,6 @@ public class UserRepositoryImpl implements IUserRepository {
                 .filter(p -> LocalDate.parse(p.getDate(), formatter).isAfter(
                         (currentDate.minusDays(14)))).collect(Collectors.toSet());
     }
-
 
     @Override
     public boolean addPostToUser(Post post) {

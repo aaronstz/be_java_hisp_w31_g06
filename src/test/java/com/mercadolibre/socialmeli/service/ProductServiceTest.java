@@ -1,5 +1,6 @@
 package com.mercadolibre.socialmeli.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.entity.Post;
@@ -12,6 +13,7 @@ import com.mercadolibre.socialmeli.exception.NotFoundException;
 import com.mercadolibre.socialmeli.repository.ProductRepositoryImpl;
 import com.mercadolibre.socialmeli.repository.UserRepositoryImpl;
 import com.mercadolibre.socialmeli.util.TestDataFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -88,8 +90,8 @@ public class ProductServiceTest {
         postDto.setProduct(product);
         postDto.setCategory(2);
         postDto.setPrice(1000.0);
-        postDto.setHasPromo(false);
-        postDto.setDiscount(5.0);
+        postDto.setHasPromo(null);
+        postDto.setDiscount(null);
     }
 
     @DisplayName("Should return posts filtered by category when valid userId and category are provided")
@@ -450,6 +452,25 @@ public class ProductServiceTest {
     }
 
     @Test
+    void getRecentSellerPostsForUser_shouldReturn_NotFoundExceptionByNotFollowingList() {
+        // Arrange
+        User user1 = TestDataFactory.getUserFromId(999);
+        String order = "date_asc";
+
+        String response = "No se encontraron seguidos para el usuario con ID: " + user1.getUserId();
+
+        // Act
+        when(userRepository.findUserById(user1.getUserId())).thenReturn(user1);
+        NotFoundException thrown = Assertions.assertThrows(NotFoundException.class,
+                () -> service.getRecentSellerPostsForUser(user1.getUserId(), order));
+
+        // Asser
+        Assertions.assertEquals(response, thrown.getMessage());
+    }
+
+
+
+    @Test
     @DisplayName("Should throw NotFoundException when the user is not found while getting promo post count.")
     void testGetPromoPostCount_UserNotFound() {
         Integer userId = 1;
@@ -546,6 +567,19 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should throw NotFoundException when no products are found while getting all.")
+    void testGetAll_GetProducts() {
+        List<ProductDto> expected = TestDataFactory.createSixProductsDto();
+        List<Product> productList = TestDataFactory.createSixProducts();
+
+        when(productRepository.findAllProducts()).thenReturn(productList);
+
+        List<ProductDto> response = service.getAll();
+
+        assertEquals(expected, response);
+    }
+
+    @Test
+    @DisplayName("Should throw NotFoundException when no products are found while getting all.")
     void testGetAll_NoProducts() {
         when(productRepository.findAllProducts()).thenReturn(Collections.emptyList());
 
@@ -568,6 +602,7 @@ public class ProductServiceTest {
         assertEquals(LocalDate.now(), result.getDate());
         assertEquals(Integer.valueOf(2), result.getPostId());
         verify(productRepository, times(1)).saveProduct(post.getProduct());
+        verify(userRepository, atLeastOnce()).addPostToUser(any(Post.class));
     }
 
     @Test
@@ -593,6 +628,17 @@ public class ProductServiceTest {
         assertEquals("No se encontró al usuario", exception.getMessage());
     }
 
+    @Test
+    void testGetAllPromos_shouldReturnNotFoundException_whenPromosNotExist() {
+        // Arrange
+        String expected = "No se encontraron promociones";
 
+        // Act
+        when(productRepository.getAllPromos()).thenReturn(new ArrayList<>());
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> service.getAllPromos());
 
+        // Assert
+        assertEquals(expected, thrown.getMessage());
+        verify(productRepository, atLeast(1)).getAllPromos();
+    }
 }

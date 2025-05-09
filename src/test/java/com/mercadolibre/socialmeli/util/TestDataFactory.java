@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mercadolibre.socialmeli.dto.PostDto;
+import com.mercadolibre.socialmeli.dto.ProductDto;
 import com.mercadolibre.socialmeli.entity.Follow;
 import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.entity.Product;
@@ -90,6 +91,37 @@ public class TestDataFactory {
                 return products;
         }
 
+        public static List<ProductDto> createSixProductsDto() {
+                List<ProductDto> products = new ArrayList<>();
+
+                ProductDto product1 = new ProductDto(1, "Laptop Inspiron", "Electronics", "Dell", "Negro",
+                        "Laptop para gaming");
+                products.add(product1);
+
+                ProductDto product2 = new ProductDto(2, "Smartphone Galaxy", "Electronics", "Samsung", "Azul",
+                        "Smartphone de alta gama");
+                products.add(product2);
+
+                ProductDto product3 = new ProductDto(3, "Tablet iPad", "Electronics", "Apple", "Plata",
+                        "Tablet con tecnología avanzada");
+                products.add(product3);
+
+                ProductDto product4 = new ProductDto(4, "Auriculares Noise Cancelling", "Audio", "Sony", "Negro",
+                        "Auriculares con cancelación de ruido");
+                products.add(product4);
+
+                ProductDto product5 = new ProductDto(5, "Smartwatch Series", "Wearables", "Apple", "Blanco",
+                        "Reloj inteligente con múltiples funciones");
+                products.add(product5);
+
+                ProductDto product6 = new ProductDto(6, "Libro 'El Quijote'", "Literatura", "Planeta", "Rojo",
+                        "Edición ilustrada");
+                products.add(product6);
+
+                return products;
+        }
+
+
         public static List<Post> createSixPosts() {
                 List<Product> products = createSixProducts();
                 List<Post> posts = new ArrayList<Post>();
@@ -117,7 +149,7 @@ public class TestDataFactory {
                 List<Post> posts = createSixPosts();
 
                 User mainUser = new User(100, "Mariano Lopez", 2, new HashSet<Follow>(), new HashSet<Follow>(),
-                                Set.of(posts.get(0), posts.get(1)));
+                                new HashSet<>(Arrays.asList(posts.get(0), posts.get(1))));
 
                 User follower1 = new User(200, "Guillermo Lopez", 0, new HashSet<Follow>(), new HashSet<Follow>(),
                                 Set.of(posts.get(2)));
@@ -227,5 +259,17 @@ public class TestDataFactory {
                 mainUser.setFollowing(new HashSet<>());
 
                 return mainUser;
+        }
+
+        public static Post getPost(int userId, int productId) {
+                Product product = new Product(productId, "Laptop Inspiron", "Electronics", "Dell", "Negro",
+                        "Laptop para gaming");
+
+                return new Post(userId, 1, "2023-10-10", product, 1, 1000.0, false, 0.0);
+        }
+
+        public static Product getProduct() {
+            return new Product(1, "Laptop Inspiron", "Electronics", "Dell", "Negro",
+                    "Laptop para gaming");
         }
 }

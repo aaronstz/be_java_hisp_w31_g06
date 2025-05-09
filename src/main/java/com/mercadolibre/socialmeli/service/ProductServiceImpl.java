@@ -93,17 +93,17 @@ public class ProductServiceImpl implements IProductService {
             throw new BadRequestException("El orden solo puede ser 'date_asc' o 'date_desc'");
         }
 
-        User user = getUserById(userId);
+        User user = userRepository.findUserById(userId);
 
-        if (user == null) {
-            throw new NotFoundException("No se encontró un usuario con ID: " + userId);
+        if(user == null) {
+            throw new NotFoundException("Usuario no encontrado con ID: " + userId);
         }
 
         Set<Follow> followingList = user.getFollowing();
+
         if (followingList == null || followingList.isEmpty()) {
             throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<PostDto> allRecentPosts = followingList.stream()
                 .map(s -> userRepository.findRecentPostsForUser(s.getUserId()))
@@ -181,7 +181,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public FollowingPostDto getSellerPostsForUserByKeyword(Integer userId, String keyword) {
-        User user = getUserById(userId);
+        User user = userRepository.findUserById(userId);
 
         Set<Follow> followingList = user.getFollowing();
         if (followingList == null || followingList.isEmpty()) {
@@ -205,11 +205,6 @@ public class ProductServiceImpl implements IProductService {
         result.setUserId(userId);
         result.setPostDto(filteredPosts);
         return result;
-    }
-
-    private User getUserById(Integer userId) {
-        return Optional.ofNullable(userRepository.findUserById(userId))
-                .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: " + userId));
     }
 
     @Override

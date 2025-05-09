@@ -9,19 +9,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -135,4 +137,103 @@ class UserRepositoryTests {
         assertThrows(NullPointerException.class, () -> repository.findPostsByKeyword(userId, null));
     }
 
+    @Test
+    @DisplayName("Should return false when user to follow doesn´t exist")
+    void userNotExisting_shouldReturnFalse_whenTryingToFollowUser() {
+        // Arrange
+        int user = 1;
+        int userToFollow = 9999;
+
+        // Act
+        boolean response   = repository.isUserAlreadyFollowing(user, userToFollow);
+
+        // Asser
+        assertFalse(response);
+    }
+
+    @Test
+    void testAddPostToUser_shouldReturnTrue_whenUserExists() {
+        Post post = TestDataFactory.getPost(100, 9999);
+
+        boolean result = repository.addPostToUser(post);
+
+        assertTrue(result);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1",
+            "2",
+            "3"
+    })
+    @DisplayName("Should return false when user not exist")
+    void testAddPostToUser_shouldReturnFalse_whenUserNotExist(int userId) {
+        // Arrange
+        Post post = TestDataFactory.getPost(userId, 1);
+
+        // Act
+        boolean result = repository.addPostToUser(post);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Verifica que la lista de usuarios está limpia antes y despues de utilizar")
+    void testClearRepository_shouldNotReturnAnything() {
+        // Arrange
+        assertFalse(repository.findAll().isEmpty());
+
+        // Act
+        repository.clearRepository();
+
+        // Assert
+        assertTrue(repository.findAll().isEmpty());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1",
+            "2",
+            "3"
+    })
+    @DisplayName("Should return null when user does not exist")
+    void testFindPostsByKeyWord_shouldReturnNull_whenUserDontExist(int userId) {
+
+        // Act
+        Set<Post> post = repository.findPostsByKeyword(userId, "");
+
+        // Assert
+        assertNull(post);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1, 1",
+            "2, 2",
+            "3, 3",
+    })
+    @DisplayName("Should return false when user does not exist")
+    void testIsFollowing_shouldReturnFalse_whenUserNotExist(int userId, int userIdToFollow){
+        // Act
+        boolean response = repository.isFollowing(userId, userIdToFollow);
+
+        // Assert
+        assertFalse(response);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1",
+            "2",
+            "3",
+    })
+    @DisplayName("Should return false when user does not exist")
+    void testFindRecentPostsForUser_shouldReturnFalse_whenUserNotExist(int userId){
+        // Act
+        Set<Post> response = repository.findRecentPostsForUser(userId);
+
+        // Assert
+        assertNull(response);
+    }
 }

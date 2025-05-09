@@ -82,6 +82,10 @@ public class UserServiceImpl implements IUserService {
         Set<Follow> foundFollowing = Optional.ofNullable(userRepository.findFollowingList(userId))
                 .orElseThrow(() -> new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId));
 
+        if(foundFollowing.isEmpty()) {
+            throw new NotFoundException("No se encontraron seguidos para el usuario con ID: " + userId);
+        }
+
         List<Follow> followedList = createFollowList(foundFollowing);
         sortFollowListByName(followedList, order);
 
