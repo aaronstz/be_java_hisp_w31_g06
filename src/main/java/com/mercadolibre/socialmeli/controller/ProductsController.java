@@ -4,9 +4,6 @@ import com.mercadolibre.socialmeli.dto.*;
 import com.mercadolibre.socialmeli.service.IProductService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

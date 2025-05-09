@@ -1,12 +1,8 @@
 package com.mercadolibre.socialmeli.controller;
 
 import com.mercadolibre.socialmeli.dto.PostDto;
-import com.mercadolibre.socialmeli.dto.ProductDto;
-import com.mercadolibre.socialmeli.entity.Follow;
-import com.mercadolibre.socialmeli.entity.Post;
 import com.mercadolibre.socialmeli.dto.FollowingPostDto;
 import com.mercadolibre.socialmeli.service.ProductServiceImpl;
-import com.mercadolibre.socialmeli.util.TestDataFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
